@@ -1,0 +1,1668 @@
+id: https://w3id.org//None
+description: TODO
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  null: http://kbase.us/
+default_prefix: null
+classes:
+  annotation:
+    aliases:
+    - Annotations
+    description: Associations between GO terms and genes or gene products.
+    slots:
+    - document_category
+    - id
+    - source
+    - type
+    - date
+    - assigned_by
+    - is_redundant_for
+    - taxon
+    - taxon_label
+    - taxon_label_searchable
+    - taxon_closure
+    - taxon_closure_label
+    - taxon_closure_label_searchable
+    - taxon_subset_closure
+    - taxon_subset_closure_label
+    - taxon_subset_closure_label_searchable
+    - secondary_taxon
+    - secondary_taxon_label
+    - secondary_taxon_label_searchable
+    - secondary_taxon_closure
+    - secondary_taxon_closure_label
+    - secondary_taxon_closure_label_searchable
+    - isa_partof_closure
+    - isa_partof_closure_label
+    - isa_partof_closure_label_searchable
+    - regulates_closure
+    - regulates_closure_label
+    - regulates_closure_label_searchable
+    - has_participant_closure
+    - has_participant_closure_label
+    - has_participant_closure_label_searchable
+    - synonym
+    - synonym_searchable
+    - bioentity
+    - bioentity_label
+    - bioentity_label_searchable
+    - bioentity_name
+    - bioentity_name_searchable
+    - bioentity_internal_id
+    - qualifier
+    - annotation_class
+    - annotation_class_label
+    - annotation_class_label_searchable
+    - aspect
+    - bioentity_isoform
+    - evidence_type
+    - evidence_type_closure
+    - evidence_with
+    - evidence_with_searchable
+    - evidence
+    - evidence_label
+    - evidence_label_searchable
+    - evidence_closure
+    - evidence_closure_label
+    - evidence_closure_label_searchable
+    - evidence_subset_closure
+    - evidence_subset_closure_label
+    - evidence_subset_closure_label_searchable
+    - reference
+    - reference_searchable
+    - annotation_extension_class
+    - annotation_extension_class_label
+    - annotation_extension_class_label_searchable
+    - annotation_extension_class_closure
+    - annotation_extension_class_closure_label
+    - annotation_extension_class_closure_label_searchable
+    - annotation_extension_json
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+    - geospatial_x
+    - geospatial_y
+    - geospatial_z
+  annotation_evidence_aggregate:
+    aliases:
+    - Advanced
+    description: A description of annotation evidence aggregate for GOlr and AmiGO.
+    slots:
+    - document_category
+    - id
+    - bioentity
+    - bioentity_label
+    - bioentity_label_searchable
+    - annotation_class
+    - annotation_class_label
+    - annotation_class_label_searchable
+    - evidence_type_closure
+    - evidence_with
+    - taxon
+    - taxon_label
+    - taxon_label_searchable
+    - taxon_closure
+    - taxon_closure_label
+    - taxon_closure_label_searchable
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+  bioentity:
+    aliases:
+    - Genes and gene products
+    description: Genes and gene products associated with GO terms.
+    slots:
+    - document_category
+    - id
+    - bioentity
+    - bioentity_label
+    - bioentity_label_searchable
+    - bioentity_name
+    - bioentity_name_searchable
+    - bioentity_internal_id
+    - type
+    - taxon
+    - taxon_label
+    - taxon_label_searchable
+    - taxon_closure
+    - taxon_closure_label
+    - taxon_closure_label_searchable
+    - taxon_subset_closure
+    - taxon_subset_closure_label
+    - taxon_subset_closure_label_searchable
+    - isa_partof_closure
+    - isa_partof_closure_label
+    - isa_partof_closure_label_searchable
+    - regulates_closure
+    - regulates_closure_label
+    - regulates_closure_label_searchable
+    - source
+    - annotation_class_list
+    - annotation_class_list_label
+    - synonym
+    - synonym_searchable
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+    - phylo_graph_json
+    - database_xref
+  complex_annotation:
+    aliases:
+    - Complex annotations (ALPHA)
+    description: An individual unit within LEGO. This is <strong>ALPHA</strong> software.
+    slots:
+    - document_category
+    - id
+    - annotation_unit
+    - annotation_unit_label
+    - annotation_unit_label_searchable
+    - annotation_group
+    - annotation_group_label
+    - annotation_group_label_searchable
+    - annotation_group_url
+    - enabled_by
+    - enabled_by_searchable
+    - enabled_by_label
+    - enabled_by_label_searchable
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+    - taxon
+    - taxon_label
+    - taxon_label_searchable
+    - taxon_closure
+    - taxon_closure_label
+    - taxon_closure_label_searchable
+    - function_class
+    - function_class_label
+    - function_class_label_searchable
+    - function_class_closure
+    - function_class_closure_label
+    - function_class_closure_label_searchable
+    - process_class
+    - process_class_label
+    - process_class_label_searchable
+    - process_class_closure
+    - process_class_closure_label
+    - process_class_closure_label_searchable
+    - location_list
+    - location_list_label
+    - location_list_closure
+    - location_list_closure_label
+    - owl_blob_json
+    - topology_graph_json
+  general:
+    aliases:
+    - General
+    description: A generic search document to get a general overview of everything.
+    slots:
+    - document_category
+    - id
+    - entity
+    - entity_label
+    - entity_label_searchable
+    - category
+    - general_blob
+    - general_blob_searchable
+  model_annotation:
+    aliases:
+    - GO models (ALPHA)
+    description: An individual unit within a GO-CAM. This is <strong>ALPHA</strong>
+      software.
+    slots:
+    - document_category
+    - id
+    - annotation_unit
+    - annotation_unit_label
+    - annotation_unit_label_searchable
+    - model
+    - model_label
+    - model_label_searchable
+    - model_url
+    - model_state
+    - annotation_value
+    - contributor
+    - contributor_searchable
+    - model_date
+    - model_date_searchable
+    - comment
+    - comment_searchable
+    - enabled_by
+    - enabled_by_searchable
+    - enabled_by_label
+    - enabled_by_label_searchable
+    - enabled_by_complex
+    - enabled_by_complex_searchable
+    - enabled_by_complex_label
+    - enabled_by_complex_label_searchable
+    - has_participant
+    - has_participant_searchable
+    - has_participant_label
+    - has_participant_label_searchable
+    - has_complex_participant
+    - has_complex_participant_searchable
+    - has_complex_participant_label
+    - has_complex_participant_label_searchable
+    - has_output
+    - has_output_searchable
+    - has_output_label
+    - has_output_label_searchable
+    - has_complex_output
+    - has_complex_output_searchable
+    - has_complex_output_label
+    - has_complex_output_label_searchable
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+    - taxon
+    - taxon_label
+    - taxon_label_searchable
+    - taxon_closure
+    - taxon_closure_label
+    - taxon_closure_label_searchable
+    - function_class
+    - function_class_label
+    - function_class_label_searchable
+    - function_class_closure
+    - function_class_closure_label
+    - function_class_closure_label_searchable
+    - process_class
+    - process_class_label
+    - process_class_label_searchable
+    - process_class_closure
+    - process_class_closure_label
+    - process_class_closure_label_searchable
+    - location_list
+    - location_list_label
+    - location_list_closure
+    - location_list_closure_label
+    - owl_blob_json
+    - topology_graph_json
+    - evidence_type
+    - evidence_type_closure
+    - evidence_type_label
+    - evidence_type_label_searchable
+    - evidence_type_closure_label
+    - evidence_type_closure_label_searchable
+    - evidence_with
+    - evidence_with_searchable
+    - reference
+    - reference_searchable
+    - relationship
+    - relationship_searchable
+    - relationship_label
+    - relationship_label_searchable
+  noctua_model_meta:
+    aliases:
+    - Noctua meta
+    description: A generic capture of light Noctua metadata in realtime.
+    slots:
+    - document_category
+    - id
+    - annotation_unit
+    - annotation_unit_label
+    - annotation_unit_label_searchable
+    - contributor
+    - contributor_searchable
+    - model_date
+    - model_date_searchable
+    - model_state
+    - comment
+    - comment_searchable
+    - owl_blob_json
+  ontology_class:
+    aliases:
+    - Ontology
+    description: Gene Ontology Term, Synonym, or Definition.
+    slots:
+    - document_category
+    - id
+    - annotation_class
+    - annotation_class_label
+    - annotation_class_label_searchable
+    - description
+    - description_searchable
+    - source
+    - idspace
+    - is_obsolete
+    - comment
+    - comment_searchable
+    - synonym
+    - synonym_searchable
+    - alternate_id
+    - replaced_by
+    - consider
+    - subset
+    - definition_xref
+    - database_xref
+    - isa_partof_closure
+    - isa_partof_closure_label
+    - isa_partof_closure_label_searchable
+    - isa_closure
+    - isa_closure_label
+    - isa_closure_label_searchable
+    - regulates_closure
+    - regulates_closure_label
+    - regulates_closure_label_searchable
+    - topology_graph_json
+    - regulates_transitivity_graph_json
+    - neighborhood_graph_json
+    - neighborhood_limited_graph_json
+    - only_in_taxon
+    - only_in_taxon_searchable
+    - only_in_taxon_label
+    - only_in_taxon_label_searchable
+    - only_in_taxon_closure
+    - only_in_taxon_closure_label
+    - only_in_taxon_closure_label_searchable
+    - annotation_extension_owl_json
+    - annotation_relation
+    - annotation_relation_label
+    - annotation_relation_label_searchable
+    - equivalent_class_expressions_json
+    - disjoint_class_list
+    - disjoint_class_list_label
+    - disjoint_class_list_label_searchable
+  family:
+    aliases:
+    - Protein families
+    description: Information about protein (PANTHER) families.
+    slots:
+    - document_category
+    - id
+    - panther_family
+    - panther_family_searchable
+    - panther_family_label
+    - panther_family_label_searchable
+    - phylo_graph_json
+    - bioentity_list
+    - bioentity_list_label
+  ontology_class_ac:
+    aliases:
+    - Term autocomplete
+    description: Easily find ontology classes in GO. For personality only - not a
+      schema configuration.
+    slots:
+    - document_category
+    - id
+    - annotation_class
+    - annotation_class_label
+    - annotation_class_label_searchable
+    - synonym
+    - synonym_searchable
+    - alternate_id
+slots:
+  document_category: {}
+  id:
+    description: Term acc/ID.
+    range: string
+    aliases:
+    - Acc
+    multivalued: false
+    comments: []
+  source:
+    description: 'Term namespace. In GO, this is one of: biological_process, molecular_function,
+      cellular_component. In other ontologies it is not guaranteed to be populated.
+      Consider using idspace instead for general queries.'
+    range: string
+    aliases:
+    - Ontology source
+    multivalued: false
+    comments: []
+  type:
+    description: Type class.
+    range: string
+    aliases:
+    - Type
+    multivalued: false
+    comments: []
+  date:
+    description: Date of assignment.
+    range: string
+    aliases:
+    - Date
+    multivalued: false
+    comments: []
+  assigned_by:
+    description: Annotations assigned by group.
+    range: string
+    aliases:
+    - Contributor
+    multivalued: false
+    comments: []
+  is_redundant_for:
+    description: Rational for redundancy of annotation.
+    range: string
+    aliases:
+    - Redundant for
+    multivalued: false
+    comments: []
+  taxon:
+    description: taxon of the entity in enabled_by
+    range: string
+    aliases:
+    - Taxon
+    multivalued: false
+    comments: []
+  taxon_label:
+    description: label for taxon
+    range: SearchableString
+    aliases: &id001
+    - Taxon
+    multivalued: false
+    comments: &id002 []
+  taxon_label_searchable:
+    description: label for taxon
+    range: SearchableString
+    aliases: *id001
+    multivalued: false
+    comments: *id002
+  taxon_closure:
+    description: is_a closure of taxon
+    range: string
+    aliases:
+    - Taxon (IDs)
+    multivalued: true
+    comments: []
+  taxon_closure_label:
+    description: labels of is_a closure.
+    range: SearchableString
+    aliases: &id003
+    - Taxon
+    multivalued: true
+    comments: &id004 []
+  taxon_closure_label_searchable:
+    description: labels of is_a closure.
+    range: SearchableString
+    aliases: *id003
+    multivalued: true
+    comments: *id004
+  taxon_subset_closure:
+    description: Taxonomic group (direct) and ancestral groups that are within the
+      specified subset (e.g mammalia, eukaryota).
+    range: string
+    aliases:
+    - Organism
+    multivalued: true
+    comments: []
+  taxon_subset_closure_label:
+    description: Labels for taxonomic group (direct) and ancestral groups that are
+      within the specified subset.
+    range: SearchableString
+    aliases: &id005
+    - Organism
+    multivalued: true
+    comments: &id006 []
+  taxon_subset_closure_label_searchable:
+    description: Labels for taxonomic group (direct) and ancestral groups that are
+      within the specified subset.
+    range: SearchableString
+    aliases: *id005
+    multivalued: true
+    comments: *id006
+  secondary_taxon:
+    description: Secondary taxon.
+    range: string
+    aliases:
+    - Secondary taxon
+    multivalued: false
+    comments: []
+  secondary_taxon_label:
+    description: Secondary taxon.
+    range: SearchableString
+    aliases: &id007
+    - Secondary taxon
+    multivalued: false
+    comments: &id008 []
+  secondary_taxon_label_searchable:
+    description: Secondary taxon.
+    range: SearchableString
+    aliases: *id007
+    multivalued: false
+    comments: *id008
+  secondary_taxon_closure:
+    description: Secondary taxon closure.
+    range: string
+    aliases:
+    - Secondary taxon
+    multivalued: true
+    comments: []
+  secondary_taxon_closure_label:
+    description: Secondary taxon closure.
+    range: SearchableString
+    aliases: &id009
+    - Secondary taxon
+    multivalued: true
+    comments: &id010 []
+  secondary_taxon_closure_label_searchable:
+    description: Secondary taxon closure.
+    range: SearchableString
+    aliases: *id009
+    multivalued: true
+    comments: *id010
+  isa_partof_closure:
+    description: Ancestral terms (is_a/part_of).
+    range: string
+    aliases:
+    - Is-a/part-of
+    multivalued: true
+    comments: []
+  isa_partof_closure_label:
+    description: Ancestral terms (is_a/part_of).
+    range: SearchableString
+    aliases: &id011
+    - Is-a/part-of
+    multivalued: true
+    comments: &id012 []
+  isa_partof_closure_label_searchable:
+    description: Ancestral terms (is_a/part_of).
+    range: SearchableString
+    aliases: *id011
+    multivalued: true
+    comments: *id012
+  regulates_closure:
+    description: Ancestral terms (regulates, occurs in, capable_of).
+    range: string
+    aliases:
+    - Ancestor
+    multivalued: true
+    comments: []
+  regulates_closure_label:
+    description: Ancestral terms (regulates, occurs in, capable_of).
+    range: SearchableString
+    aliases: &id013
+    - Ancestor
+    multivalued: true
+    comments: &id014 []
+  regulates_closure_label_searchable:
+    description: Ancestral terms (regulates, occurs in, capable_of).
+    range: SearchableString
+    aliases: *id013
+    multivalued: true
+    comments: *id014
+  has_participant_closure:
+    description: Closure of ids/accs over has_participant.
+    range: string
+    aliases:
+    - Has participant (IDs)
+    multivalued: true
+    comments: []
+  has_participant_closure_label:
+    description: Closure of labels over has_participant.
+    range: SearchableString
+    aliases: &id015
+    - Has participant
+    multivalued: true
+    comments: &id016 []
+  has_participant_closure_label_searchable:
+    description: Closure of labels over has_participant.
+    range: SearchableString
+    aliases: *id015
+    multivalued: true
+    comments: *id016
+  synonym:
+    description: Term synonyms.
+    range: SearchableString
+    aliases: &id017
+    - Synonyms
+    multivalued: true
+    comments: &id018 []
+  synonym_searchable:
+    description: Term synonyms.
+    range: SearchableString
+    aliases: *id017
+    multivalued: true
+    comments: *id018
+  bioentity:
+    description: Gene or gene product identifiers.
+    range: string
+    aliases:
+    - Gene/product
+    multivalued: false
+    comments: []
+  bioentity_label:
+    description: Gene or gene product identifiers.
+    range: SearchableString
+    aliases: &id019
+    - Gene/product
+    multivalued: false
+    comments: &id020 []
+  bioentity_label_searchable:
+    description: Gene or gene product identifiers.
+    range: SearchableString
+    aliases: *id019
+    multivalued: false
+    comments: *id020
+  bioentity_name:
+    description: The full name of the gene or gene product.
+    range: SearchableString
+    aliases: &id021
+    - Gene/product name
+    multivalued: false
+    comments: &id022 []
+  bioentity_name_searchable:
+    description: The full name of the gene or gene product.
+    range: SearchableString
+    aliases: *id021
+    multivalued: false
+    comments: *id022
+  bioentity_internal_id:
+    description: The bioentity ID used at the database of origin.
+    range: string
+    aliases:
+    - This should not be displayed
+    multivalued: false
+    comments: []
+  qualifier:
+    description: Annotation qualifier.
+    range: string
+    aliases:
+    - Annotation qualifier
+    multivalued: true
+    comments: []
+  annotation_class:
+    description: Term acc/ID.
+    range: string
+    aliases:
+    - Term
+    multivalued: false
+    comments: []
+  annotation_class_label:
+    description: Common term name.
+    range: SearchableString
+    aliases: &id023
+    - Term
+    multivalued: false
+    comments: &id024 []
+  annotation_class_label_searchable:
+    description: Common term name.
+    range: SearchableString
+    aliases: *id023
+    multivalued: false
+    comments: *id024
+  aspect:
+    description: Ontology aspect.
+    range: string
+    aliases:
+    - Ontology (aspect)
+    multivalued: false
+    comments: []
+  bioentity_isoform:
+    description: Biological isoform.
+    range: string
+    aliases:
+    - Isoform
+    multivalued: false
+    comments: []
+  evidence_type:
+    description: Evidence type.
+    range: string
+    aliases:
+    - Evidence
+    multivalued: false
+    comments: []
+  evidence_type_closure:
+    description: All evidence (evidence closure) for this annotation
+    range: string
+    aliases:
+    - Evidence type
+    multivalued: true
+    comments: []
+  evidence_with:
+    description: Evidence with/from.
+    range: SearchableString
+    aliases: &id025
+    - Evidence with
+    multivalued: true
+    comments: &id026 []
+  evidence_with_searchable:
+    description: Evidence with/from.
+    range: SearchableString
+    aliases: *id025
+    multivalued: true
+    comments: *id026
+  evidence:
+    description: Evidence.
+    range: string
+    aliases:
+    - Evidence
+    multivalued: false
+    comments: []
+  evidence_label:
+    description: Evidence.
+    range: SearchableString
+    aliases: &id027
+    - Evidence
+    multivalued: false
+    comments: &id028 []
+  evidence_label_searchable:
+    description: Evidence.
+    range: SearchableString
+    aliases: *id027
+    multivalued: false
+    comments: *id028
+  evidence_closure:
+    description: All evidence for this annotation.
+    range: string
+    aliases:
+    - Evidence
+    multivalued: true
+    comments: []
+  evidence_closure_label:
+    description: All evidence for this annotation.
+    range: SearchableString
+    aliases: &id029
+    - Evidence
+    multivalued: true
+    comments: &id030 []
+  evidence_closure_label_searchable:
+    description: All evidence for this annotation.
+    range: SearchableString
+    aliases: *id029
+    multivalued: true
+    comments: *id030
+  evidence_subset_closure:
+    description: All evidence for this annotation reduced to a usable subset.
+    range: string
+    aliases:
+    - Evidence
+    multivalued: true
+    comments: []
+  evidence_subset_closure_label:
+    description: All evidence for this annotation reduced to a usable subset.
+    range: SearchableString
+    aliases: &id031
+    - Evidence
+    multivalued: true
+    comments: &id032 []
+  evidence_subset_closure_label_searchable:
+    description: All evidence for this annotation reduced to a usable subset.
+    range: SearchableString
+    aliases: *id031
+    multivalued: true
+    comments: *id032
+  reference:
+    description: Database reference.
+    range: SearchableString
+    aliases: &id033
+    - Reference
+    multivalued: true
+    comments: &id034 []
+  reference_searchable:
+    description: Database reference.
+    range: SearchableString
+    aliases: *id033
+    multivalued: true
+    comments: *id034
+  annotation_extension_class:
+    description: Extension class for the annotation.
+    range: string
+    aliases:
+    - Annotation extension
+    multivalued: true
+    comments: []
+  annotation_extension_class_label:
+    description: Extension class for the annotation.
+    range: SearchableString
+    aliases: &id035
+    - Annotation extension
+    multivalued: true
+    comments: &id036 []
+  annotation_extension_class_label_searchable:
+    description: Extension class for the annotation.
+    range: SearchableString
+    aliases: *id035
+    multivalued: true
+    comments: *id036
+  annotation_extension_class_closure:
+    description: Extension class for the annotation.
+    range: string
+    aliases:
+    - Annotation extension
+    multivalued: true
+    comments: []
+  annotation_extension_class_closure_label:
+    description: Extension class for the annotation.
+    range: SearchableString
+    aliases: &id037
+    - Annotation extension
+    multivalued: true
+    comments: &id038 []
+  annotation_extension_class_closure_label_searchable:
+    description: Extension class for the annotation.
+    range: SearchableString
+    aliases: *id037
+    multivalued: true
+    comments: *id038
+  annotation_extension_json:
+    description: Extension class for the annotation (JSON).
+    range: string
+    aliases:
+    - Annotation extension
+    multivalued: true
+    comments: []
+  panther_family:
+    description: PANTHER family IDs that are associated with this entity.
+    range: SearchableString
+    aliases: &id039
+    - PANTHER family
+    multivalued: false
+    comments: &id040 []
+  panther_family_searchable:
+    description: PANTHER family IDs that are associated with this entity.
+    range: SearchableString
+    aliases: *id039
+    multivalued: false
+    comments: *id040
+  panther_family_label:
+    description: PANTHER families that are associated with this entity.
+    range: SearchableString
+    aliases: &id041
+    - PANTHER family
+    multivalued: false
+    comments: &id042 []
+  panther_family_label_searchable:
+    description: PANTHER families that are associated with this entity.
+    range: SearchableString
+    aliases: *id041
+    multivalued: false
+    comments: *id042
+  geospatial_x:
+    description: Experimental numeric type (X).
+    range: integer
+    aliases:
+    - X
+    multivalued: true
+    comments:
+    - Indexed
+  geospatial_y:
+    description: Experimental numeric type (Y).
+    range: integer
+    aliases:
+    - Y
+    multivalued: true
+    comments:
+    - Indexed
+  geospatial_z:
+    description: Experimental numeric type (Z).
+    range: integer
+    aliases:
+    - Z
+    multivalued: true
+    comments:
+    - Indexed
+  annotation_class_list:
+    description: Direct annotations.
+    range: string
+    aliases:
+    - Direct annotation
+    multivalued: true
+    comments: []
+  annotation_class_list_label:
+    description: Direct annotations.
+    range: string
+    aliases:
+    - Direct annotation
+    multivalued: true
+    comments: []
+  phylo_graph_json:
+    description: JSON blob form of the phylogenic tree.
+    range: string
+    aliases:
+    - This should not be displayed
+    multivalued: false
+    comments: []
+  database_xref:
+    description: Database cross-reference.
+    range: string
+    aliases:
+    - DB xref
+    multivalued: true
+    comments: []
+  annotation_unit:
+    description: The title(s) associated with the model.
+    range: string
+    aliases:
+    - Model identifier
+    multivalued: false
+    comments: []
+  annotation_unit_label:
+    description: The title(s) associated with the model.
+    range: SearchableString
+    aliases: &id043
+    - Model identifier
+    multivalued: false
+    comments: &id044 []
+  annotation_unit_label_searchable:
+    description: The title(s) associated with the model.
+    range: SearchableString
+    aliases: *id043
+    multivalued: false
+    comments: *id044
+  annotation_group:
+    description: ???.
+    range: string
+    aliases:
+    - Annotation group
+    multivalued: false
+    comments: []
+  annotation_group_label:
+    description: ???.
+    range: SearchableString
+    aliases: &id045
+    - Annotation group
+    multivalued: false
+    comments: &id046 []
+  annotation_group_label_searchable:
+    description: ???.
+    range: SearchableString
+    aliases: *id045
+    multivalued: false
+    comments: *id046
+  annotation_group_url:
+    description: ???.
+    range: string
+    aliases:
+    - Annotation group URL
+    multivalued: false
+    comments: []
+  enabled_by:
+    description: The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id047
+    - Enabled by
+    multivalued: false
+    comments: &id048 []
+  enabled_by_searchable:
+    description: The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id047
+    multivalued: false
+    comments: *id048
+  enabled_by_label:
+    description: Searchable label version of the gene product
+    range: SearchableString
+    aliases: &id049
+    - Enabled by label
+    multivalued: false
+    comments: &id050 []
+  enabled_by_label_searchable:
+    description: Searchable label version of the gene product
+    range: SearchableString
+    aliases: *id049
+    multivalued: false
+    comments: *id050
+  function_class:
+    description: This is the value of rdf:type for the annoton/MF instance
+    range: string
+    aliases:
+    - Function
+    multivalued: false
+    comments: []
+  function_class_label:
+    description: Common function name.
+    range: SearchableString
+    aliases: &id051
+    - Function
+    multivalued: false
+    comments: &id052 []
+  function_class_label_searchable:
+    description: Common function name.
+    range: SearchableString
+    aliases: *id051
+    multivalued: false
+    comments: *id052
+  function_class_closure:
+    description: ???
+    range: string
+    aliases:
+    - Function
+    multivalued: true
+    comments: []
+  function_class_closure_label:
+    description: ???
+    range: SearchableString
+    aliases: &id053
+    - Function
+    multivalued: true
+    comments: &id054 []
+  function_class_closure_label_searchable:
+    description: ???
+    range: SearchableString
+    aliases: *id053
+    multivalued: true
+    comments: *id054
+  process_class:
+    description: Process acc/ID.
+    range: string
+    aliases:
+    - Process
+    multivalued: false
+    comments: []
+  process_class_label:
+    description: Common process name.
+    range: SearchableString
+    aliases: &id055
+    - Process
+    multivalued: false
+    comments: &id056 []
+  process_class_label_searchable:
+    description: Common process name.
+    range: SearchableString
+    aliases: *id055
+    multivalued: false
+    comments: *id056
+  process_class_closure:
+    description: ???
+    range: string
+    aliases:
+    - Process
+    multivalued: true
+    comments: []
+  process_class_closure_label:
+    description: ???
+    range: SearchableString
+    aliases: &id057
+    - Process
+    multivalued: true
+    comments: &id058 []
+  process_class_closure_label_searchable:
+    description: ???
+    range: SearchableString
+    aliases: *id057
+    multivalued: true
+    comments: *id058
+  location_list:
+    description: ''
+    range: string
+    aliases:
+    - Location
+    multivalued: true
+    comments: []
+  location_list_label:
+    description: ''
+    range: string
+    aliases:
+    - Location
+    multivalued: true
+    comments: []
+  location_list_closure:
+    description: ''
+    range: string
+    aliases:
+    - Location
+    multivalued: true
+    comments: []
+  location_list_closure_label:
+    description: ''
+    range: string
+    aliases:
+    - Location
+    multivalued: true
+    comments: []
+  owl_blob_json:
+    description: ???
+    range: string
+    aliases:
+    - ???
+    multivalued: false
+    comments: []
+  topology_graph_json:
+    description: JSON blob form of the local stepwise topology graph. Uses various
+      relations (including regulates, occurs in, capable_of).
+    range: string
+    aliases:
+    - Topology graph (JSON)
+    multivalued: false
+    comments: []
+  entity:
+    description: The ID/label for this entity.
+    range: string
+    aliases:
+    - Entity
+    multivalued: false
+    comments: []
+  entity_label:
+    description: The label for this entity.
+    range: SearchableString
+    aliases: &id059
+    - Enity label
+    multivalued: false
+    comments: &id060 []
+  entity_label_searchable:
+    description: The label for this entity.
+    range: SearchableString
+    aliases: *id059
+    multivalued: false
+    comments: *id060
+  category:
+    description: The document category that this enitity belongs to.
+    range: string
+    aliases:
+    - Document category
+    multivalued: false
+    comments: []
+  general_blob:
+    description: A hidden searchable blob document to access this item. It should
+      contain all the goodies that we want to search for, like species(?), synonyms,
+      etc.
+    range: SearchableString
+    aliases: &id061
+    - Generic blob
+    multivalued: false
+    comments: &id062 []
+  general_blob_searchable:
+    description: A hidden searchable blob document to access this item. It should
+      contain all the goodies that we want to search for, like species(?), synonyms,
+      etc.
+    range: SearchableString
+    aliases: *id061
+    multivalued: false
+    comments: *id062
+  model:
+    description: The CURIE of the model to which the annoton belongs
+    range: string
+    aliases:
+    - Model title
+    multivalued: false
+    comments: []
+  model_label:
+    description: The dc:title of the model to which the annoton belongs
+    range: SearchableString
+    aliases: &id063
+    - Model title
+    multivalued: false
+    comments: &id064 []
+  model_label_searchable:
+    description: The dc:title of the model to which the annoton belongs
+    range: SearchableString
+    aliases: *id063
+    multivalued: false
+    comments: *id064
+  model_url:
+    description: The URI of the model to which the annoton belongs
+    range: string
+    aliases:
+    - Model URL
+    multivalued: false
+    comments: []
+  model_state:
+    description: The editorial state of the model.
+    range: string
+    aliases:
+    - State
+    multivalued: false
+    comments: []
+  annotation_value:
+    description: set of all literal values of all annotation assertions in model
+    range: string
+    aliases:
+    - Text
+    multivalued: true
+    comments: []
+  contributor:
+    description: Contributor identity.
+    range: SearchableString
+    aliases: &id065
+    - Contributor
+    multivalued: true
+    comments: &id066 []
+  contributor_searchable:
+    description: Contributor identity.
+    range: SearchableString
+    aliases: *id065
+    multivalued: true
+    comments: *id066
+  model_date:
+    description: Model last modification dates.
+    range: SearchableString
+    aliases: &id067
+    - Last modified
+    multivalued: false
+    comments: &id068 []
+  model_date_searchable:
+    description: Model last modification dates.
+    range: SearchableString
+    aliases: *id067
+    multivalued: false
+    comments: *id068
+  comment:
+    description: Term comments.
+    range: SearchableString
+    aliases: &id069
+    - Comments
+    multivalued: true
+    comments: &id070 []
+  comment_searchable:
+    description: Term comments.
+    range: SearchableString
+    aliases: *id069
+    multivalued: true
+    comments: *id070
+  enabled_by_complex:
+    description: The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id071
+    - Enabled by complex
+    multivalued: false
+    comments: &id072 []
+  enabled_by_complex_searchable:
+    description: The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id071
+    multivalued: false
+    comments: *id072
+  enabled_by_complex_label:
+    description: Searchable label version of the complex
+    range: SearchableString
+    aliases: &id073
+    - Enabled by complex label
+    multivalued: false
+    comments: &id074 []
+  enabled_by_complex_label_searchable:
+    description: Searchable label version of the complex
+    range: SearchableString
+    aliases: *id073
+    multivalued: false
+    comments: *id074
+  has_participant:
+    description: The CURIE for the ro:has_participant.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id075
+    - Has participant
+    multivalued: false
+    comments: &id076 []
+  has_participant_searchable:
+    description: The CURIE for the ro:has_participant.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id075
+    multivalued: false
+    comments: *id076
+  has_participant_label:
+    description: Searchable label version of participant entities
+    range: SearchableString
+    aliases: &id077
+    - Has participant label
+    multivalued: false
+    comments: &id078 []
+  has_participant_label_searchable:
+    description: Searchable label version of participant entities
+    range: SearchableString
+    aliases: *id077
+    multivalued: false
+    comments: *id078
+  has_complex_participant:
+    description: The CURIE for the ro:has_participant.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id079
+    - Has complex participant
+    multivalued: false
+    comments: &id080 []
+  has_complex_participant_searchable:
+    description: The CURIE for the ro:has_participant.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id079
+    multivalued: false
+    comments: *id080
+  has_complex_participant_label:
+    description: Searchable label version of participant entities
+    range: SearchableString
+    aliases: &id081
+    - Has complex participant label
+    multivalued: false
+    comments: &id082 []
+  has_complex_participant_label_searchable:
+    description: Searchable label version of participant entities
+    range: SearchableString
+    aliases: *id081
+    multivalued: false
+    comments: *id082
+  has_output:
+    description: The CURIE for the ro:has_output.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id083
+    - Has output
+    multivalued: false
+    comments: &id084 []
+  has_output_searchable:
+    description: The CURIE for the ro:has_output.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id083
+    multivalued: false
+    comments: *id084
+  has_output_label:
+    description: Searchable label version of output entities
+    range: SearchableString
+    aliases: &id085
+    - Has output label
+    multivalued: false
+    comments: &id086 []
+  has_output_label_searchable:
+    description: Searchable label version of output entities
+    range: SearchableString
+    aliases: *id085
+    multivalued: false
+    comments: *id086
+  has_complex_output:
+    description: The CURIE for the ro:has_output.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: &id087
+    - Has complex output
+    multivalued: false
+    comments: &id088 []
+  has_complex_output_searchable:
+    description: The CURIE for the ro:has_output.rdf:type value of the annoton/MF
+      individual
+    range: SearchableString
+    aliases: *id087
+    multivalued: false
+    comments: *id088
+  has_complex_output_label:
+    description: Searchable label version of output entities
+    range: SearchableString
+    aliases: &id089
+    - Has complex output label
+    multivalued: false
+    comments: &id090 []
+  has_complex_output_label_searchable:
+    description: Searchable label version of output entities
+    range: SearchableString
+    aliases: *id089
+    multivalued: false
+    comments: *id090
+  evidence_type_label:
+    description: Evidence type.
+    range: SearchableString
+    aliases: &id091
+    - Evidence
+    multivalued: false
+    comments: &id092 []
+  evidence_type_label_searchable:
+    description: Evidence type.
+    range: SearchableString
+    aliases: *id091
+    multivalued: false
+    comments: *id092
+  evidence_type_closure_label:
+    description: All evidence (evidence closure) for this annotation
+    range: SearchableString
+    aliases: &id093
+    - Evidence type
+    multivalued: true
+    comments: &id094 []
+  evidence_type_closure_label_searchable:
+    description: All evidence (evidence closure) for this annotation
+    range: SearchableString
+    aliases: *id093
+    multivalued: true
+    comments: *id094
+  relationship:
+    description: List the distinct relationship types
+    range: SearchableString
+    aliases: &id095
+    - Relationship
+    multivalued: true
+    comments: &id096 []
+  relationship_searchable:
+    description: List the distinct relationship types
+    range: SearchableString
+    aliases: *id095
+    multivalued: true
+    comments: *id096
+  relationship_label:
+    description: ''
+    range: SearchableString
+    aliases: &id097
+    - Searchable label version of relationships
+    multivalued: true
+    comments: &id098 []
+  relationship_label_searchable:
+    description: ''
+    range: SearchableString
+    aliases: *id097
+    multivalued: true
+    comments: *id098
+  description:
+    description: Term definition.
+    range: SearchableString
+    aliases: &id099
+    - Definition
+    multivalued: false
+    comments: &id100 []
+  description_searchable:
+    description: Term definition.
+    range: SearchableString
+    aliases: *id099
+    multivalued: false
+    comments: *id100
+  idspace:
+    description: Term ID space.
+    range: string
+    aliases:
+    - Ontology ID space
+    multivalued: false
+    comments: []
+  is_obsolete:
+    description: Is the term obsolete?
+    range: boolean
+    aliases:
+    - Obsoletion
+    multivalued: false
+    comments: []
+  alternate_id:
+    description: Alternate term id.
+    range: string
+    aliases:
+    - Alt ID
+    multivalued: true
+    comments: []
+  replaced_by:
+    description: Term that replaces this term.
+    range: string
+    aliases:
+    - Replaced By
+    multivalued: true
+    comments: []
+  consider:
+    description: Others terms you might want to look at.
+    range: string
+    aliases:
+    - Consider
+    multivalued: true
+    comments: []
+  subset:
+    description: Special use collections of terms.
+    range: string
+    aliases:
+    - Subset
+    multivalued: true
+    comments: []
+  definition_xref:
+    description: Definition cross-reference.
+    range: string
+    aliases:
+    - Def xref
+    multivalued: true
+    comments: []
+  isa_closure:
+    description: Ancestral terms (is_a).
+    range: string
+    aliases:
+    - Is-a
+    multivalued: true
+    comments: []
+  isa_closure_label:
+    description: Ancestral terms (is_a) labels.
+    range: SearchableString
+    aliases: &id101
+    - Is-a
+    multivalued: true
+    comments: &id102 []
+  isa_closure_label_searchable:
+    description: Ancestral terms (is_a) labels.
+    range: SearchableString
+    aliases: *id101
+    multivalued: true
+    comments: *id102
+  regulates_transitivity_graph_json:
+    description: JSON blob form of the local relation transitivity graph. Uses various
+      relations (including regulates, occurs in, capable_of).
+    range: string
+    aliases:
+    - Regulates transitivity graph (JSON)
+    multivalued: false
+    comments: []
+  neighborhood_graph_json:
+    description: JSON blob form of all immediate neighbors of the term.
+    range: string
+    aliases:
+    - Term neighborhood graph (JSON)
+    multivalued: false
+    comments: []
+  neighborhood_limited_graph_json:
+    description: JSON blob form of all immediate neighbors of the term; in the case
+      that there are too many neighbors to transport, the number will be artificially
+      reduced.
+    range: string
+    aliases:
+    - Term neighborhood limited graph (JSON)
+    multivalued: false
+    comments: []
+  only_in_taxon:
+    description: Only in taxon.
+    range: SearchableString
+    aliases: &id103
+    - Only in taxon
+    multivalued: false
+    comments: &id104 []
+  only_in_taxon_searchable:
+    description: Only in taxon.
+    range: SearchableString
+    aliases: *id103
+    multivalued: false
+    comments: *id104
+  only_in_taxon_label:
+    description: Only in taxon label.
+    range: SearchableString
+    aliases: &id105
+    - Only in taxon
+    multivalued: false
+    comments: &id106 []
+  only_in_taxon_label_searchable:
+    description: Only in taxon label.
+    range: SearchableString
+    aliases: *id105
+    multivalued: false
+    comments: *id106
+  only_in_taxon_closure:
+    description: Only in taxon closure.
+    range: string
+    aliases:
+    - Only in taxon (IDs)
+    multivalued: true
+    comments: []
+  only_in_taxon_closure_label:
+    description: Only in taxon label closure.
+    range: SearchableString
+    aliases: &id107
+    - Only in taxon
+    multivalued: true
+    comments: &id108 []
+  only_in_taxon_closure_label_searchable:
+    description: Only in taxon label closure.
+    range: SearchableString
+    aliases: *id107
+    multivalued: true
+    comments: *id108
+  annotation_extension_owl_json:
+    description: A non-lossy representation of conjunctions and disjunctions in c16
+      (JSON).
+    range: string
+    aliases:
+    - Annotation extension
+    multivalued: false
+    comments: []
+  annotation_relation:
+    description: This is equivalent to the relation field in GPAD.
+    range: string
+    aliases:
+    - Annotation relation
+    multivalued: false
+    comments: []
+  annotation_relation_label:
+    description: This is equivalent to the relation field in GPAD.
+    range: SearchableString
+    aliases: &id109
+    - Annotation relation
+    multivalued: false
+    comments: &id110 []
+  annotation_relation_label_searchable:
+    description: This is equivalent to the relation field in GPAD.
+    range: SearchableString
+    aliases: *id109
+    multivalued: false
+    comments: *id110
+  equivalent_class_expressions_json:
+    description: For any class document C, this will contain json(CE) for all axioms
+      of form EquivalentClasses(C ... CE ....).
+    range: string
+    aliases:
+    - Eq class expressions
+    multivalued: false
+    comments: []
+  disjoint_class_list:
+    description: Disjoint classes.
+    range: string
+    aliases:
+    - Disjoint classes
+    multivalued: true
+    comments: []
+  disjoint_class_list_label:
+    description: Disjoint classes.
+    range: SearchableString
+    aliases: &id111
+    - Disjoint classes
+    multivalued: true
+    comments: &id112 []
+  disjoint_class_list_label_searchable:
+    description: Disjoint classes.
+    range: SearchableString
+    aliases: *id111
+    multivalued: true
+    comments: *id112
+  bioentity_list:
+    description: Gene/products annotated with this protein family.
+    range: string
+    aliases:
+    - Gene/products
+    multivalued: true
+    comments: []
+  bioentity_list_label:
+    description: Gene/products annotated with this protein family.
+    range: string
+    aliases:
+    - Gene/products
+    multivalued: true
+    comments: []
+types:
+  SearchableString:
+    typeof: string
+

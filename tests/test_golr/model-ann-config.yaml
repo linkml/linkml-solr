@@ -3,50 +3,50 @@
 ####
 id: model_annotation
 schema_generating: true
-description: An individual unit within LEGO. This is <strong>ALPHA</strong> software.
+description: An individual unit within a GO-CAM. This is <strong>ALPHA</strong> software.
 display_name: GO models (ALPHA)
 document_category: model_annotation
 weight: 40
-boost_weights: model_label^1.0 annotation_unit_label^1.0 enabled_by^1.0 enabled_by_label^1.0 location_list_closure^1.0 location_list_closure_label^1.0 process_class_closure_label^1.0 function_class_closure_label^1.0 comment^0.5 
+boost_weights: model_label^1.0 annotation_unit_label^1.0 enabled_by^1.0 enabled_by_label^1.0 location_list_closure^1.0 location_list_closure_label^1.0 process_class_closure_label^1.0 function_class_closure_label^1.0 comment^0.5
 result_weights: function_class^9.0 enabled_by^8.0 location_list^7.0 process_class^6.0 model^5.0 taxon^4.5 contributor^4.0 model_date^3.0 reference^2.0
 filter_weights:  model_label^5.0 enabled_by_label^4.5 reference^4.3 location_list_closure_label^4.0 process_class_closure_label^3.0 function_class_closure_label^2.0 contributor^1.0 evidence_type^0.5
 fields:
   - id: id
-    description: A unique (and internal) thing.
+    description: CURIE form of annoton (molecular function individual)
     display_name: ID
     type: string
     property: []
 ## Annotation unit
   - id: annotation_unit
-    description: ???.
+    description: Same as id
     display_name: Annotation unit
     type: string
     property: []
   - id: annotation_unit_label
-    description: ???.
+    description: Generally not display but for debug purpose can be concatenation of gene product label, function, process etc
     display_name: Annotation unit
     type: string
     property: []
     searchable: true
 ## model
   - id: model
-    description: ???.
+    description: The CURIE of the model to which the annoton belongs
     display_name: Model title
     type: string
     property: []
   - id: model_label
-    description: ???.
+    description: "The dc:title of the model to which the annoton belongs"
     display_name: Model title
     type: string
     property: []
     searchable: true
   - id: model_url
-    description: ???.
+    description: The URI of the model to which the annoton belongs
     display_name: Model URL
     type: string
     property: []
   - id: model_state
-    description: ???.
+    description: Curation status
     display_name: State
     type: string
     property: []
@@ -57,14 +57,14 @@ fields:
     cardinality: multi
     property: []
   - id: contributor
-    description: ???.
+    description: "Value of dc:contributor fields for the annoton"
     display_name: Contributor
     searchable: true
     type: string
     cardinality: multi
     property: []
   - id: model_date
-    description: Last modified
+    description: "Value of dc:date field for the annoton"
     display_name: Modified
     type: string
     searchable: true
@@ -79,20 +79,80 @@ fields:
     property: []
 ## Enabled by/bioentity
   - id: enabled_by
-    description: ???
+    description: "The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF individual"
     display_name: Enabled by
     searchable: true
     type: string
     property: []
   - id: enabled_by_label
-    description: ???
-    display_name: Enabled by
+    description: "Searchable label version of the gene product"
+    display_name: Enabled by label
+    searchable: true
+    type: string
+    property: []
+  - id: enabled_by_complex
+    description: "The CURIE for the ro:enabled_by.rdf:type value of the annoton/MF individual"
+    display_name: Enabled by complex
+    searchable: true
+    type: []
+    property: []
+  - id: enabled_by_complex_label
+    description: "Searchable label version of the complex"
+    display_name: Enabled by complex label
+    searchable: true
+    type: string
+    property: []
+  - id: has_participant
+    description: "The CURIE for the ro:has_participant.rdf:type value of the annoton/MF individual"
+    display_name: Has participant
+    searchable: true
+    type: string
+    property: []
+  - id: has_participant_label
+    description: "Searchable label version of participant entities"
+    display_name: Has participant label
+    searchable: true
+    type: string
+    property: []
+  - id: has_complex_participant
+    description: "The CURIE for the ro:has_participant.rdf:type value of the annoton/MF individual"
+    display_name: Has complex participant
+    searchable: true
+    type: string
+    property: []
+  - id: has_complex_participant_label
+    description: "Searchable label version of participant entities"
+    display_name: Has complex participant label
+    searchable: true
+    type: string
+    property: []
+  - id: has_output
+    description: "The CURIE for the ro:has_output.rdf:type value of the annoton/MF individual"
+    display_name: Has output
+    searchable: true
+    type: string
+    property: []
+  - id: has_output_label
+    description: "Searchable label version of output entities"
+    display_name: Has output label
+    searchable: true
+    type: string
+    property: []
+  - id: has_complex_output
+    description: "The CURIE for the ro:has_output.rdf:type value of the annoton/MF individual"
+    display_name: Has complex output
+    searchable: true
+    type: string
+    property: []
+  - id: has_complex_output_label
+    description: "Searchable label version of output entities"
+    display_name: Has complex output label
     searchable: true
     type: string
     property: []
 ## PANTHER
   - id: panther_family
-    description: PANTHER family IDs that are associated with this entity.
+    description: PANTHER family IDs that are associated with this entity, not yet populated.
     display_name: PANTHER family
     type: string
     searchable: true
@@ -105,24 +165,24 @@ fields:
     property: []
 ## Taxon
   - id: taxon
-    description: "GAF column 13 (taxon)."
+    description: "taxon of the entity in enabled_by"
     display_name: Taxon
     type: string
     property: []
   - id: taxon_label
-    description: "Taxon derived from GAF column 13 and ncbi_taxonomy.obo."
+    description: "label for taxon"
     display_name: Taxon
     type: string
     property: []
     searchable: true
   - id: taxon_closure
-    description: "Taxon IDs derived from GAF column 13 and ncbi_taxonomy.obo."
+    description: "is_a closure of taxon"
     display_name: Taxon (IDs)
     type: string
     cardinality: multi
     property: []
   - id: taxon_closure_label
-    description: "Taxon label closure derived from GAF column 13 and ncbi_taxonomy.obo."
+    description: "labels of is_a closure."
     display_name: Taxon
     type: string
     cardinality: multi
@@ -130,7 +190,7 @@ fields:
     searchable: true
 ## Function
   - id: function_class
-    description: Function acc/ID.
+    description: "This is the value of rdf:type for the annoton/MF instance"
     display_name: Function
     type: string
     property: []
@@ -204,8 +264,8 @@ fields:
     cardinality: multi
     property: []
   - id: owl_blob_json
-    description: ???
-    display_name: ???
+    description: "???"
+    display_name: "???"
     type: string
     property: []
     indexed: false
@@ -250,6 +310,21 @@ fields:
   - id: reference
     description: "Database reference."
     display_name: Reference
+    type: string
+    searchable: true
+    cardinality: multi
+    property: []
+## Relationships Stats
+  - id: relationship
+    description: "List the distinct relationship types"
+    display_name: "Relationship"
+    type: string
+    searchable: true
+    cardinality: multi
+    property: []
+  - id: relationship_label
+    description: ""
+    display_name: "Searchable label version of relationships"
     type: string
     searchable: true
     cardinality: multi
