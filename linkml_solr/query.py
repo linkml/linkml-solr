@@ -4,7 +4,7 @@ import pysolr
 from dataclasses import dataclass
 
 from linkml_runtime.utils.formatutils import underscore
-from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition
+from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
 
 from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult
 
@@ -28,6 +28,7 @@ class SolrQueryEngine(object):
     endpoint: SolrEndpoint
     schema: SchemaDefinition
     mapper: LinkMLMapper = None
+    discriminator_field: SlotDefinitionName = None
 
     def __post_init__(self):
         if self.mapper is None:
@@ -44,20 +45,27 @@ class SolrQueryEngine(object):
         """
         return self.search(target_class, **params).items
 
-    def search(self, target_class: Type[YAMLRoot] = None, **params) -> SolrQueryResult:
+    def search(self, target_class: Type[YAMLRoot] = None,
+               solr_params: Dict = None,
+               search_term: str = '*:*',
+               **params) -> SolrQueryResult:
         """
         Query a SOLR endpoint for a list of objects
 
+        :param search_term:
+        :param solr_params:
         :param target_class:
         :param params: key-value parameters. Keys should be in the schema
         :return:
         """
-        sq = self.generate_query(**params)
+        sq = self.generate_query(target_class=target_class, **params)
+        sq.other_params = solr_params
+        sq.search_term = search_term
         rawres = self.execute(sq)
         items = [self.fetch_object(row, sq, target_class=target_class) for row in rawres.docs]
         return SolrQueryResult(items=items)
 
-    def generate_query(self, **params) -> SolrQuery:
+    def generate_query(self, target_class: Type[YAMLRoot] = None, **params) -> SolrQuery:
         """
         Generate a solr query given query parameters
 
@@ -66,6 +74,9 @@ class SolrQueryEngine(object):
         :return:
         """
         sq = SolrQuery(prefixmap={})
+        if target_class is not None:
+            if self.discriminator_field is not None:
+                params[self.discriminator_field] = target_class.class_name
         self._generate_query_for_params(sq, params)
         return sq
 
@@ -115,8 +126,7 @@ class SolrQueryEngine(object):
         #solr = pysolr.Solr(self.endpoint.url, **solr_params)
         solr = pysolr.Solr(self.endpoint.url)
         params = query.http_params()
-        print(params)
-        results = solr.search('*:*', **params)
-        print(results.docs)
+        logging.info(params)
+        results = solr.search(query.search_term, **params)
         return results
 

@@ -20,9 +20,14 @@ class SolrQuery:
     prefixmap: PREFIXMAP = None
     fields: List[FIELD] = None
     filter_query: Dict[FIELD, Any] = None
+    other_params: Dict[str, Any] = None
+    search_term: str = '*:*'
 
     def http_params(self) -> dict:
         params = {}
+        if self.other_params is not None:
+            for k, v in self.other_params.items():
+                params[k] = v
         params['fq'] = [f'{k}:{_quote(v)}' for (k,v) in self.filter_query.items()]
         if self.fields is not None:
             params['fields'] = ','.join(self.fields)
@@ -32,6 +37,7 @@ class SolrQuery:
         if self.filter_query is None:
             self.filter_query = {}
         self.filter_query[solr_prop] = solr_val
+
 
 
 @dataclass
