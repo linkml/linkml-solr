@@ -21,7 +21,9 @@ Unlike querying with the native pysolr API, this will validate input
 keys (which your IDE will be aware of), and will instantiate an
 instance of your model class.
 
- - validate query inputs (
+ - validate query inputs (also IDE-aware)
+ - instantiate classes in your object model
+ - provide mappings from abstracted domain model concepts
 
 ## Step 1: Define your datamodel
 

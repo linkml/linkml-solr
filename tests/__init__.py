@@ -3,7 +3,7 @@ import pprint
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 INPUT_DIR = os.path.join(ROOT, 'inputs')
-OUTPUT_DIR = os.path.join(ROOT, 'outputs')
+OUTPUT_DIR = os.path.join(ROOT, 'target')
 MODEL_DIR = os.path.join(ROOT, 'test_models')
 
 

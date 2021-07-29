@@ -1,4 +1,5 @@
 id: https://w3id.org//None
+name: amigo
 description: TODO
 imports:
 - linkml:types

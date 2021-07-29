@@ -2,11 +2,15 @@ import logging
 from typing import Union, Dict, Tuple, Type, List
 import pysolr
 from dataclasses import dataclass
+import json
+import requests
 
+from linkml_runtime.dumpers import json_dumper
 from linkml_runtime.utils.formatutils import underscore
 from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
 
 from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult
+from linkml_solr.solrschema import Transaction
 
 from linkml_solr.mapper import LinkMLMapper
 
@@ -106,12 +110,25 @@ class SolrQueryEngine(object):
         """
         mapper = self.mapper
         new_obj = {}
+        schema_class = self.schema.classes[target_class.class_name]
         for k, v in row.items():
+            if k == '_version_':
+                # TODO
+                continue
             if v is not None and v != []:
+                slot = mapper._lookup_slot(schema_class, k)
+                if not slot.multivalued and isinstance(v, list):
+                    if len(v) == 1:
+                        v = v[0]
+                    elif len(v) == 0:
+                        v = None
+                    else:
+                        raise Exception(f'Multi-values for scalar field {schema_class.name}.{k} == {v} {len(v)}')
                 new_obj[k] = v
         cls = mapper._get_linkml_class(new_obj)
         if cls is None:
             cls = target_class
+        logging.debug(new_obj)
         return cls(**new_obj)
 
     def execute(self, query: SolrQuery) -> RawSolrResult:
@@ -126,7 +143,62 @@ class SolrQueryEngine(object):
         #solr = pysolr.Solr(self.endpoint.url, **solr_params)
         solr = pysolr.Solr(self.endpoint.url)
         params = query.http_params()
-        logging.info(params)
+        #logging.info(params)
+        print(f'Params={params}')
         results = solr.search(query.search_term, **params)
         return results
+
+    def add(self, objs: List[YAMLRoot]):
+        """
+
+        :param objs:
+        :return:
+        """
+        jstrs = [json_dumper.dumps(obj) for obj in objs]
+        nu_objs = [json.loads(s) for s in jstrs]
+        print(f'Adding = {nu_objs}')
+        solr = pysolr.Solr(self.endpoint.url)
+        solr.add(nu_objs)
+
+    def _solr_request(self, req: Dict, path='schema'):
+        response = requests.post(f'{self.endpoint.url}/{path}',
+                                 headers={"Content-Type": "application/json"},
+                                 data=json.dumps(req, indent=' '))
+        if response.status_code != 200:
+            logging.error(f'Failed to execute {path} {req}: {response.status_code} :: {response.text}')
+        return response
+
+    def _solr_query(self, path='schema'):
+        response = requests.get(f'{self.endpoint.url}/{path}',
+                                 headers={"Content-Type": "application/json"})
+        if response.status_code != 200:
+            logging.error(f'Failed to execute {path} {req}: {response.status_code} :: {response.text}')
+        return response
+
+    def _get_fields(self):
+        response = self._solr_query(path='schema/fields')
+        return [f['name'] for f in response.json()['fields']]
+
+    def _get_fieldtypes(self):
+        response = self._solr_query(path='schema/fieldtypes')
+        return [f['name'] for f in response.json()['fieldTypes']]
+
+    def create_schema(self):
+        from linkml_solr.solrschemagen import SolrSchemaGenerator
+        existing_fields = self._get_fields()
+        existing_fieldtypes = self._get_fieldtypes()
+        print(f'Fields={existing_fields}')
+        if 'int' not in existing_fieldtypes:
+            self._solr_request({"add-field-type": {
+                'name': 'int',
+                'class': 'solr.TrieIntField',
+                'precisionStep':"0",
+                "positionIncrementGap":"0"
+            }}, path='schema')
+        gen = SolrSchemaGenerator(self.schema)
+        gen.serialize()
+        post_obj = gen.post_request
+        for f in post_obj['add-field']:
+            if f['name'] not in existing_fields:
+                self._solr_request({'add-field': f}, path='schema')
 

@@ -22,12 +22,15 @@ class SolrQuery:
     filter_query: Dict[FIELD, Any] = None
     other_params: Dict[str, Any] = None
     search_term: str = '*:*'
+    rows: int = 100
 
     def http_params(self) -> dict:
-        params = {}
+        params = {'rows': self.rows}
         if self.other_params is not None:
             for k, v in self.other_params.items():
                 params[k] = v
+        if self.filter_query is None:
+            self.filter_query = {}
         params['fq'] = [f'{k}:{_quote(v)}' for (k,v) in self.filter_query.items()]
         if self.fields is not None:
             params['fields'] = ','.join(self.fields)
