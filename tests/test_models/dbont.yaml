@@ -1,0 +1,296 @@
+id: http://dbpedia.org/ontology/
+name: dbpedia-ontology
+description: |-
+  dbpedia ontology schema
+default_curi_maps:
+  - semweb_context
+imports:
+ - linkml:types
+prefixes:
+  dbont: http://dbpedia.org/ontology/
+  dbproperty: http://dbpedia.org/property/
+  foaf: http://xmlns.com/foaf/0.1/
+  dbr: http://dbpedia.org/resource/
+  pav: http://purl.org/pav/
+  dce: http://purl.org/dc/elements/1.1/
+  linkml: https://w3id.org/linkml/
+  geo: http://www.w3.org/2003/01/geo/wgs84_pos#
+  wd: http://www.wikidata.org/entity/
+  rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  
+default_prefix: dbont
+license: https://creativecommons.org/publicdomain/zero/1.0/
+see_also:
+  - http://dbpedia.org/sparql/
+
+classes:
+
+  Thing:
+    slots:
+      - id
+      - label
+      - comment
+      - type
+  
+  Class:
+    is_a: Thing
+    slots:
+      - subClassOf
+  
+  Food:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q2095
+    slots:
+      - differentFrom
+      - thumbnail
+      - wikiPageID
+      - wikiPageRevisionID
+      - sameAs
+      - servingTemperature
+      - abstract
+      - servingSize
+      - alias
+      - cuisine
+      - ingredientName
+      - country
+      - manufacturer
+      - origin
+      - region
+      - creatorOfDish
+      - wikiPageLength
+      - notes
+      - distributor
+      - approximateCalories
+      - carbohydrate
+      - fat
+      - protein
+      - introduced
+      - species
+      - glycemicIndex
+      - maxTime
+      - minTime
+      - complexity
+      - discontinued
+      - imdbId
+
+  Species:
+    is_a: Thing
+      
+  Activity:
+    is_a: Thing
+    exact_mappings:
+      - http://www.openlinksw.com/schemas/opengraph#Activity
+      - http://www.openlinksw.com/schemas/linkedin#Publication
+      - http://www.openlinksw.com/schemas/twitter#Tweet
+      - http://www.openlinksw.com/schemas/googleplus#Activity
+      - wd:Q1914636
+      - http://www.ontologydesignpatterns.org/ont/d0.owl#Activity
+      - http://rdfs.org/sioc/ns#Post
+      - http://purl.org/ontology/bibo/Article
+      - http://rdfs.org/sioc/types#MicroblogPost
+      - http://umbel.org/umbel/rc/ScholarlyArticle
+      - http://www.openlinksw.com/schemas/opengraph#Comment
+      - http://www.openlinksw.com/schemas/opengraph#Post
+      - http://www.openlinksw.com/schemas/linkedin#Recommendation
+      - http://www.openlinksw.com/schemas/googleplus#Comment
+      - http://www.openlinksw.com/schemas/googleplus#ActivityObject
+  Place:
+    is_a: Thing
+    exact_mappings:
+      - http://www.openlinksw.com/schemas/googleplus#PlaceLived
+      - http://schema.org/Place
+    slots:
+      - lat
+      - long
+  PopulatedPlace:
+    is_a: Place
+  Country:
+    is_a: PopulatedPlace
+  Language:
+    is_a: Thing
+    exact_mappings:
+      - http://www.openlinksw.com/schemas/linkedin#Language
+      - wd:Q315
+      - http://schema.org/Language
+      - http://www.openlinksw.com/schemas/rdfs/Language#this
+  TopicalConcept:
+    is_a: Thing
+    exact_mappings:
+      - http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Concept
+  MedicalSpecialty:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q930752
+  Agent:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q24229398
+      - http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Agent
+  Person:
+    is_a: Agent
+  Organisation:
+    is_a: Agent
+  Biomolecule:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q206229
+  ChemicalSubstance:
+    is_a: Thing
+    exact_mappings:
+      - http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#ChemicalObject
+  Identifier:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q6545185
+  Work:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q386724
+      - http://schema.org/CreativeWork
+  Award:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q618779
+  Disease:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q12136
+  EthnicGroup:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q41710
+  Event:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q1656682
+      - http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Event
+      - http://schema.org/Event
+      
+  AnatomicalStructure:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q4936952
+  Algorithm:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q8366
+  Altitude:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q190200
+  Flag:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q14660
+  Media:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q340169
+  Medicine:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q11190
+  Population:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q33829
+  PublicService:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q161837
+  Statistic:
+    is_a: Thing
+    exact_mappings:
+      - wd:Q1949963
+slots:
+
+  id:
+    identifier: true
+
+  label:
+    required: false
+    slot_uri: rdfs:label
+
+  comment:
+    slot_uri: rdfs:comment
+  
+  subClassOf:
+    slot_uri: rdfs:subClassOf
+    range: Class
+  
+  type:
+    slot_uri: rdf:type
+    range: Class
+  
+  sameAs:
+    slot_uri: owl:sameAs
+    range: Thing
+  
+  lat:
+    slot_uri: geo:lat
+  
+  long:
+    slot_uri: geo:long
+  
+  servingSize:
+    range: double
+  wikiPageRevisionID:
+    range: integer
+  wikiPageLength:
+    range: integer
+  approximateCalories:
+    range: double
+  complexity:
+    range: string
+  thumbnail:
+  differentFrom:
+    range: Thing
+    slot_uri: owl:differentFrom
+  creatorOfDish:
+    range: Person
+  distributor:
+    range: Organisation
+  introduced:
+    range: date
+  ingredientName:
+    range: string
+  wikiPageID:
+    range: integer
+  carbohydrate:
+    range: double
+  discontinued:
+    range: date
+  maxTime:
+    range: double
+  origin:
+    range: PopulatedPlace
+  manufacturer:
+    range: Organisation
+  fat:
+    range: double
+  imdbId:
+    range: string
+  region:
+    range: Place
+  glycemicIndex:
+    range: integer
+  protein:
+    range: double
+  cuisine:
+    range: string
+  abstract:
+  notes:
+    range: string
+  servingTemperature:
+    range: string
+  species:
+    range: Species
+  country:
+    range: Country
+  minTime:
+    range: double
+  alias:
+
+

@@ -152,3 +152,5 @@ cython_debug/
 
 # Apple stuff
 .DS_Store
+
+*.old

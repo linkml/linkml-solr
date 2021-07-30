@@ -1,0 +1,159 @@
+id: https://w3id.org/linkml/solr
+name: solr-schema
+description: TODO
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  solr: https://w3id.org/linkml/solr/
+default_prefix: solr
+
+# https://solr.apache.org/guide/8_9/schema-api.html#multiple-commands-in-a-single-post
+
+classes:
+  Field:
+    slots:
+      - name
+      - type
+      - stored
+      - indexed
+      - multiValued
+    slot_usage:
+      type:
+        examples:
+          - value: solr.TextField
+          - value: string
+          - value: text_general
+  DynamicField:
+    slots:
+      - name
+      - type
+      - stored
+    slot_usage:
+      name:
+        examples:
+          - value: "*_s"
+  CopyField:
+    attributes:
+      source:
+        required: true
+        description: The source field
+      dest:
+        required: true
+        multivalued: true
+        description: A field or an array of fields to which the source field will be copied. This parameter is required.
+      maxChars:
+        range: integer
+  FieldType:
+    slots:
+      - name
+      - _class
+      - positionIncrementGap
+      - analyzer
+  Analyzer:
+    attributes:
+      charFilters:
+        multivalued: true
+      tokenizer:
+        range: Tokenizer
+      filters:
+        multivalued: true
+  Tokenizer:
+    attributes:
+      _class:
+  CharFilter:
+    attributes:
+      _class:
+        examples:
+          - value: solr.PatternReplaceCharFilterFactory
+      replacement:
+        examples:
+          - value: "$1$1"
+      pattern:
+        examples:
+          - value: "([a-zA-Z])\\\\1+"
+  Filter:
+    attributes:
+      _class:
+        examples:
+          - value: solr.WordDelimiterFilterFactory
+      preserveOriginal:
+    
+  transaction:
+    slots:
+      - add field
+      - delete field
+      - replace field
+      - add field type
+      - delete field type
+      - replace field type
+      - add dynamic field
+      - delete dynamic field
+      - replace dynamic field
+
+slots:
+
+  name:
+    range: string
+    identifier: true
+  multiValued:
+    range: boolean
+  type:
+  _class:
+  positionIncrementGap:
+  analyzer:
+    range: Analyzer
+  charFilters:
+    range: CharFilter
+    multivalued: true
+  filters:
+    range: Filter
+    multivalued: true
+
+  stored:
+    boolean
+
+  indexed:
+    boolean
+  
+  # transactions
+  
+  add command:
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  delete command:
+    multivalued: true
+  replace command:
+    multivalued: true
+    
+  add field:
+    is_a: add command
+    range: Field
+  delete field:
+    is_a: delete command
+    range: Field
+  replace field:
+    is_a: replace command
+    range: Field
+    
+  add field type:
+    is_a: add command
+    range: FieldType
+  delete field type:
+    is_a: delete command
+    range: FieldType
+  replace field type:
+    is_a: replace command
+    range: FieldType
+
+  add dynamic field:
+    is_a: add command
+    range: DynamicField
+  delete dynamic field:
+    is_a: delete command
+    range: DynamicField
+  replace dynamic field:
+    is_a: replace command
+    range: DynamicField
+  

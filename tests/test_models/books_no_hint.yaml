@@ -1,0 +1,75 @@
+id: https://w3id.org/example
+name: example
+description: example
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  example: https://w3id.org/example
+default_prefix: example
+types: {}
+classes:
+  book:
+    slots:
+    - id
+    - book_category
+    - name
+    - price
+    - inStock
+    - author
+    - series
+    - sequence
+    - genre
+    - yesno
+    - blah
+    slot_usage: {}
+slots:
+  id:
+    identifier: true
+    range: string
+    examples:
+    - value: '123'
+  book_category:
+    range: string
+    examples:
+    - value: book
+    multivalued: true
+  name:
+    range: string
+    examples:
+    - value: Consider Phlebas
+  price:
+    range: string
+    examples:
+    - value: '7.99'
+  inStock:
+    range: string
+    examples:
+    - value: 'true'
+  author:
+    range: string
+    examples:
+    - value: Ian M Banks
+  series:
+    range: string
+    examples:
+    - value: The Chronicles of Prydain
+  sequence:
+    range: integer
+    examples:
+    - value: '1'
+  genre:
+    range: string
+    examples:
+    - value: scifi
+  yesno:
+    range: string
+    examples:
+    - value: 'true'
+  blah:
+    range: string
+    examples:
+    - value: 'false'
+  _version_:
+enums: {}
+
