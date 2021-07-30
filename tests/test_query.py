@@ -22,7 +22,6 @@ class QueryTestCase(unittest.TestCase):
         """ solr """
         schema = YAMLGenerator(SCHEMA).schema
         qe = SolrQueryEngine(schema=schema,
-                             #discriminator_field=amigo.slots.document_category.name,
                              endpoint=SolrEndpoint(url='http://localhost:8983/solr/books'))
         #qe.create_schema()
         sq = qe.generate_query(genre_s='fantasy')

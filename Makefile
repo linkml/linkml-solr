@@ -2,11 +2,13 @@ RUN = pipenv run
 
 all: build test
 
+clean:
+	rm test-docker-env
 
 build: linkml_solr/solrschema.py
 
-test:
-	pipenv run python -m unittest
+test: test-docker-env
+	$(RUN) python -m unittest
 
 test_data: tests/test_models/kitchen_sink.context.jsonld tests/test_models/kitchen_sink.py
 
@@ -30,11 +32,17 @@ tests/test_models/amigo.yaml: linkml_solr/utils/golr_schema_utils.py
 #BL = $(RUN) python linkml_solr/utils/solr_bulkload.py
 BL = $(RUN) lsolr-bulkload
 
+test-docker-env: test-server wait-10 test-load
+	touch $@
+
 test-server:
-	$(BL) start-server -C books -s tests/test_models/books.yaml
+	$(BL) start-server -C books -s tests/test_models/books.yaml &
 
 test-schema: 
 	$(BL) create-schema -C books -s tests/test_models/books.yaml 
+
+wait-%:
+	sleep $*
 
 test-load: tests/inputs/books.tsv
 	$(BL) bulkload -C books -s tests/test_models/books.yaml $<
