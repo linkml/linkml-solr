@@ -13,7 +13,7 @@
 flatten-dict
 linkml-model
 linkml-runtime
-linkml>=1.0.3
+linkml>=1.0.4
 pyparsing~=2.4
 pysolr
 sparqlwrapper
