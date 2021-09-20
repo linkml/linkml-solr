@@ -79,7 +79,7 @@ class SolrSchemaGenerator(Generator):
 
 
 
-
+# TODO: move to linkml
 @shared_arguments(SolrSchemaGenerator)
 @click.command()
 def cli(yamlfile, **kwargs):

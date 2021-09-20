@@ -5,12 +5,13 @@ name = "pypi"
 
 [packages]
 linkml = ">=1.0.4"
-linkml-runtime = "*"
+linkml-runtime = ">=1.1.0"
 linkml-model = "*"
 pyparsing = "~=2.4"
 sparqlwrapper = "*"
 pysolr = "*"
 flatten-dict = "*"
+linkml-solr = {editable = true, path = "."}
 
 [dev-packages]
 tox = "*"

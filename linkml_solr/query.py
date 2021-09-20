@@ -9,7 +9,7 @@ from linkml_runtime.dumpers import json_dumper
 from linkml_runtime.utils.formatutils import underscore
 from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
 
-from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult
+from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult, FIELD
 from linkml_solr.solrschema import Transaction
 
 from linkml_solr.mapper import LinkMLMapper
@@ -23,6 +23,7 @@ def class_for_name(module_name, class_name):
     return c
 
 
+# TODO: inherit from linkml_runtime_api.QueryEngine
 @dataclass
 class SolrQueryEngine(object):
     """
@@ -35,6 +36,7 @@ class SolrQueryEngine(object):
     discriminator_field: SlotDefinitionName = None
 
     def __post_init__(self):
+        # TODO: use schemaview
         if self.mapper is None:
             self.mapper = LinkMLMapper(schema=self.schema)
         if self.mapper.schema is None:
@@ -52,6 +54,7 @@ class SolrQueryEngine(object):
     def search(self, target_class: Type[YAMLRoot] = None,
                solr_params: Dict = None,
                search_term: str = '*:*',
+               facet_fields: List[FIELD] = None,
                **params) -> SolrQueryResult:
         """
         Query a SOLR endpoint for a list of objects
@@ -65,9 +68,13 @@ class SolrQueryEngine(object):
         sq = self.generate_query(target_class=target_class, **params)
         sq.other_params = solr_params
         sq.search_term = search_term
+        sq.facet_fields = facet_fields
         rawres = self.execute(sq)
         items = [self.fetch_object(row, sq, target_class=target_class) for row in rawres.docs]
-        return SolrQueryResult(items=items)
+        return SolrQueryResult(items=items, response=rawres,
+                               raw=rawres.raw_response,
+                               start=rawres.raw_response['response']['start'],
+                               num_found=rawres.hits)
 
     def generate_query(self, target_class: Type[YAMLRoot] = None, **params) -> SolrQuery:
         """
@@ -146,6 +153,8 @@ class SolrQueryEngine(object):
         #logging.info(params)
         print(f'Params={params}')
         results = solr.search(query.search_term, **params)
+        if solr.session is not None:
+            solr.session.close()
         return results
 
     def add(self, objs: List[YAMLRoot]):

@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest
 
@@ -28,14 +29,26 @@ class QueryTestCase(unittest.TestCase):
                              endpoint=SolrEndpoint(url='http://golr.geneontology.org/solr/'))
 
         sq = qe.generate_query(document_category=OntologyClass.class_name, synonym='apoptosis')
-        print(sq)
-        print(sq.http_params())
-
-        result = qe.search(target_class=OntologyClass, isa_partof_closure='GO:0031965') ## nuclear membrane
-        #print(f'Result={result}')
+        sq.facet_fields = ['isa_partof_closure']
+        #print(sq)
+        #print(sq.http_params())
+        result = qe.search(target_class=OntologyClass,
+                           facet_fields = ['isa_partof_closure'],
+                           isa_partof_closure='GO:0031965') ## nuclear membrane
         for oc in result.items:
             oc: OntologyClass
             print(f'Term: {oc.id} {oc.annotation_class_label}')
+        logging.info(result.raw)
+        for slt, countdict in result.facet_counts.items():
+            print(f' FACET {slt}: {countdict}')
+        for k, v in result.response.__dict__.items():
+            logging.info(f'  *** {k} = {v}')
+        for k, v in result.raw.items():
+            logging.info(f'  RAW *** {k} = {v}')
+        for k, v in result.raw['response'].items():
+            logging.info(f'  RESPONSE >>>> {k} = {v}')
+        #for x in result.facet_counts:
+        #    print(f'Facet={x}')
 
 
 

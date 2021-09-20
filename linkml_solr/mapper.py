@@ -1,7 +1,7 @@
 import logging
 
 from linkml_runtime.utils.formatutils import underscore
-from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition
+from linkml_runtime.linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition
 from rdflib import BNode, URIRef, Literal
 from rdflib.term import Node
 
