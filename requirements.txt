@@ -10,10 +10,11 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
+-e .
 flatten-dict
-linkml-model
-linkml-runtime>=1.1.0
-linkml>=1.0.4
+json-flattener>= 0.1.7
+linkml-runtime>=1.1.12
+linkml>=1.1.15
 pyparsing~=2.4
 pysolr
 sparqlwrapper
