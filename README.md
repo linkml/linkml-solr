@@ -1,6 +1,8 @@
-# linkml-solr: Simple wrapper for using Solr with LinkML schemas
+# linkml-solr
 
-this provides a convenience layer for working with a Solr database
+A simple wrapper for using Solr with [LinkML](https://linkml.io) schemas
+
+This provides a convenience layer for working with a Solr database
 whose schema is defined in LinkML. It provides bindings both from
 slots in your schema to queries, and binds result objects to your
 object model.
@@ -44,6 +46,51 @@ See [tests/test_models/books.py](tests/test_models/books.py) for an example
 
 See [tests/test_query.py](tests/test_query.py) for an example
 
+## Command Line Tools
+
+### main command
+
+```
+lsolr-bulkload --help
+Usage: lsolr-bulkload [OPTIONS] COMMAND [ARGS]...
+
+  Main
+
+  Args:
+
+      verbose (int): Verbose.     quiet (bool): Quiet.
+
+  Returns:
+
+      None.
+
+Options:
+  -v, --verbose
+  -q, --quiet TEXT
+  --help            Show this message and exit.
+
+Commands:
+  bulkload       Convert multiple golr yaml schemas to linkml :param files:...
+  create-schema
+  start-server
+```
+
+### bulkload
+
+```
+lsolr-bulkload bulkload --help
+Usage: lsolr-bulkload bulkload [OPTIONS] [FILES]...
+
+  Convert multiple golr yaml schemas to linkml :param files: :param schema:
+  :return:
+
+Options:
+  -s, --schema TEXT  Path to schema.
+  -C, --core TEXT    solr core.
+  -f, --format TEXT  input format.
+  -u, --url TEXT     solr url.
+  --help             Show this message and exit.
+```
 
 ## More documentation
 

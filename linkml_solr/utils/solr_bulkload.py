@@ -1,5 +1,4 @@
 from typing import List
-import click
 import logging
 import subprocess
 from linkml.generators.yamlgen import YAMLGenerator
@@ -15,8 +14,18 @@ def bulkload_file(f,
                   format='csv',
                   base_url=None,
                   core=None,
-                  schema: SchemaDefinition =None,
+                  schema: SchemaDefinition = None,
                   ):
+    """
+    Bulkload a file using solr bulkload API
+
+    :param f:
+    :param format:
+    :param base_url:
+    :param core:
+    :param schema:
+    :return:
+    """
     mvslots = _get_multivalued_slots(schema)
     print(f'MV = {mvslots}')
     separator = '%09'
@@ -33,110 +42,3 @@ def bulkload_file(f,
     print(command)
     subprocess.run(command)
 
-@click.group()
-@click.option("-v", "--verbose", count=True)
-@click.option("-q", "--quiet")
-def main(verbose: int, quiet: bool):
-    """Main
-
-    Args:
-
-        verbose (int): Verbose.
-        quiet (bool): Quiet.
-
-    Returns:
-
-        None.
-
-    """
-    if verbose >= 2:
-        logging.basicConfig(level=logging.DEBUG)
-    elif verbose == 1:
-        logging.basicConfig(level=logging.INFO)
-    else:
-        logging.basicConfig(level=logging.WARNING)
-    if quiet:
-        logging.basicConfig(level=logging.ERROR)
-
-@main.command()
-@click.option('--schema', '-s',
-              help='Path to schema.')
-@click.option('--core', '-C',
-              default='linkml-solr-test',
-              help='solr core.')
-@click.option('--format', '-f',
-              default='csv',
-              help='input format.')
-@click.option('--url', '-u',
-              default='http://localhost:8983/solr',
-              help='solr url.')
-@click.argument('files', nargs=-1)
-def bulkload(files, format, schema, url, core):
-    """
-    Convert multiple golr yaml schemas to linkml
-    :param files:
-    :param schema:
-    :return:
-    """
-    inputs = {}
-    if schema is not None:
-        with open(schema) as stream:
-            schema_obj = yaml_loader.load(stream, target_class=SchemaDefinition)
-    for f in files:
-        bulkload_file(f, format=format, schema=schema_obj, core=core, base_url=url)
-
-@main.command()
-@click.option('--schema', '-s',
-              help='Path to schema.')
-@click.option('--core', '-C',
-              default='linkml-solr-test',
-              help='solr core.')
-@click.option('--container', '-n',
-              default='my_solr',
-              help='solr core.')
-@click.option('--port', '-P',
-              default='8983',
-              help='solr core.')
-@click.option('--create-schema/--no-create-schema',
-              default=True,
-              help='create the solr schema from the linkml schema on startup')
-@click.option('--url', '-u',
-              default='http://localhost:8983/solr',
-              help='solr url.')
-def start_server(schema, container, url, core, port, create_schema):
-    subprocess.run(['docker', 'rm', container])
-    command = [
-        'docker',
-        'run',
-        '--name',
-        container,
-        '-p',
-        f'{port}:{port}',
-        'solr:8',
-        'solr-precreate',
-        core]
-    subprocess.Popen(command)
-    if create_schema:
-        schema_obj = YAMLGenerator(schema).schema
-        qe = SolrQueryEngine(schema=schema_obj,
-                             endpoint=SolrEndpoint(url=f'{url}/{core}'))
-        qe.create_schema()
-
-@main.command()
-@click.option('--schema', '-s',
-              help='Path to schema.')
-@click.option('--core', '-C',
-              default='linkml-solr-test',
-              help='solr core.')
-@click.option('--url', '-u',
-              default='http://localhost:8983/solr',
-              help='solr url.')
-def create_schema(schema, url, core):
-    schema_obj = YAMLGenerator(schema).schema
-    qe = SolrQueryEngine(schema=schema_obj,
-                         endpoint=SolrEndpoint(url=f'{url}/{core}'))
-    qe.create_schema()
-
-
-if __name__ == '__main__':
-    main()

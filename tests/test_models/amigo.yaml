@@ -400,7 +400,8 @@ classes:
     - synonym_searchable
     - alternate_id
 slots:
-  document_category: {}
+  document_category:
+    designates_type: true
   id:
     description: Term acc/ID.
     range: string

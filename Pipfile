@@ -4,17 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-linkml = ">=1.0.4"
-linkml-runtime = ">=1.1.0"
-linkml-model = "*"
+linkml = ">=1.1.15"
+linkml-runtime = ">=1.1.12"
 pyparsing = "~=2.4"
 sparqlwrapper = "*"
 pysolr = "*"
 flatten-dict = "*"
 linkml-solr = {editable = true, path = "."}
+json-flattener = ">= 0.1.7"
 
 [dev-packages]
 tox = "*"
+linkml-solr = {editable = true, path = "."}
 
 [pipenv]
 allow_prereleases = true

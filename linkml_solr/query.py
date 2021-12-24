@@ -1,4 +1,5 @@
 import logging
+from json import JSONDecodeError
 from typing import Union, Dict, Tuple, Type, List
 import pysolr
 from dataclasses import dataclass
@@ -11,6 +12,7 @@ from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, Eleme
 
 from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult, FIELD
 from linkml_solr.solrschema import Transaction
+from linkml_solr.solrschemagen import SolrSchemaGenerator
 
 from linkml_solr.mapper import LinkMLMapper
 
@@ -124,6 +126,12 @@ class SolrQueryEngine(object):
                 continue
             if v is not None and v != []:
                 slot = mapper._lookup_slot(schema_class, k)
+                if slot is None:
+                    if k == 'id':
+                        # autogen field
+                        continue
+                    else:
+                        raise ValueError(f'Cannot retrieve slot for field {k}')
                 if not slot.multivalued and isinstance(v, list):
                     if len(v) == 1:
                         v = v[0]
@@ -157,17 +165,21 @@ class SolrQueryEngine(object):
             solr.session.close()
         return results
 
-    def add(self, objs: List[YAMLRoot]):
+    def add(self, objs: List[YAMLRoot], commit=True):
         """
+        Adds an instance of a LinkML class as a Solr document
 
-        :param objs:
+        :param objs: list of objects to add
         :return:
         """
-        jstrs = [json_dumper.dumps(obj) for obj in objs]
+        jstrs = [json_dumper.dumps(obj, inject_type=False) for obj in objs]
         nu_objs = [json.loads(s) for s in jstrs]
         print(f'Adding = {nu_objs}')
         solr = pysolr.Solr(self.endpoint.url)
-        solr.add(nu_objs)
+        r = solr.add(nu_objs)
+        if commit:
+            solr.commit()
+        return r
 
     def _solr_request(self, req: Dict, path='schema'):
         response = requests.post(f'{self.endpoint.url}/{path}',
@@ -177,32 +189,51 @@ class SolrQueryEngine(object):
             logging.error(f'Failed to execute {path} {req}: {response.status_code} :: {response.text}')
         return response
 
-    def _solr_query(self, path='schema'):
+    def _solr_query(self, path='schema', strict=True):
         response = requests.get(f'{self.endpoint.url}/{path}',
                                  headers={"Content-Type": "application/json"})
         if response.status_code != 200:
-            logging.error(f'Failed to execute {path} {req}: {response.status_code} :: {response.text}')
+            # TODO: raise exception
+            logging.error(f'Failed to execute {path}: {response.status_code} :: {response.text}')
         return response
 
-    def _get_fields(self):
-        response = self._solr_query(path='schema/fields')
-        return [f['name'] for f in response.json()['fields']]
+    def _response_json(self, response, strict=True):
+        try:
+            return response.json()
+        except JSONDecodeError as e:
+            if strict:
+                raise JSONDecodeError(e)
+            else:
+                return {}
 
-    def _get_fieldtypes(self):
-        response = self._solr_query(path='schema/fieldtypes')
-        return [f['name'] for f in response.json()['fieldTypes']]
+    def _get_fields(self, strict=True):
+        response = self._solr_query(path='schema/fields', strict=strict)
+        obj = self._response_json(response, strict=strict)
+        return [f['name'] for f in obj.get('fields', [])]
 
-    def create_schema(self):
-        from linkml_solr.solrschemagen import SolrSchemaGenerator
-        existing_fields = self._get_fields()
-        existing_fieldtypes = self._get_fieldtypes()
-        print(f'Fields={existing_fields}')
+    def _get_fieldtypes(self, strict=True):
+        response = self._solr_query(path='schema/fieldtypes', strict=strict)
+        obj = self._response_json(response, strict=strict)
+        return [f['name'] for f in obj.get('fieldTypes', [])]
+
+    def load_schema(self):
+        """
+        Adds a schema to SOLR corresponding to a LinkML schema
+        """
+        existing_fields = self._get_fields(strict=False)
+        existing_fieldtypes = self._get_fieldtypes(strict=False)
+        logging.info(f'Current Fields={existing_fields}')
         if 'int' not in existing_fieldtypes:
             self._solr_request({"add-field-type": {
                 'name': 'int',
                 'class': 'solr.TrieIntField',
-                'precisionStep':"0",
-                "positionIncrementGap":"0"
+                'precisionStep': "0",
+                "positionIncrementGap": "0"
+            }}, path='schema')
+        if 'date' not in existing_fieldtypes:
+            self._solr_request({"add-field-type": {
+                'name': 'date',
+                'class': 'solr.TrieDateField',
             }}, path='schema')
         gen = SolrSchemaGenerator(self.schema)
         gen.serialize()

@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest
 import requests
@@ -17,58 +18,36 @@ from rdflib import Graph
 SCHEMA = os.path.join(MODEL_DIR, 'books.yaml')
 
 class QueryTestCase(unittest.TestCase):
+    """
+    This test requires a solr instance running - see the Makefile
+    for running in Docker
+    """
 
     def test_query(self):
-        """ solr """
+        """ tests querying from and adding to a solr endpoint """
         schema = YAMLGenerator(SCHEMA).schema
         qe = SolrQueryEngine(schema=schema,
                              endpoint=SolrEndpoint(url='http://localhost:8983/solr/books'))
-        #qe.create_schema()
+        qe.load_schema()
         sq = qe.generate_query(genre_s='fantasy')
         print(sq)
         print(sq.http_params())
 
         result = qe.search(target_class=Book, genre_s='scifi')
-        #result = qe.search(target_class=Book)
-        #print(f'Result={result}')
+        logging.info(f'Result={result}')
         for book in result.items:
             print(f'Book:  {book.name} :: {book}')
         assert len(result.items) > 2
 
-        book = Book(id='B1', name='bar')
+        book = Book(id='B1', name='made up book name2')
 
         qe.add([book])
-        import pysolr
-        solr = pysolr.Solr(qe.endpoint.url, always_commit=True)
-        solr.ping()
-        solr.add([{'id': 'xxx', 'foo': 'baz'}])
-        x = solr.add([{'id': 'zzz', 'name': ['baz']}])
-        import json
-        rj = {"add": {"doc": [
-                          {"id": 14,
-                           "log_type": "debug",
-                           "log_text": "A transaction of debug from Kimy"}],
-                      "boost": 1.0,
-                      "overwrite": True,
-                      "commitWithin": 1000}}
-        rj = [
-            {"id": 14,
-             "log_type": "debug",
-             "log_text": "A transaction of debug from Kimy"}]
-        rjs = json.dumps(rj)
-        status = requests.post("http://localhost:8983/solr/books/update",
-                      headers={"Content-Type": "application/json"},
-                      data=rjs)
-        print(f'Status={status} {status.text}')
-        #solr.delete(q='*:*')
-        solr.commit()
-        results = solr.search('*:*', rows=100)
-        print(results)
-        print(results.docs)
-        print(results.docs[-1])
-        print(len(results.docs))
-        print(x)
-        solr.commit()
+        result = qe.search(target_class=Book, name=book.name)
+        logging.info(f'Result={result}')
+        print(f'ITEMS={result.items}')
+        for book in result.items:
+            print(f'Book2:  {book.name} :: {book}')
+        assert len(result.items) >= 1
 
 
 

@@ -78,6 +78,10 @@ def golr_to_linkml_schema(inputs: Dict[str, dict], base_url: str = 'https://w3id
 def convert(files, schema):
     """
     Convert multiple golr yaml schemas to linkml
+
+    Note this is primarily useful for converting schemas in the
+    golr format used by AmiGO/Monarch
+
     :param files:
     :param schema:
     :return:

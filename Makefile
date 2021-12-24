@@ -1,4 +1,5 @@
 RUN = pipenv run
+LSOLR = $(RUN) lsolr
 
 all: build test
 
@@ -7,11 +8,13 @@ clean:
 
 build: linkml_solr/solrschema.py
 
+# TODO: sometimes load starts before docker environment complete
 test: test-docker-env
 	$(RUN) python -m unittest
 
 test_data: tests/test_models/kitchen_sink.context.jsonld tests/test_models/kitchen_sink.py
 
+# typically this should not need to be regenerated
 SRC = model/schema/solrschema.yaml
 linkml_solr/solrschema.py: $(SRC)
 	$(RUN) gen-python --no-slots $< > $@.tmp && mv $@.tmp $@
@@ -29,22 +32,27 @@ tests/test_models/%.ttl: $(TESTMODELS_SRC)
 tests/test_models/amigo.yaml: linkml_solr/utils/golr_schema_utils.py
 	pipenv run python $< tests/test_golr/*yaml > $@
 
-#BL = $(RUN) python linkml_solr/utils/solr_bulkload.py
-BL = $(RUN) lsolr-bulkload
 
 test-docker-env: test-server wait-10 test-load
 	touch $@
 
+start-solr-server:
+	$(LSOLR) start-server
 test-server:
-	$(BL) start-server -C books -s tests/test_models/books.yaml &
+	$(LSOLR) start-server -C books -s tests/test_models/books.yaml
+
+add-test-core: add-core-test
+add-core-%:
+	$(LSOLR) add-cores $*
 
 test-schema: 
-	$(BL) create-schema -C books -s tests/test_models/books.yaml 
+	$(LSOLR) create-schema -C books -s tests/test_models/books.yaml 
 
 wait-%:
 	sleep $*
 
+# uses solr_bulkload.py to load into a core
 test-load: tests/inputs/books.tsv
-	$(BL) bulkload -C books -s tests/test_models/books.yaml $<
+	$(LSOLR) bulkload -C books -s tests/test_models/books.yaml $<
 test-load2: tests/inputs/books.json
-	$(BL) bulkload -f json -C books -s tests/test_models/books.yaml $<
+	$(LSOLR) bulkload -f json -C books -s tests/test_models/books.yaml $<

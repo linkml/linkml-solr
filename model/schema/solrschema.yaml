@@ -1,6 +1,6 @@
 id: https://w3id.org/linkml/solr
 name: solr-schema
-description: TODO
+description: A LinkML description of the Solr schema metamodel
 imports:
 - linkml:types
 prefixes:

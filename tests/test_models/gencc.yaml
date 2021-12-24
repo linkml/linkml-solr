@@ -1,0 +1,242 @@
+id: https://w3id.org/example
+name: example
+description: example
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  example: https://w3id.org/example
+default_prefix: example
+types:
+  HGNC identifier:
+    typeof: string
+  MONDO identifier:
+    typeof: string
+  identifier:
+    typeof: string
+  GENCC identifier:
+    typeof: string
+  HP identifier:
+    typeof: string
+  https identifier:
+    typeof: string
+classes:
+  Container:
+    tree_root: true
+    slots:
+      - associations
+  GeneToDiseaseAssociation:
+    slots:
+    - uuid
+    - gene_curie
+    - gene_symbol
+    - disease_curie
+    - disease_title
+    - disease_original_curie
+    - disease_original_title
+    - classification_curie
+    - classification_title
+    - moi_curie
+    - moi_title
+    - submitter_curie
+    - submitter_title
+    - submitted_as_hgnc_id
+    - submitted_as_hgnc_symbol
+    - submitted_as_disease_id
+    - submitted_as_disease_name
+    - submitted_as_moi_id
+    - submitted_as_moi_name
+    - submitted_as_submitter_id
+    - submitted_as_submitter_name
+    - submitted_as_classification_id
+    - submitted_as_classification_name
+    - submitted_as_date
+    - submitted_as_public_report_url
+    - submitted_as_notes
+    - submitted_as_pmids
+    - submitted_as_assertion_criteria_url
+    - submitted_as_submission_id
+    - submitted_run_date
+    slot_usage: {}
+slots:
+  associations:
+    multivalued: true
+    range: GeneToDiseaseAssociation
+    inlined: true
+    inlined_as_list: true
+  uuid:
+    range: string
+    examples:
+    - value: GENCC_000102-HGNC_1480-MONDO_0016971-HP_0032113-GENCC_100002
+  gene_curie:
+    range: HGNC identifier
+    examples:
+    - value: HGNC:1480
+  gene_symbol:
+    range: string
+    examples:
+    - value: CAPN3
+  disease_curie:
+    range: MONDO identifier
+    examples:
+    - value: MONDO:0016971
+  disease_title:
+    range: string
+    examples:
+    - value: limb-girdle muscular dystrophy
+  disease_original_curie:
+    range: identifier
+    examples:
+    - value: MONDO:0016971
+  disease_original_title:
+    range: string
+    examples:
+    - value: limb-girdle muscular dystrophy
+  classification_curie:
+    range: GENCC identifier
+    examples:
+    - value: GENCC:100002
+  classification_title:
+    range: classification_title_enum
+    examples:
+    - value: Strong
+  moi_curie:
+    range: HP identifier
+    examples:
+    - value: HP:0032113
+  moi_title:
+    range: string
+    examples:
+    - value: Semidominant
+  submitter_curie:
+    range: GENCC identifier
+    examples:
+    - value: GENCC:000102
+  submitter_title:
+    range: string
+    examples:
+    - value: ClinGen
+    multivalued: true
+  submitted_as_hgnc_id:
+    range: HGNC identifier
+    examples:
+    - value: HGNC:1480
+  submitted_as_hgnc_symbol:
+    range: string
+    examples:
+    - value: CAPN3
+  submitted_as_disease_id:
+    range: identifier
+    examples:
+    - value: MONDO:0016971
+  submitted_as_disease_name:
+    range: string
+    examples:
+    - value: limb-girdle muscular dystrophy
+  submitted_as_moi_id:
+    range: HP identifier
+    examples:
+    - value: HP:0032113
+  submitted_as_moi_name:
+    range: string
+    examples:
+    - value: SD
+  submitted_as_submitter_id:
+    range: GENCC identifier
+    examples:
+    - value: GENCC:000102
+  submitted_as_submitter_name:
+    range: string
+    examples:
+    - value: ClinGen
+  submitted_as_classification_id:
+    range: GENCC identifier
+    examples:
+    - value: GENCC:100002
+  submitted_as_classification_name:
+    range: submitted_as_classification_name_enum
+    examples:
+    - value: Strong
+  submitted_as_date:
+    range: string
+    examples:
+    - value: '2021-06-15 13:41:47'
+  submitted_as_public_report_url:
+    range: https identifier
+    examples:
+    - value: https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_6f7dbd92-77a0-4fe7-9308-98ce7f4cc383-2021-06-15T185759.642Z
+  submitted_as_notes:
+    range: string
+    examples:
+    - value: 'THSD1 was first reported in relation to autosomal recessive form of
+        Non-immune hydrops fetalis (Shamseldin et al., 2015, PMID:26036949). At least
+        6 unique variants (e.g. missense, frameshift and nonsense) have been reported
+        in humans. Variants in this gene have been reported in at least 8 probands
+        in 5 publications (PMID:26036949; PMID:31130284;PMID:28600779; PMID:30055085;
+        PMID: 33569873). Two publications with convincing evidence and no convincing
+        contradictory evidence classified THSD1 as definitive. Gene is scored according
+        to ClinGen classification.'
+  submitted_as_pmids:
+    range: string
+    examples:
+    - value: 26036949, 31130284, 28600779, 30055085, 33569873
+  submitted_as_assertion_criteria_url:
+    range: identifier
+    examples:
+    - value: https://www.clinicalgenome.org/docs/?doc-type=curation-activity-procedures&curation-procedure=gene-disease-validity
+  submitted_as_submission_id:
+    range: string
+    examples:
+    - value: '1'
+  submitted_run_date:
+    range: string
+    examples:
+    - value: '2021-08-16'
+enums:
+  classification_title_enum:
+    permissible_values:
+      Definitive:
+        description: Definitive
+      Strong:
+        description: Strong
+      Limited:
+        description: Limited
+      Moderate:
+        description: Moderate
+      Refuted Evidence:
+        description: Refuted Evidence
+      No Known Disease Relationship:
+        description: No Known Disease Relationship
+      Disputed Evidence:
+        description: Disputed Evidence
+  submitted_as_classification_name_enum:
+    permissible_values:
+      Definitive:
+        description: Definitive
+      Refuted:
+        description: Refuted
+      Strong:
+        description: Strong
+      STRONG:
+        description: STRONG
+      Limited:
+        description: Limited
+      Moderate:
+        description: Moderate
+      Slight:
+        description: Slight
+      Disputed:
+        description: Disputed
+      Disputed evidence:
+        description: Disputed evidence
+      LIMITED:
+        description: LIMITED
+      Modeare:
+        description: Modeare
+      No Known Disease Relationship:
+        description: No Known Disease Relationship
+      Refuted Evidence:
+        description: Refuted Evidence
+      Disputed Evidence:
+        description: Disputed Evidence
+

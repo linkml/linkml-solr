@@ -10,7 +10,6 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
--e .
 flatten-dict
 linkml-model
 linkml-runtime>=1.1.0
