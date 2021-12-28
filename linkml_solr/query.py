@@ -47,6 +47,7 @@ class SolrQueryEngine(object):
     def query(self, target_class: Type[YAMLRoot] = None, **params) -> List[YAMLRoot]:
         """
         As search, but just returns items, discarding facet info etc
+
         :param target_class:
         :param params:
         :return:
@@ -180,6 +181,18 @@ class SolrQueryEngine(object):
         if commit:
             solr.commit()
         return r
+
+    def delete_all(self, commit=True):
+        """
+        Deletes all documents in core
+
+        :param commit:
+        :return:
+        """
+        solr = pysolr.Solr(self.endpoint.url)
+        solr.delete(q='*:*')
+        if commit:
+            solr.commit()
 
     def _solr_request(self, req: Dict, path='schema'):
         response = requests.post(f'{self.endpoint.url}/{path}',

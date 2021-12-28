@@ -42,25 +42,23 @@ class CreateLoadTestCase(unittest.TestCase):
         qe = SolrQueryEngine(schema=schema,
                              endpoint=SolrEndpoint(url=URL))
         qe.load_schema()
+        qe.delete_all()
         a = GeneToDiseaseAssociation(gene_symbol='foo')
         qe.add([a])
         results = qe.query(target_class=GeneToDiseaseAssociation)
-        assert len(results) >= 1
+        assert len(results) == 1
         container = csv_loader.load(DATA, schemaview=sv, index_slot='associations', target_class=Container)
         print(f'ASSOCS={len(container.associations)}')
         assert len(container.associations) > 50
         qe.add(container.associations)
         results = qe.query(target_class=GeneToDiseaseAssociation, gene_symbol='MED12L')
         print(results)
-        assert len(results) >= 1
-
-
-
-
-
-
-
-
+        assert len(results) == 1
+        FACET_FIELDS = ['moi_title', 'classification_title']
+        result = qe.search(target_class=GeneToDiseaseAssociation,
+                           facet_fields=FACET_FIELDS)
+        for ff in FACET_FIELDS:
+            print(f'FC[{ff}]={result.facet_counts[ff]}')
 
 
 
