@@ -8,7 +8,7 @@ import requests
 
 from linkml_runtime.dumpers import json_dumper
 from linkml_runtime.utils.formatutils import underscore
-from linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
+from linkml_runtime.linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
 
 from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult, FIELD
 from linkml_solr.solrschema import Transaction
