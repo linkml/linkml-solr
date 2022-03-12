@@ -17,15 +17,20 @@ jobs:
       with:
         python-version: 3.8
 
+    - name: Install Poetry
+      uses: snok/install-poetry@v1.3
+      with:
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install wheel
+        run: |
+          poetry install --no-interaction
 
     - name: build a binary wheel dist
       run: |
         rm -fr dist
-        python setup.py bdist_wheel sdist
+        poetry build
 
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@v1.2.2
