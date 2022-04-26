@@ -32,7 +32,14 @@ class SolrQuery:
                 params[k] = v
         if self.filter_query is None:
             self.filter_query = {}
-        params['fq'] = [f'{k}:{_quote(v)}' for (k,v) in self.filter_query.items()]
+        fq = []
+        for k, v in self.filter_query.items():
+            if isinstance(v, list):
+                for v1 in v:
+                    fq.append(f'{k}:{_quote(v1)}')
+            else:
+                fq.append(f'{k}:{_quote(v)}')
+        params['fq'] = fq
         if self.facet_fields is not None:
             params['facet'] = 'on'
             params['facet.field'] = self.facet_fields

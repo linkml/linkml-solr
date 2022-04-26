@@ -1,4 +1,4 @@
-RUN = pipenv run
+RUN = poetry run
 LSOLR = $(RUN) lsolr
 
 all: build test
@@ -8,8 +8,11 @@ clean:
 
 build: linkml_solr/solrschema.py
 
+# Running make test
 # TODO: sometimes load starts before docker environment complete
-test: test-docker-env
+test: test-docker-env test_main
+
+test_main:
 	$(RUN) python -m unittest
 
 test_data: tests/test_models/kitchen_sink.context.jsonld tests/test_models/kitchen_sink.py
@@ -27,6 +30,8 @@ tests/test_models/%.context.jsonld: $(TESTMODELS_SRC)
 	$(RUN) gen-jsonld-context $< > $@
 tests/test_models/%.py: $(TESTMODELS_SRC)
 	$(RUN) gen-python $< > $@
+tests/test_models/%_api.py: $(TESTMODELS_SRC)
+	$(RUN) gen-python-api $< > $@
 tests/test_models/%.ttl: $(TESTMODELS_SRC)
 	$(RUN) gen-rdf $< > $@
 tests/test_models/amigo.yaml: linkml_solr/utils/golr_schema_utils.py
@@ -39,7 +44,7 @@ test-docker-env: test-server wait-10 test-load
 start-solr-server:
 	$(LSOLR) start-server
 test-server:
-	$(LSOLR) start-server -C books -s tests/test_models/books.yaml
+	$(LSOLR) start-server -C books --sleep 10 -s tests/test_models/books.yaml
 
 add-test-core: add-core-test
 add-core-%:

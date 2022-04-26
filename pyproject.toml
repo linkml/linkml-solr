@@ -10,12 +10,13 @@ lsolr = "linkml_solr.cli:main"
 [tool.poetry.dependencies]
 python = "^3.7.4"
 linkml = "^1.1.15"
-linkml-runtime = "^1.1.12"
+linkml-runtime = "^1.2.7"
 pyparsing = "2.4"
 SPARQLWrapper = "^1.8.5"
 pysolr = "^3.9.0"
 flatten-dict = "^0.4.2"
 json-flattener = "^0.1.9"
+linkml-dataops = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 tox = "^3.24.5"
