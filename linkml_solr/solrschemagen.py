@@ -6,8 +6,6 @@ import json
 from linkml_runtime.linkml_model.meta import SchemaDefinition, ClassDefinition, SlotDefinition, ClassDefinitionName
 from linkml_runtime.dumpers import json_dumper
 from linkml_runtime.utils.schemaview import SchemaView
-from linkml_runtime.utils.yamlutils import YAMLRoot, as_json_object
-from linkml_runtime.utils.formatutils import camelcase, be, underscore
 
 from linkml.utils.generator import Generator, shared_arguments
 

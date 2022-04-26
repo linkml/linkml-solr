@@ -1,10 +1,7 @@
 from typing import List
 import logging
 import subprocess
-from linkml.generators.yamlgen import YAMLGenerator
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
-from linkml_runtime.loaders import yaml_loader
-from linkml_solr import SolrQueryEngine, SolrEndpoint
 
 def _get_multivalued_slots(schema: SchemaDefinition) -> List[SlotDefinitionName]:
     return [s.name for s in schema.slots.values() if s.multivalued]

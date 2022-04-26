@@ -1,9 +1,10 @@
 from typing import List
 import click
+import time
 import logging
 import subprocess
-from linkml.generators.yamlgen import YAMLGenerator
-from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
+
+from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.loaders import yaml_loader
 from linkml_solr import SolrQueryEngine, SolrEndpoint, DEFAULT_CORE, DEFAULT_SOLR_URL
 from linkml_solr.utils.solr_bulkload import bulkload_file
@@ -75,6 +76,10 @@ def bulkload(files, format, schema, url, core):
               default='8983',
               show_default=True,
               help='http port number on which solr rules.')
+@click.option('--sleep',
+              default=10,
+              show_default=True,
+              help='Number of seconds to sleep after initiating server start before exiting.')
 @click.option('--create-schema/--no-create-schema',
               default=True,
               show_default=True,
@@ -87,7 +92,7 @@ def bulkload(files, format, schema, url, core):
               default=DEFAULT_SOLR_URL,
               show_default=True,
               help='solr url.')
-def start_server(schema, kill, container, url, core, port, create_schema):
+def start_server(schema, kill, container, url, core, port, sleep: int, create_schema):
     """
     Starts a solr server (via Docker)
     """
@@ -105,7 +110,12 @@ def start_server(schema, kill, container, url, core, port, create_schema):
         'solr-precreate',
         core]
     subprocess.Popen(command)
+    print(f'Sleeping for {sleep} seconds to allow server time to initialize...')
+    time.sleep(sleep)
+    print(f'Done sleeping!')
     if create_schema and schema:
+        # TODO: use SchemaView
+        from linkml.generators.yamlgen import YAMLGenerator
         schema_obj = YAMLGenerator(schema).schema
         qe = SolrQueryEngine(schema=schema_obj,
                              endpoint=SolrEndpoint(url=f'{url}/{core}'))
@@ -157,6 +167,8 @@ def create_schema(schema, url, core):
     """
     Creates a solr schema from a LinkML schema
     """
+    # TODO: use schemaview
+    from linkml.generators.yamlgen import YAMLGenerator
     schema_obj = YAMLGenerator(schema).schema
     qe = SolrQueryEngine(schema=schema_obj,
                          endpoint=SolrEndpoint(url=f'{url}/{core}'))

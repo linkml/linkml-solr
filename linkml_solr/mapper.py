@@ -1,9 +1,8 @@
 import logging
+from typing import Union
 
 from linkml_runtime.utils.formatutils import underscore
 from linkml_runtime.linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition
-from rdflib import BNode, URIRef, Literal
-from rdflib.term import Node
 
 from linkml_solr.solrmodel import *
 
@@ -34,8 +33,11 @@ class LinkMLMapper(Mapper):
     def _get_python_field_for_slot(self, slot: SlotDefinition) -> str:
         return underscore(slot.name) # TODO: map to pythongen
 
-    def pyval_to_solr_atom(self, v: Any, range: ElementName = None, query: SolrQuery = None) -> str:
-        return str(v)
+    def pyval_to_solr_atom(self, v: Any, range: ElementName = None, query: SolrQuery = None) -> Union[str, List[str]]:
+        if isinstance(v, list):
+            return [str(v1) for v1 in v]
+        else:
+            return str(v)
 
     def _get_linkml_class(self, in_obj: Dict) -> str:
         if ASSERTED_TYPE_FIELD in in_obj:

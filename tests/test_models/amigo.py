@@ -1,9 +1,9 @@
 # Auto generated from amigo.yaml by pythongen.py version: 0.9.0
-# Generation date: 2021-07-23 17:49
-# Schema: None
+# Generation date: 2022-04-21T12:29:46
+# Schema: amigo-solr
 #
-# id: https://w3id.org//None
-# description: TODO
+# id: https://geneontology.org/amigo/schema
+# description: AmiGO
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
 import dataclasses
@@ -31,10 +31,10 @@ metamodel_version = "1.7.0"
 dataclasses._init_fn = dataclasses_init_fn_with_kwargs
 
 # Namespaces
-NONE = CurieNamespace('None', 'http://kbase.us/')
+AMIGO = CurieNamespace('amigo', 'https://geneontology.org/amigo/schema/')
 LINKML = CurieNamespace('linkml', 'https://w3id.org/linkml/')
 XSD = CurieNamespace('xsd', 'http://www.w3.org/2001/XMLSchema#')
-DEFAULT_ = CurieNamespace('', 'https://w3id.org//None/')
+DEFAULT_ = AMIGO
 
 
 # Types
@@ -42,7 +42,7 @@ class SearchableString(String):
     type_class_uri = XSD.string
     type_class_curie = "xsd:string"
     type_name = "SearchableString"
-    type_model_uri = URIRef("https://w3id.org//None/SearchableString")
+    type_model_uri = AMIGO.SearchableString
 
 
 # Class references
@@ -56,10 +56,10 @@ class Annotation(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Annotation")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.Annotation
+    class_class_curie: ClassVar[str] = "amigo:Annotation"
     class_name: ClassVar[str] = "annotation"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Annotation")
+    class_model_uri: ClassVar[URIRef] = AMIGO.Annotation
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -411,10 +411,10 @@ class AnnotationEvidenceAggregate(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/AnnotationEvidenceAggregate")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.AnnotationEvidenceAggregate
+    class_class_curie: ClassVar[str] = "amigo:AnnotationEvidenceAggregate"
     class_name: ClassVar[str] = "annotation_evidence_aggregate"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/AnnotationEvidenceAggregate")
+    class_model_uri: ClassVar[URIRef] = AMIGO.AnnotationEvidenceAggregate
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -513,10 +513,10 @@ class Bioentity(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Bioentity")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.Bioentity
+    class_class_curie: ClassVar[str] = "amigo:Bioentity"
     class_name: ClassVar[str] = "bioentity"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Bioentity")
+    class_model_uri: ClassVar[URIRef] = AMIGO.Bioentity
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -687,10 +687,10 @@ class ComplexAnnotation(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/ComplexAnnotation")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.ComplexAnnotation
+    class_class_curie: ClassVar[str] = "amigo:ComplexAnnotation"
     class_name: ClassVar[str] = "complex_annotation"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/ComplexAnnotation")
+    class_model_uri: ClassVar[URIRef] = AMIGO.ComplexAnnotation
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -881,10 +881,10 @@ class General(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/General")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.General
+    class_class_curie: ClassVar[str] = "amigo:General"
     class_name: ClassVar[str] = "general"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/General")
+    class_model_uri: ClassVar[URIRef] = AMIGO.General
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -930,10 +930,10 @@ class ModelAnnotation(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/ModelAnnotation")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.ModelAnnotation
+    class_class_curie: ClassVar[str] = "amigo:ModelAnnotation"
     class_name: ClassVar[str] = "model_annotation"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/ModelAnnotation")
+    class_model_uri: ClassVar[URIRef] = AMIGO.ModelAnnotation
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -1308,10 +1308,10 @@ class NoctuaModelMeta(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/NoctuaModelMeta")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.NoctuaModelMeta
+    class_class_curie: ClassVar[str] = "amigo:NoctuaModelMeta"
     class_name: ClassVar[str] = "noctua_model_meta"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/NoctuaModelMeta")
+    class_model_uri: ClassVar[URIRef] = AMIGO.NoctuaModelMeta
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -1381,10 +1381,10 @@ class OntologyClass(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/OntologyClass")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.OntologyClass
+    class_class_curie: ClassVar[str] = "amigo:OntologyClass"
     class_name: ClassVar[str] = "ontology_class"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/OntologyClass")
+    class_model_uri: ClassVar[URIRef] = AMIGO.OntologyClass
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -1417,6 +1417,7 @@ class OntologyClass(YAMLRoot):
     regulates_closure_label_searchable: Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]] = empty_list()
     topology_graph_json: Optional[str] = None
     regulates_transitivity_graph_json: Optional[str] = None
+    isa_partof_transitivity_graph_json: Optional[str] = None
     neighborhood_graph_json: Optional[str] = None
     neighborhood_limited_graph_json: Optional[str] = None
     only_in_taxon: Optional[Union[str, SearchableString]] = None
@@ -1548,6 +1549,9 @@ class OntologyClass(YAMLRoot):
         if self.regulates_transitivity_graph_json is not None and not isinstance(self.regulates_transitivity_graph_json, str):
             self.regulates_transitivity_graph_json = str(self.regulates_transitivity_graph_json)
 
+        if self.isa_partof_transitivity_graph_json is not None and not isinstance(self.isa_partof_transitivity_graph_json, str):
+            self.isa_partof_transitivity_graph_json = str(self.isa_partof_transitivity_graph_json)
+
         if self.neighborhood_graph_json is not None and not isinstance(self.neighborhood_graph_json, str):
             self.neighborhood_graph_json = str(self.neighborhood_graph_json)
 
@@ -1615,10 +1619,10 @@ class Family(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Family")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.Family
+    class_class_curie: ClassVar[str] = "amigo:Family"
     class_name: ClassVar[str] = "family"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/Family")
+    class_model_uri: ClassVar[URIRef] = AMIGO.Family
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -1670,10 +1674,10 @@ class OntologyClassAc(YAMLRoot):
     """
     _inherited_slots: ClassVar[List[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/OntologyClassAc")
-    class_class_curie: ClassVar[str] = None
+    class_class_uri: ClassVar[URIRef] = AMIGO.OntologyClassAc
+    class_class_curie: ClassVar[str] = "amigo:OntologyClassAc"
     class_name: ClassVar[str] = "ontology_class_ac"
-    class_model_uri: ClassVar[URIRef] = URIRef("https://w3id.org//None/OntologyClassAc")
+    class_model_uri: ClassVar[URIRef] = AMIGO.OntologyClassAc
 
     document_category: Optional[str] = None
     id: Optional[str] = None
@@ -1722,557 +1726,560 @@ class OntologyClassAc(YAMLRoot):
 class slots:
     pass
 
-slots.document_category = Slot(uri=DEFAULT_.document_category, name="document_category", curie=DEFAULT_.curie('document_category'),
-                   model_uri=DEFAULT_.document_category, domain=None, range=Optional[str])
+slots.document_category = Slot(uri=AMIGO.document_category, name="document_category", curie=AMIGO.curie('document_category'),
+                   model_uri=AMIGO.document_category, domain=None, range=Optional[str])
 
-slots.id = Slot(uri=DEFAULT_.id, name="id", curie=DEFAULT_.curie('id'),
-                   model_uri=DEFAULT_.id, domain=None, range=Optional[str])
+slots.id = Slot(uri=AMIGO.id, name="id", curie=AMIGO.curie('id'),
+                   model_uri=AMIGO.id, domain=None, range=Optional[str])
 
-slots.source = Slot(uri=DEFAULT_.source, name="source", curie=DEFAULT_.curie('source'),
-                   model_uri=DEFAULT_.source, domain=None, range=Optional[str])
+slots.source = Slot(uri=AMIGO.source, name="source", curie=AMIGO.curie('source'),
+                   model_uri=AMIGO.source, domain=None, range=Optional[str])
 
-slots.type = Slot(uri=DEFAULT_.type, name="type", curie=DEFAULT_.curie('type'),
-                   model_uri=DEFAULT_.type, domain=None, range=Optional[str])
+slots.type = Slot(uri=AMIGO.type, name="type", curie=AMIGO.curie('type'),
+                   model_uri=AMIGO.type, domain=None, range=Optional[str])
 
-slots.date = Slot(uri=DEFAULT_.date, name="date", curie=DEFAULT_.curie('date'),
-                   model_uri=DEFAULT_.date, domain=None, range=Optional[str])
+slots.date = Slot(uri=AMIGO.date, name="date", curie=AMIGO.curie('date'),
+                   model_uri=AMIGO.date, domain=None, range=Optional[str])
 
-slots.assigned_by = Slot(uri=DEFAULT_.assigned_by, name="assigned_by", curie=DEFAULT_.curie('assigned_by'),
-                   model_uri=DEFAULT_.assigned_by, domain=None, range=Optional[str])
+slots.assigned_by = Slot(uri=AMIGO.assigned_by, name="assigned_by", curie=AMIGO.curie('assigned_by'),
+                   model_uri=AMIGO.assigned_by, domain=None, range=Optional[str])
 
-slots.is_redundant_for = Slot(uri=DEFAULT_.is_redundant_for, name="is_redundant_for", curie=DEFAULT_.curie('is_redundant_for'),
-                   model_uri=DEFAULT_.is_redundant_for, domain=None, range=Optional[str])
+slots.is_redundant_for = Slot(uri=AMIGO.is_redundant_for, name="is_redundant_for", curie=AMIGO.curie('is_redundant_for'),
+                   model_uri=AMIGO.is_redundant_for, domain=None, range=Optional[str])
 
-slots.taxon = Slot(uri=DEFAULT_.taxon, name="taxon", curie=DEFAULT_.curie('taxon'),
-                   model_uri=DEFAULT_.taxon, domain=None, range=Optional[str])
+slots.taxon = Slot(uri=AMIGO.taxon, name="taxon", curie=AMIGO.curie('taxon'),
+                   model_uri=AMIGO.taxon, domain=None, range=Optional[str])
 
-slots.taxon_label = Slot(uri=DEFAULT_.taxon_label, name="taxon_label", curie=DEFAULT_.curie('taxon_label'),
-                   model_uri=DEFAULT_.taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.taxon_label = Slot(uri=AMIGO.taxon_label, name="taxon_label", curie=AMIGO.curie('taxon_label'),
+                   model_uri=AMIGO.taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.taxon_label_searchable = Slot(uri=DEFAULT_.taxon_label_searchable, name="taxon_label_searchable", curie=DEFAULT_.curie('taxon_label_searchable'),
-                   model_uri=DEFAULT_.taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.taxon_label_searchable = Slot(uri=AMIGO.taxon_label_searchable, name="taxon_label_searchable", curie=AMIGO.curie('taxon_label_searchable'),
+                   model_uri=AMIGO.taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.taxon_closure = Slot(uri=DEFAULT_.taxon_closure, name="taxon_closure", curie=DEFAULT_.curie('taxon_closure'),
-                   model_uri=DEFAULT_.taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.taxon_closure = Slot(uri=AMIGO.taxon_closure, name="taxon_closure", curie=AMIGO.curie('taxon_closure'),
+                   model_uri=AMIGO.taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.taxon_closure_label = Slot(uri=DEFAULT_.taxon_closure_label, name="taxon_closure_label", curie=DEFAULT_.curie('taxon_closure_label'),
-                   model_uri=DEFAULT_.taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.taxon_closure_label = Slot(uri=AMIGO.taxon_closure_label, name="taxon_closure_label", curie=AMIGO.curie('taxon_closure_label'),
+                   model_uri=AMIGO.taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.taxon_closure_label_searchable = Slot(uri=DEFAULT_.taxon_closure_label_searchable, name="taxon_closure_label_searchable", curie=DEFAULT_.curie('taxon_closure_label_searchable'),
-                   model_uri=DEFAULT_.taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.taxon_closure_label_searchable = Slot(uri=AMIGO.taxon_closure_label_searchable, name="taxon_closure_label_searchable", curie=AMIGO.curie('taxon_closure_label_searchable'),
+                   model_uri=AMIGO.taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.taxon_subset_closure = Slot(uri=DEFAULT_.taxon_subset_closure, name="taxon_subset_closure", curie=DEFAULT_.curie('taxon_subset_closure'),
-                   model_uri=DEFAULT_.taxon_subset_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.taxon_subset_closure = Slot(uri=AMIGO.taxon_subset_closure, name="taxon_subset_closure", curie=AMIGO.curie('taxon_subset_closure'),
+                   model_uri=AMIGO.taxon_subset_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.taxon_subset_closure_label = Slot(uri=DEFAULT_.taxon_subset_closure_label, name="taxon_subset_closure_label", curie=DEFAULT_.curie('taxon_subset_closure_label'),
-                   model_uri=DEFAULT_.taxon_subset_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.taxon_subset_closure_label = Slot(uri=AMIGO.taxon_subset_closure_label, name="taxon_subset_closure_label", curie=AMIGO.curie('taxon_subset_closure_label'),
+                   model_uri=AMIGO.taxon_subset_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.taxon_subset_closure_label_searchable = Slot(uri=DEFAULT_.taxon_subset_closure_label_searchable, name="taxon_subset_closure_label_searchable", curie=DEFAULT_.curie('taxon_subset_closure_label_searchable'),
-                   model_uri=DEFAULT_.taxon_subset_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.taxon_subset_closure_label_searchable = Slot(uri=AMIGO.taxon_subset_closure_label_searchable, name="taxon_subset_closure_label_searchable", curie=AMIGO.curie('taxon_subset_closure_label_searchable'),
+                   model_uri=AMIGO.taxon_subset_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.secondary_taxon = Slot(uri=DEFAULT_.secondary_taxon, name="secondary_taxon", curie=DEFAULT_.curie('secondary_taxon'),
-                   model_uri=DEFAULT_.secondary_taxon, domain=None, range=Optional[str])
+slots.secondary_taxon = Slot(uri=AMIGO.secondary_taxon, name="secondary_taxon", curie=AMIGO.curie('secondary_taxon'),
+                   model_uri=AMIGO.secondary_taxon, domain=None, range=Optional[str])
 
-slots.secondary_taxon_label = Slot(uri=DEFAULT_.secondary_taxon_label, name="secondary_taxon_label", curie=DEFAULT_.curie('secondary_taxon_label'),
-                   model_uri=DEFAULT_.secondary_taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.secondary_taxon_label = Slot(uri=AMIGO.secondary_taxon_label, name="secondary_taxon_label", curie=AMIGO.curie('secondary_taxon_label'),
+                   model_uri=AMIGO.secondary_taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.secondary_taxon_label_searchable = Slot(uri=DEFAULT_.secondary_taxon_label_searchable, name="secondary_taxon_label_searchable", curie=DEFAULT_.curie('secondary_taxon_label_searchable'),
-                   model_uri=DEFAULT_.secondary_taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.secondary_taxon_label_searchable = Slot(uri=AMIGO.secondary_taxon_label_searchable, name="secondary_taxon_label_searchable", curie=AMIGO.curie('secondary_taxon_label_searchable'),
+                   model_uri=AMIGO.secondary_taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.secondary_taxon_closure = Slot(uri=DEFAULT_.secondary_taxon_closure, name="secondary_taxon_closure", curie=DEFAULT_.curie('secondary_taxon_closure'),
-                   model_uri=DEFAULT_.secondary_taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.secondary_taxon_closure = Slot(uri=AMIGO.secondary_taxon_closure, name="secondary_taxon_closure", curie=AMIGO.curie('secondary_taxon_closure'),
+                   model_uri=AMIGO.secondary_taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.secondary_taxon_closure_label = Slot(uri=DEFAULT_.secondary_taxon_closure_label, name="secondary_taxon_closure_label", curie=DEFAULT_.curie('secondary_taxon_closure_label'),
-                   model_uri=DEFAULT_.secondary_taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.secondary_taxon_closure_label = Slot(uri=AMIGO.secondary_taxon_closure_label, name="secondary_taxon_closure_label", curie=AMIGO.curie('secondary_taxon_closure_label'),
+                   model_uri=AMIGO.secondary_taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.secondary_taxon_closure_label_searchable = Slot(uri=DEFAULT_.secondary_taxon_closure_label_searchable, name="secondary_taxon_closure_label_searchable", curie=DEFAULT_.curie('secondary_taxon_closure_label_searchable'),
-                   model_uri=DEFAULT_.secondary_taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.secondary_taxon_closure_label_searchable = Slot(uri=AMIGO.secondary_taxon_closure_label_searchable, name="secondary_taxon_closure_label_searchable", curie=AMIGO.curie('secondary_taxon_closure_label_searchable'),
+                   model_uri=AMIGO.secondary_taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.isa_partof_closure = Slot(uri=DEFAULT_.isa_partof_closure, name="isa_partof_closure", curie=DEFAULT_.curie('isa_partof_closure'),
-                   model_uri=DEFAULT_.isa_partof_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.isa_partof_closure = Slot(uri=AMIGO.isa_partof_closure, name="isa_partof_closure", curie=AMIGO.curie('isa_partof_closure'),
+                   model_uri=AMIGO.isa_partof_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.isa_partof_closure_label = Slot(uri=DEFAULT_.isa_partof_closure_label, name="isa_partof_closure_label", curie=DEFAULT_.curie('isa_partof_closure_label'),
-                   model_uri=DEFAULT_.isa_partof_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.isa_partof_closure_label = Slot(uri=AMIGO.isa_partof_closure_label, name="isa_partof_closure_label", curie=AMIGO.curie('isa_partof_closure_label'),
+                   model_uri=AMIGO.isa_partof_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.isa_partof_closure_label_searchable = Slot(uri=DEFAULT_.isa_partof_closure_label_searchable, name="isa_partof_closure_label_searchable", curie=DEFAULT_.curie('isa_partof_closure_label_searchable'),
-                   model_uri=DEFAULT_.isa_partof_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.isa_partof_closure_label_searchable = Slot(uri=AMIGO.isa_partof_closure_label_searchable, name="isa_partof_closure_label_searchable", curie=AMIGO.curie('isa_partof_closure_label_searchable'),
+                   model_uri=AMIGO.isa_partof_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.regulates_closure = Slot(uri=DEFAULT_.regulates_closure, name="regulates_closure", curie=DEFAULT_.curie('regulates_closure'),
-                   model_uri=DEFAULT_.regulates_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.regulates_closure = Slot(uri=AMIGO.regulates_closure, name="regulates_closure", curie=AMIGO.curie('regulates_closure'),
+                   model_uri=AMIGO.regulates_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.regulates_closure_label = Slot(uri=DEFAULT_.regulates_closure_label, name="regulates_closure_label", curie=DEFAULT_.curie('regulates_closure_label'),
-                   model_uri=DEFAULT_.regulates_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.regulates_closure_label = Slot(uri=AMIGO.regulates_closure_label, name="regulates_closure_label", curie=AMIGO.curie('regulates_closure_label'),
+                   model_uri=AMIGO.regulates_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.regulates_closure_label_searchable = Slot(uri=DEFAULT_.regulates_closure_label_searchable, name="regulates_closure_label_searchable", curie=DEFAULT_.curie('regulates_closure_label_searchable'),
-                   model_uri=DEFAULT_.regulates_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.regulates_closure_label_searchable = Slot(uri=AMIGO.regulates_closure_label_searchable, name="regulates_closure_label_searchable", curie=AMIGO.curie('regulates_closure_label_searchable'),
+                   model_uri=AMIGO.regulates_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.has_participant_closure = Slot(uri=DEFAULT_.has_participant_closure, name="has_participant_closure", curie=DEFAULT_.curie('has_participant_closure'),
-                   model_uri=DEFAULT_.has_participant_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.has_participant_closure = Slot(uri=AMIGO.has_participant_closure, name="has_participant_closure", curie=AMIGO.curie('has_participant_closure'),
+                   model_uri=AMIGO.has_participant_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.has_participant_closure_label = Slot(uri=DEFAULT_.has_participant_closure_label, name="has_participant_closure_label", curie=DEFAULT_.curie('has_participant_closure_label'),
-                   model_uri=DEFAULT_.has_participant_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.has_participant_closure_label = Slot(uri=AMIGO.has_participant_closure_label, name="has_participant_closure_label", curie=AMIGO.curie('has_participant_closure_label'),
+                   model_uri=AMIGO.has_participant_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.has_participant_closure_label_searchable = Slot(uri=DEFAULT_.has_participant_closure_label_searchable, name="has_participant_closure_label_searchable", curie=DEFAULT_.curie('has_participant_closure_label_searchable'),
-                   model_uri=DEFAULT_.has_participant_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.has_participant_closure_label_searchable = Slot(uri=AMIGO.has_participant_closure_label_searchable, name="has_participant_closure_label_searchable", curie=AMIGO.curie('has_participant_closure_label_searchable'),
+                   model_uri=AMIGO.has_participant_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.synonym = Slot(uri=DEFAULT_.synonym, name="synonym", curie=DEFAULT_.curie('synonym'),
-                   model_uri=DEFAULT_.synonym, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.synonym = Slot(uri=AMIGO.synonym, name="synonym", curie=AMIGO.curie('synonym'),
+                   model_uri=AMIGO.synonym, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.synonym_searchable = Slot(uri=DEFAULT_.synonym_searchable, name="synonym_searchable", curie=DEFAULT_.curie('synonym_searchable'),
-                   model_uri=DEFAULT_.synonym_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.synonym_searchable = Slot(uri=AMIGO.synonym_searchable, name="synonym_searchable", curie=AMIGO.curie('synonym_searchable'),
+                   model_uri=AMIGO.synonym_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.bioentity = Slot(uri=DEFAULT_.bioentity, name="bioentity", curie=DEFAULT_.curie('bioentity'),
-                   model_uri=DEFAULT_.bioentity, domain=None, range=Optional[str])
+slots.bioentity = Slot(uri=AMIGO.bioentity, name="bioentity", curie=AMIGO.curie('bioentity'),
+                   model_uri=AMIGO.bioentity, domain=None, range=Optional[str])
 
-slots.bioentity_label = Slot(uri=DEFAULT_.bioentity_label, name="bioentity_label", curie=DEFAULT_.curie('bioentity_label'),
-                   model_uri=DEFAULT_.bioentity_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.bioentity_label = Slot(uri=AMIGO.bioentity_label, name="bioentity_label", curie=AMIGO.curie('bioentity_label'),
+                   model_uri=AMIGO.bioentity_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.bioentity_label_searchable = Slot(uri=DEFAULT_.bioentity_label_searchable, name="bioentity_label_searchable", curie=DEFAULT_.curie('bioentity_label_searchable'),
-                   model_uri=DEFAULT_.bioentity_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.bioentity_label_searchable = Slot(uri=AMIGO.bioentity_label_searchable, name="bioentity_label_searchable", curie=AMIGO.curie('bioentity_label_searchable'),
+                   model_uri=AMIGO.bioentity_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.bioentity_name = Slot(uri=DEFAULT_.bioentity_name, name="bioentity_name", curie=DEFAULT_.curie('bioentity_name'),
-                   model_uri=DEFAULT_.bioentity_name, domain=None, range=Optional[Union[str, SearchableString]])
+slots.bioentity_name = Slot(uri=AMIGO.bioentity_name, name="bioentity_name", curie=AMIGO.curie('bioentity_name'),
+                   model_uri=AMIGO.bioentity_name, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.bioentity_name_searchable = Slot(uri=DEFAULT_.bioentity_name_searchable, name="bioentity_name_searchable", curie=DEFAULT_.curie('bioentity_name_searchable'),
-                   model_uri=DEFAULT_.bioentity_name_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.bioentity_name_searchable = Slot(uri=AMIGO.bioentity_name_searchable, name="bioentity_name_searchable", curie=AMIGO.curie('bioentity_name_searchable'),
+                   model_uri=AMIGO.bioentity_name_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.bioentity_internal_id = Slot(uri=DEFAULT_.bioentity_internal_id, name="bioentity_internal_id", curie=DEFAULT_.curie('bioentity_internal_id'),
-                   model_uri=DEFAULT_.bioentity_internal_id, domain=None, range=Optional[str])
+slots.bioentity_internal_id = Slot(uri=AMIGO.bioentity_internal_id, name="bioentity_internal_id", curie=AMIGO.curie('bioentity_internal_id'),
+                   model_uri=AMIGO.bioentity_internal_id, domain=None, range=Optional[str])
 
-slots.qualifier = Slot(uri=DEFAULT_.qualifier, name="qualifier", curie=DEFAULT_.curie('qualifier'),
-                   model_uri=DEFAULT_.qualifier, domain=None, range=Optional[Union[str, List[str]]])
+slots.qualifier = Slot(uri=AMIGO.qualifier, name="qualifier", curie=AMIGO.curie('qualifier'),
+                   model_uri=AMIGO.qualifier, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.annotation_class = Slot(uri=DEFAULT_.annotation_class, name="annotation_class", curie=DEFAULT_.curie('annotation_class'),
-                   model_uri=DEFAULT_.annotation_class, domain=None, range=Optional[str])
+slots.annotation_class = Slot(uri=AMIGO.annotation_class, name="annotation_class", curie=AMIGO.curie('annotation_class'),
+                   model_uri=AMIGO.annotation_class, domain=None, range=Optional[str])
 
-slots.annotation_class_label = Slot(uri=DEFAULT_.annotation_class_label, name="annotation_class_label", curie=DEFAULT_.curie('annotation_class_label'),
-                   model_uri=DEFAULT_.annotation_class_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_class_label = Slot(uri=AMIGO.annotation_class_label, name="annotation_class_label", curie=AMIGO.curie('annotation_class_label'),
+                   model_uri=AMIGO.annotation_class_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.annotation_class_label_searchable = Slot(uri=DEFAULT_.annotation_class_label_searchable, name="annotation_class_label_searchable", curie=DEFAULT_.curie('annotation_class_label_searchable'),
-                   model_uri=DEFAULT_.annotation_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_class_label_searchable = Slot(uri=AMIGO.annotation_class_label_searchable, name="annotation_class_label_searchable", curie=AMIGO.curie('annotation_class_label_searchable'),
+                   model_uri=AMIGO.annotation_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.aspect = Slot(uri=DEFAULT_.aspect, name="aspect", curie=DEFAULT_.curie('aspect'),
-                   model_uri=DEFAULT_.aspect, domain=None, range=Optional[str])
+slots.aspect = Slot(uri=AMIGO.aspect, name="aspect", curie=AMIGO.curie('aspect'),
+                   model_uri=AMIGO.aspect, domain=None, range=Optional[str])
 
-slots.bioentity_isoform = Slot(uri=DEFAULT_.bioentity_isoform, name="bioentity_isoform", curie=DEFAULT_.curie('bioentity_isoform'),
-                   model_uri=DEFAULT_.bioentity_isoform, domain=None, range=Optional[str])
+slots.bioentity_isoform = Slot(uri=AMIGO.bioentity_isoform, name="bioentity_isoform", curie=AMIGO.curie('bioentity_isoform'),
+                   model_uri=AMIGO.bioentity_isoform, domain=None, range=Optional[str])
 
-slots.evidence_type = Slot(uri=DEFAULT_.evidence_type, name="evidence_type", curie=DEFAULT_.curie('evidence_type'),
-                   model_uri=DEFAULT_.evidence_type, domain=None, range=Optional[str])
+slots.evidence_type = Slot(uri=AMIGO.evidence_type, name="evidence_type", curie=AMIGO.curie('evidence_type'),
+                   model_uri=AMIGO.evidence_type, domain=None, range=Optional[str])
 
-slots.evidence_type_closure = Slot(uri=DEFAULT_.evidence_type_closure, name="evidence_type_closure", curie=DEFAULT_.curie('evidence_type_closure'),
-                   model_uri=DEFAULT_.evidence_type_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.evidence_type_closure = Slot(uri=AMIGO.evidence_type_closure, name="evidence_type_closure", curie=AMIGO.curie('evidence_type_closure'),
+                   model_uri=AMIGO.evidence_type_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.evidence_with = Slot(uri=DEFAULT_.evidence_with, name="evidence_with", curie=DEFAULT_.curie('evidence_with'),
-                   model_uri=DEFAULT_.evidence_with, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_with = Slot(uri=AMIGO.evidence_with, name="evidence_with", curie=AMIGO.curie('evidence_with'),
+                   model_uri=AMIGO.evidence_with, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence_with_searchable = Slot(uri=DEFAULT_.evidence_with_searchable, name="evidence_with_searchable", curie=DEFAULT_.curie('evidence_with_searchable'),
-                   model_uri=DEFAULT_.evidence_with_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_with_searchable = Slot(uri=AMIGO.evidence_with_searchable, name="evidence_with_searchable", curie=AMIGO.curie('evidence_with_searchable'),
+                   model_uri=AMIGO.evidence_with_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence = Slot(uri=DEFAULT_.evidence, name="evidence", curie=DEFAULT_.curie('evidence'),
-                   model_uri=DEFAULT_.evidence, domain=None, range=Optional[str])
+slots.evidence = Slot(uri=AMIGO.evidence, name="evidence", curie=AMIGO.curie('evidence'),
+                   model_uri=AMIGO.evidence, domain=None, range=Optional[str])
 
-slots.evidence_label = Slot(uri=DEFAULT_.evidence_label, name="evidence_label", curie=DEFAULT_.curie('evidence_label'),
-                   model_uri=DEFAULT_.evidence_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.evidence_label = Slot(uri=AMIGO.evidence_label, name="evidence_label", curie=AMIGO.curie('evidence_label'),
+                   model_uri=AMIGO.evidence_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.evidence_label_searchable = Slot(uri=DEFAULT_.evidence_label_searchable, name="evidence_label_searchable", curie=DEFAULT_.curie('evidence_label_searchable'),
-                   model_uri=DEFAULT_.evidence_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.evidence_label_searchable = Slot(uri=AMIGO.evidence_label_searchable, name="evidence_label_searchable", curie=AMIGO.curie('evidence_label_searchable'),
+                   model_uri=AMIGO.evidence_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.evidence_closure = Slot(uri=DEFAULT_.evidence_closure, name="evidence_closure", curie=DEFAULT_.curie('evidence_closure'),
-                   model_uri=DEFAULT_.evidence_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.evidence_closure = Slot(uri=AMIGO.evidence_closure, name="evidence_closure", curie=AMIGO.curie('evidence_closure'),
+                   model_uri=AMIGO.evidence_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.evidence_closure_label = Slot(uri=DEFAULT_.evidence_closure_label, name="evidence_closure_label", curie=DEFAULT_.curie('evidence_closure_label'),
-                   model_uri=DEFAULT_.evidence_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_closure_label = Slot(uri=AMIGO.evidence_closure_label, name="evidence_closure_label", curie=AMIGO.curie('evidence_closure_label'),
+                   model_uri=AMIGO.evidence_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence_closure_label_searchable = Slot(uri=DEFAULT_.evidence_closure_label_searchable, name="evidence_closure_label_searchable", curie=DEFAULT_.curie('evidence_closure_label_searchable'),
-                   model_uri=DEFAULT_.evidence_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_closure_label_searchable = Slot(uri=AMIGO.evidence_closure_label_searchable, name="evidence_closure_label_searchable", curie=AMIGO.curie('evidence_closure_label_searchable'),
+                   model_uri=AMIGO.evidence_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence_subset_closure = Slot(uri=DEFAULT_.evidence_subset_closure, name="evidence_subset_closure", curie=DEFAULT_.curie('evidence_subset_closure'),
-                   model_uri=DEFAULT_.evidence_subset_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.evidence_subset_closure = Slot(uri=AMIGO.evidence_subset_closure, name="evidence_subset_closure", curie=AMIGO.curie('evidence_subset_closure'),
+                   model_uri=AMIGO.evidence_subset_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.evidence_subset_closure_label = Slot(uri=DEFAULT_.evidence_subset_closure_label, name="evidence_subset_closure_label", curie=DEFAULT_.curie('evidence_subset_closure_label'),
-                   model_uri=DEFAULT_.evidence_subset_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_subset_closure_label = Slot(uri=AMIGO.evidence_subset_closure_label, name="evidence_subset_closure_label", curie=AMIGO.curie('evidence_subset_closure_label'),
+                   model_uri=AMIGO.evidence_subset_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence_subset_closure_label_searchable = Slot(uri=DEFAULT_.evidence_subset_closure_label_searchable, name="evidence_subset_closure_label_searchable", curie=DEFAULT_.curie('evidence_subset_closure_label_searchable'),
-                   model_uri=DEFAULT_.evidence_subset_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_subset_closure_label_searchable = Slot(uri=AMIGO.evidence_subset_closure_label_searchable, name="evidence_subset_closure_label_searchable", curie=AMIGO.curie('evidence_subset_closure_label_searchable'),
+                   model_uri=AMIGO.evidence_subset_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.reference = Slot(uri=DEFAULT_.reference, name="reference", curie=DEFAULT_.curie('reference'),
-                   model_uri=DEFAULT_.reference, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.reference = Slot(uri=AMIGO.reference, name="reference", curie=AMIGO.curie('reference'),
+                   model_uri=AMIGO.reference, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.reference_searchable = Slot(uri=DEFAULT_.reference_searchable, name="reference_searchable", curie=DEFAULT_.curie('reference_searchable'),
-                   model_uri=DEFAULT_.reference_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.reference_searchable = Slot(uri=AMIGO.reference_searchable, name="reference_searchable", curie=AMIGO.curie('reference_searchable'),
+                   model_uri=AMIGO.reference_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_class = Slot(uri=DEFAULT_.annotation_extension_class, name="annotation_extension_class", curie=DEFAULT_.curie('annotation_extension_class'),
-                   model_uri=DEFAULT_.annotation_extension_class, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_extension_class = Slot(uri=AMIGO.annotation_extension_class, name="annotation_extension_class", curie=AMIGO.curie('annotation_extension_class'),
+                   model_uri=AMIGO.annotation_extension_class, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.annotation_extension_class_label = Slot(uri=DEFAULT_.annotation_extension_class_label, name="annotation_extension_class_label", curie=DEFAULT_.curie('annotation_extension_class_label'),
-                   model_uri=DEFAULT_.annotation_extension_class_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.annotation_extension_class_label = Slot(uri=AMIGO.annotation_extension_class_label, name="annotation_extension_class_label", curie=AMIGO.curie('annotation_extension_class_label'),
+                   model_uri=AMIGO.annotation_extension_class_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_class_label_searchable = Slot(uri=DEFAULT_.annotation_extension_class_label_searchable, name="annotation_extension_class_label_searchable", curie=DEFAULT_.curie('annotation_extension_class_label_searchable'),
-                   model_uri=DEFAULT_.annotation_extension_class_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.annotation_extension_class_label_searchable = Slot(uri=AMIGO.annotation_extension_class_label_searchable, name="annotation_extension_class_label_searchable", curie=AMIGO.curie('annotation_extension_class_label_searchable'),
+                   model_uri=AMIGO.annotation_extension_class_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_class_closure = Slot(uri=DEFAULT_.annotation_extension_class_closure, name="annotation_extension_class_closure", curie=DEFAULT_.curie('annotation_extension_class_closure'),
-                   model_uri=DEFAULT_.annotation_extension_class_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_extension_class_closure = Slot(uri=AMIGO.annotation_extension_class_closure, name="annotation_extension_class_closure", curie=AMIGO.curie('annotation_extension_class_closure'),
+                   model_uri=AMIGO.annotation_extension_class_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.annotation_extension_class_closure_label = Slot(uri=DEFAULT_.annotation_extension_class_closure_label, name="annotation_extension_class_closure_label", curie=DEFAULT_.curie('annotation_extension_class_closure_label'),
-                   model_uri=DEFAULT_.annotation_extension_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.annotation_extension_class_closure_label = Slot(uri=AMIGO.annotation_extension_class_closure_label, name="annotation_extension_class_closure_label", curie=AMIGO.curie('annotation_extension_class_closure_label'),
+                   model_uri=AMIGO.annotation_extension_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_class_closure_label_searchable = Slot(uri=DEFAULT_.annotation_extension_class_closure_label_searchable, name="annotation_extension_class_closure_label_searchable", curie=DEFAULT_.curie('annotation_extension_class_closure_label_searchable'),
-                   model_uri=DEFAULT_.annotation_extension_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.annotation_extension_class_closure_label_searchable = Slot(uri=AMIGO.annotation_extension_class_closure_label_searchable, name="annotation_extension_class_closure_label_searchable", curie=AMIGO.curie('annotation_extension_class_closure_label_searchable'),
+                   model_uri=AMIGO.annotation_extension_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_json = Slot(uri=DEFAULT_.annotation_extension_json, name="annotation_extension_json", curie=DEFAULT_.curie('annotation_extension_json'),
-                   model_uri=DEFAULT_.annotation_extension_json, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_extension_json = Slot(uri=AMIGO.annotation_extension_json, name="annotation_extension_json", curie=AMIGO.curie('annotation_extension_json'),
+                   model_uri=AMIGO.annotation_extension_json, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.panther_family = Slot(uri=DEFAULT_.panther_family, name="panther_family", curie=DEFAULT_.curie('panther_family'),
-                   model_uri=DEFAULT_.panther_family, domain=None, range=Optional[Union[str, SearchableString]])
+slots.panther_family = Slot(uri=AMIGO.panther_family, name="panther_family", curie=AMIGO.curie('panther_family'),
+                   model_uri=AMIGO.panther_family, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.panther_family_searchable = Slot(uri=DEFAULT_.panther_family_searchable, name="panther_family_searchable", curie=DEFAULT_.curie('panther_family_searchable'),
-                   model_uri=DEFAULT_.panther_family_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.panther_family_searchable = Slot(uri=AMIGO.panther_family_searchable, name="panther_family_searchable", curie=AMIGO.curie('panther_family_searchable'),
+                   model_uri=AMIGO.panther_family_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.panther_family_label = Slot(uri=DEFAULT_.panther_family_label, name="panther_family_label", curie=DEFAULT_.curie('panther_family_label'),
-                   model_uri=DEFAULT_.panther_family_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.panther_family_label = Slot(uri=AMIGO.panther_family_label, name="panther_family_label", curie=AMIGO.curie('panther_family_label'),
+                   model_uri=AMIGO.panther_family_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.panther_family_label_searchable = Slot(uri=DEFAULT_.panther_family_label_searchable, name="panther_family_label_searchable", curie=DEFAULT_.curie('panther_family_label_searchable'),
-                   model_uri=DEFAULT_.panther_family_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.panther_family_label_searchable = Slot(uri=AMIGO.panther_family_label_searchable, name="panther_family_label_searchable", curie=AMIGO.curie('panther_family_label_searchable'),
+                   model_uri=AMIGO.panther_family_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.geospatial_x = Slot(uri=DEFAULT_.geospatial_x, name="geospatial_x", curie=DEFAULT_.curie('geospatial_x'),
-                   model_uri=DEFAULT_.geospatial_x, domain=None, range=Optional[Union[int, List[int]]])
+slots.geospatial_x = Slot(uri=AMIGO.geospatial_x, name="geospatial_x", curie=AMIGO.curie('geospatial_x'),
+                   model_uri=AMIGO.geospatial_x, domain=None, range=Optional[Union[int, List[int]]])
 
-slots.geospatial_y = Slot(uri=DEFAULT_.geospatial_y, name="geospatial_y", curie=DEFAULT_.curie('geospatial_y'),
-                   model_uri=DEFAULT_.geospatial_y, domain=None, range=Optional[Union[int, List[int]]])
+slots.geospatial_y = Slot(uri=AMIGO.geospatial_y, name="geospatial_y", curie=AMIGO.curie('geospatial_y'),
+                   model_uri=AMIGO.geospatial_y, domain=None, range=Optional[Union[int, List[int]]])
 
-slots.geospatial_z = Slot(uri=DEFAULT_.geospatial_z, name="geospatial_z", curie=DEFAULT_.curie('geospatial_z'),
-                   model_uri=DEFAULT_.geospatial_z, domain=None, range=Optional[Union[int, List[int]]])
+slots.geospatial_z = Slot(uri=AMIGO.geospatial_z, name="geospatial_z", curie=AMIGO.curie('geospatial_z'),
+                   model_uri=AMIGO.geospatial_z, domain=None, range=Optional[Union[int, List[int]]])
 
-slots.annotation_class_list = Slot(uri=DEFAULT_.annotation_class_list, name="annotation_class_list", curie=DEFAULT_.curie('annotation_class_list'),
-                   model_uri=DEFAULT_.annotation_class_list, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_class_list = Slot(uri=AMIGO.annotation_class_list, name="annotation_class_list", curie=AMIGO.curie('annotation_class_list'),
+                   model_uri=AMIGO.annotation_class_list, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.annotation_class_list_label = Slot(uri=DEFAULT_.annotation_class_list_label, name="annotation_class_list_label", curie=DEFAULT_.curie('annotation_class_list_label'),
-                   model_uri=DEFAULT_.annotation_class_list_label, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_class_list_label = Slot(uri=AMIGO.annotation_class_list_label, name="annotation_class_list_label", curie=AMIGO.curie('annotation_class_list_label'),
+                   model_uri=AMIGO.annotation_class_list_label, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.phylo_graph_json = Slot(uri=DEFAULT_.phylo_graph_json, name="phylo_graph_json", curie=DEFAULT_.curie('phylo_graph_json'),
-                   model_uri=DEFAULT_.phylo_graph_json, domain=None, range=Optional[str])
+slots.phylo_graph_json = Slot(uri=AMIGO.phylo_graph_json, name="phylo_graph_json", curie=AMIGO.curie('phylo_graph_json'),
+                   model_uri=AMIGO.phylo_graph_json, domain=None, range=Optional[str])
 
-slots.database_xref = Slot(uri=DEFAULT_.database_xref, name="database_xref", curie=DEFAULT_.curie('database_xref'),
-                   model_uri=DEFAULT_.database_xref, domain=None, range=Optional[Union[str, List[str]]])
+slots.database_xref = Slot(uri=AMIGO.database_xref, name="database_xref", curie=AMIGO.curie('database_xref'),
+                   model_uri=AMIGO.database_xref, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.annotation_unit = Slot(uri=DEFAULT_.annotation_unit, name="annotation_unit", curie=DEFAULT_.curie('annotation_unit'),
-                   model_uri=DEFAULT_.annotation_unit, domain=None, range=Optional[str])
+slots.annotation_unit = Slot(uri=AMIGO.annotation_unit, name="annotation_unit", curie=AMIGO.curie('annotation_unit'),
+                   model_uri=AMIGO.annotation_unit, domain=None, range=Optional[str])
 
-slots.annotation_unit_label = Slot(uri=DEFAULT_.annotation_unit_label, name="annotation_unit_label", curie=DEFAULT_.curie('annotation_unit_label'),
-                   model_uri=DEFAULT_.annotation_unit_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_unit_label = Slot(uri=AMIGO.annotation_unit_label, name="annotation_unit_label", curie=AMIGO.curie('annotation_unit_label'),
+                   model_uri=AMIGO.annotation_unit_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.annotation_unit_label_searchable = Slot(uri=DEFAULT_.annotation_unit_label_searchable, name="annotation_unit_label_searchable", curie=DEFAULT_.curie('annotation_unit_label_searchable'),
-                   model_uri=DEFAULT_.annotation_unit_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_unit_label_searchable = Slot(uri=AMIGO.annotation_unit_label_searchable, name="annotation_unit_label_searchable", curie=AMIGO.curie('annotation_unit_label_searchable'),
+                   model_uri=AMIGO.annotation_unit_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.annotation_group = Slot(uri=DEFAULT_.annotation_group, name="annotation_group", curie=DEFAULT_.curie('annotation_group'),
-                   model_uri=DEFAULT_.annotation_group, domain=None, range=Optional[str])
+slots.annotation_group = Slot(uri=AMIGO.annotation_group, name="annotation_group", curie=AMIGO.curie('annotation_group'),
+                   model_uri=AMIGO.annotation_group, domain=None, range=Optional[str])
 
-slots.annotation_group_label = Slot(uri=DEFAULT_.annotation_group_label, name="annotation_group_label", curie=DEFAULT_.curie('annotation_group_label'),
-                   model_uri=DEFAULT_.annotation_group_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_group_label = Slot(uri=AMIGO.annotation_group_label, name="annotation_group_label", curie=AMIGO.curie('annotation_group_label'),
+                   model_uri=AMIGO.annotation_group_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.annotation_group_label_searchable = Slot(uri=DEFAULT_.annotation_group_label_searchable, name="annotation_group_label_searchable", curie=DEFAULT_.curie('annotation_group_label_searchable'),
-                   model_uri=DEFAULT_.annotation_group_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_group_label_searchable = Slot(uri=AMIGO.annotation_group_label_searchable, name="annotation_group_label_searchable", curie=AMIGO.curie('annotation_group_label_searchable'),
+                   model_uri=AMIGO.annotation_group_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.annotation_group_url = Slot(uri=DEFAULT_.annotation_group_url, name="annotation_group_url", curie=DEFAULT_.curie('annotation_group_url'),
-                   model_uri=DEFAULT_.annotation_group_url, domain=None, range=Optional[str])
+slots.annotation_group_url = Slot(uri=AMIGO.annotation_group_url, name="annotation_group_url", curie=AMIGO.curie('annotation_group_url'),
+                   model_uri=AMIGO.annotation_group_url, domain=None, range=Optional[str])
 
-slots.enabled_by = Slot(uri=DEFAULT_.enabled_by, name="enabled_by", curie=DEFAULT_.curie('enabled_by'),
-                   model_uri=DEFAULT_.enabled_by, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by = Slot(uri=AMIGO.enabled_by, name="enabled_by", curie=AMIGO.curie('enabled_by'),
+                   model_uri=AMIGO.enabled_by, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_searchable = Slot(uri=DEFAULT_.enabled_by_searchable, name="enabled_by_searchable", curie=DEFAULT_.curie('enabled_by_searchable'),
-                   model_uri=DEFAULT_.enabled_by_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_searchable = Slot(uri=AMIGO.enabled_by_searchable, name="enabled_by_searchable", curie=AMIGO.curie('enabled_by_searchable'),
+                   model_uri=AMIGO.enabled_by_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_label = Slot(uri=DEFAULT_.enabled_by_label, name="enabled_by_label", curie=DEFAULT_.curie('enabled_by_label'),
-                   model_uri=DEFAULT_.enabled_by_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_label = Slot(uri=AMIGO.enabled_by_label, name="enabled_by_label", curie=AMIGO.curie('enabled_by_label'),
+                   model_uri=AMIGO.enabled_by_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_label_searchable = Slot(uri=DEFAULT_.enabled_by_label_searchable, name="enabled_by_label_searchable", curie=DEFAULT_.curie('enabled_by_label_searchable'),
-                   model_uri=DEFAULT_.enabled_by_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_label_searchable = Slot(uri=AMIGO.enabled_by_label_searchable, name="enabled_by_label_searchable", curie=AMIGO.curie('enabled_by_label_searchable'),
+                   model_uri=AMIGO.enabled_by_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.function_class = Slot(uri=DEFAULT_.function_class, name="function_class", curie=DEFAULT_.curie('function_class'),
-                   model_uri=DEFAULT_.function_class, domain=None, range=Optional[str])
+slots.function_class = Slot(uri=AMIGO.function_class, name="function_class", curie=AMIGO.curie('function_class'),
+                   model_uri=AMIGO.function_class, domain=None, range=Optional[str])
 
-slots.function_class_label = Slot(uri=DEFAULT_.function_class_label, name="function_class_label", curie=DEFAULT_.curie('function_class_label'),
-                   model_uri=DEFAULT_.function_class_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.function_class_label = Slot(uri=AMIGO.function_class_label, name="function_class_label", curie=AMIGO.curie('function_class_label'),
+                   model_uri=AMIGO.function_class_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.function_class_label_searchable = Slot(uri=DEFAULT_.function_class_label_searchable, name="function_class_label_searchable", curie=DEFAULT_.curie('function_class_label_searchable'),
-                   model_uri=DEFAULT_.function_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.function_class_label_searchable = Slot(uri=AMIGO.function_class_label_searchable, name="function_class_label_searchable", curie=AMIGO.curie('function_class_label_searchable'),
+                   model_uri=AMIGO.function_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.function_class_closure = Slot(uri=DEFAULT_.function_class_closure, name="function_class_closure", curie=DEFAULT_.curie('function_class_closure'),
-                   model_uri=DEFAULT_.function_class_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.function_class_closure = Slot(uri=AMIGO.function_class_closure, name="function_class_closure", curie=AMIGO.curie('function_class_closure'),
+                   model_uri=AMIGO.function_class_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.function_class_closure_label = Slot(uri=DEFAULT_.function_class_closure_label, name="function_class_closure_label", curie=DEFAULT_.curie('function_class_closure_label'),
-                   model_uri=DEFAULT_.function_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.function_class_closure_label = Slot(uri=AMIGO.function_class_closure_label, name="function_class_closure_label", curie=AMIGO.curie('function_class_closure_label'),
+                   model_uri=AMIGO.function_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.function_class_closure_label_searchable = Slot(uri=DEFAULT_.function_class_closure_label_searchable, name="function_class_closure_label_searchable", curie=DEFAULT_.curie('function_class_closure_label_searchable'),
-                   model_uri=DEFAULT_.function_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.function_class_closure_label_searchable = Slot(uri=AMIGO.function_class_closure_label_searchable, name="function_class_closure_label_searchable", curie=AMIGO.curie('function_class_closure_label_searchable'),
+                   model_uri=AMIGO.function_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.process_class = Slot(uri=DEFAULT_.process_class, name="process_class", curie=DEFAULT_.curie('process_class'),
-                   model_uri=DEFAULT_.process_class, domain=None, range=Optional[str])
+slots.process_class = Slot(uri=AMIGO.process_class, name="process_class", curie=AMIGO.curie('process_class'),
+                   model_uri=AMIGO.process_class, domain=None, range=Optional[str])
 
-slots.process_class_label = Slot(uri=DEFAULT_.process_class_label, name="process_class_label", curie=DEFAULT_.curie('process_class_label'),
-                   model_uri=DEFAULT_.process_class_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.process_class_label = Slot(uri=AMIGO.process_class_label, name="process_class_label", curie=AMIGO.curie('process_class_label'),
+                   model_uri=AMIGO.process_class_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.process_class_label_searchable = Slot(uri=DEFAULT_.process_class_label_searchable, name="process_class_label_searchable", curie=DEFAULT_.curie('process_class_label_searchable'),
-                   model_uri=DEFAULT_.process_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.process_class_label_searchable = Slot(uri=AMIGO.process_class_label_searchable, name="process_class_label_searchable", curie=AMIGO.curie('process_class_label_searchable'),
+                   model_uri=AMIGO.process_class_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.process_class_closure = Slot(uri=DEFAULT_.process_class_closure, name="process_class_closure", curie=DEFAULT_.curie('process_class_closure'),
-                   model_uri=DEFAULT_.process_class_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.process_class_closure = Slot(uri=AMIGO.process_class_closure, name="process_class_closure", curie=AMIGO.curie('process_class_closure'),
+                   model_uri=AMIGO.process_class_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.process_class_closure_label = Slot(uri=DEFAULT_.process_class_closure_label, name="process_class_closure_label", curie=DEFAULT_.curie('process_class_closure_label'),
-                   model_uri=DEFAULT_.process_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.process_class_closure_label = Slot(uri=AMIGO.process_class_closure_label, name="process_class_closure_label", curie=AMIGO.curie('process_class_closure_label'),
+                   model_uri=AMIGO.process_class_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.process_class_closure_label_searchable = Slot(uri=DEFAULT_.process_class_closure_label_searchable, name="process_class_closure_label_searchable", curie=DEFAULT_.curie('process_class_closure_label_searchable'),
-                   model_uri=DEFAULT_.process_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.process_class_closure_label_searchable = Slot(uri=AMIGO.process_class_closure_label_searchable, name="process_class_closure_label_searchable", curie=AMIGO.curie('process_class_closure_label_searchable'),
+                   model_uri=AMIGO.process_class_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.location_list = Slot(uri=DEFAULT_.location_list, name="location_list", curie=DEFAULT_.curie('location_list'),
-                   model_uri=DEFAULT_.location_list, domain=None, range=Optional[Union[str, List[str]]])
+slots.location_list = Slot(uri=AMIGO.location_list, name="location_list", curie=AMIGO.curie('location_list'),
+                   model_uri=AMIGO.location_list, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.location_list_label = Slot(uri=DEFAULT_.location_list_label, name="location_list_label", curie=DEFAULT_.curie('location_list_label'),
-                   model_uri=DEFAULT_.location_list_label, domain=None, range=Optional[Union[str, List[str]]])
+slots.location_list_label = Slot(uri=AMIGO.location_list_label, name="location_list_label", curie=AMIGO.curie('location_list_label'),
+                   model_uri=AMIGO.location_list_label, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.location_list_closure = Slot(uri=DEFAULT_.location_list_closure, name="location_list_closure", curie=DEFAULT_.curie('location_list_closure'),
-                   model_uri=DEFAULT_.location_list_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.location_list_closure = Slot(uri=AMIGO.location_list_closure, name="location_list_closure", curie=AMIGO.curie('location_list_closure'),
+                   model_uri=AMIGO.location_list_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.location_list_closure_label = Slot(uri=DEFAULT_.location_list_closure_label, name="location_list_closure_label", curie=DEFAULT_.curie('location_list_closure_label'),
-                   model_uri=DEFAULT_.location_list_closure_label, domain=None, range=Optional[Union[str, List[str]]])
+slots.location_list_closure_label = Slot(uri=AMIGO.location_list_closure_label, name="location_list_closure_label", curie=AMIGO.curie('location_list_closure_label'),
+                   model_uri=AMIGO.location_list_closure_label, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.owl_blob_json = Slot(uri=DEFAULT_.owl_blob_json, name="owl_blob_json", curie=DEFAULT_.curie('owl_blob_json'),
-                   model_uri=DEFAULT_.owl_blob_json, domain=None, range=Optional[str])
+slots.owl_blob_json = Slot(uri=AMIGO.owl_blob_json, name="owl_blob_json", curie=AMIGO.curie('owl_blob_json'),
+                   model_uri=AMIGO.owl_blob_json, domain=None, range=Optional[str])
 
-slots.topology_graph_json = Slot(uri=DEFAULT_.topology_graph_json, name="topology_graph_json", curie=DEFAULT_.curie('topology_graph_json'),
-                   model_uri=DEFAULT_.topology_graph_json, domain=None, range=Optional[str])
+slots.topology_graph_json = Slot(uri=AMIGO.topology_graph_json, name="topology_graph_json", curie=AMIGO.curie('topology_graph_json'),
+                   model_uri=AMIGO.topology_graph_json, domain=None, range=Optional[str])
 
-slots.entity = Slot(uri=DEFAULT_.entity, name="entity", curie=DEFAULT_.curie('entity'),
-                   model_uri=DEFAULT_.entity, domain=None, range=Optional[str])
+slots.entity = Slot(uri=AMIGO.entity, name="entity", curie=AMIGO.curie('entity'),
+                   model_uri=AMIGO.entity, domain=None, range=Optional[str])
 
-slots.entity_label = Slot(uri=DEFAULT_.entity_label, name="entity_label", curie=DEFAULT_.curie('entity_label'),
-                   model_uri=DEFAULT_.entity_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.entity_label = Slot(uri=AMIGO.entity_label, name="entity_label", curie=AMIGO.curie('entity_label'),
+                   model_uri=AMIGO.entity_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.entity_label_searchable = Slot(uri=DEFAULT_.entity_label_searchable, name="entity_label_searchable", curie=DEFAULT_.curie('entity_label_searchable'),
-                   model_uri=DEFAULT_.entity_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.entity_label_searchable = Slot(uri=AMIGO.entity_label_searchable, name="entity_label_searchable", curie=AMIGO.curie('entity_label_searchable'),
+                   model_uri=AMIGO.entity_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.category = Slot(uri=DEFAULT_.category, name="category", curie=DEFAULT_.curie('category'),
-                   model_uri=DEFAULT_.category, domain=None, range=Optional[str])
+slots.category = Slot(uri=AMIGO.category, name="category", curie=AMIGO.curie('category'),
+                   model_uri=AMIGO.category, domain=None, range=Optional[str])
 
-slots.general_blob = Slot(uri=DEFAULT_.general_blob, name="general_blob", curie=DEFAULT_.curie('general_blob'),
-                   model_uri=DEFAULT_.general_blob, domain=None, range=Optional[Union[str, SearchableString]])
+slots.general_blob = Slot(uri=AMIGO.general_blob, name="general_blob", curie=AMIGO.curie('general_blob'),
+                   model_uri=AMIGO.general_blob, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.general_blob_searchable = Slot(uri=DEFAULT_.general_blob_searchable, name="general_blob_searchable", curie=DEFAULT_.curie('general_blob_searchable'),
-                   model_uri=DEFAULT_.general_blob_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.general_blob_searchable = Slot(uri=AMIGO.general_blob_searchable, name="general_blob_searchable", curie=AMIGO.curie('general_blob_searchable'),
+                   model_uri=AMIGO.general_blob_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.model = Slot(uri=DEFAULT_.model, name="model", curie=DEFAULT_.curie('model'),
-                   model_uri=DEFAULT_.model, domain=None, range=Optional[str])
+slots.model = Slot(uri=AMIGO.model, name="model", curie=AMIGO.curie('model'),
+                   model_uri=AMIGO.model, domain=None, range=Optional[str])
 
-slots.model_label = Slot(uri=DEFAULT_.model_label, name="model_label", curie=DEFAULT_.curie('model_label'),
-                   model_uri=DEFAULT_.model_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.model_label = Slot(uri=AMIGO.model_label, name="model_label", curie=AMIGO.curie('model_label'),
+                   model_uri=AMIGO.model_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.model_label_searchable = Slot(uri=DEFAULT_.model_label_searchable, name="model_label_searchable", curie=DEFAULT_.curie('model_label_searchable'),
-                   model_uri=DEFAULT_.model_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.model_label_searchable = Slot(uri=AMIGO.model_label_searchable, name="model_label_searchable", curie=AMIGO.curie('model_label_searchable'),
+                   model_uri=AMIGO.model_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.model_url = Slot(uri=DEFAULT_.model_url, name="model_url", curie=DEFAULT_.curie('model_url'),
-                   model_uri=DEFAULT_.model_url, domain=None, range=Optional[str])
+slots.model_url = Slot(uri=AMIGO.model_url, name="model_url", curie=AMIGO.curie('model_url'),
+                   model_uri=AMIGO.model_url, domain=None, range=Optional[str])
 
-slots.model_state = Slot(uri=DEFAULT_.model_state, name="model_state", curie=DEFAULT_.curie('model_state'),
-                   model_uri=DEFAULT_.model_state, domain=None, range=Optional[str])
+slots.model_state = Slot(uri=AMIGO.model_state, name="model_state", curie=AMIGO.curie('model_state'),
+                   model_uri=AMIGO.model_state, domain=None, range=Optional[str])
 
-slots.annotation_value = Slot(uri=DEFAULT_.annotation_value, name="annotation_value", curie=DEFAULT_.curie('annotation_value'),
-                   model_uri=DEFAULT_.annotation_value, domain=None, range=Optional[Union[str, List[str]]])
+slots.annotation_value = Slot(uri=AMIGO.annotation_value, name="annotation_value", curie=AMIGO.curie('annotation_value'),
+                   model_uri=AMIGO.annotation_value, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.contributor = Slot(uri=DEFAULT_.contributor, name="contributor", curie=DEFAULT_.curie('contributor'),
-                   model_uri=DEFAULT_.contributor, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.contributor = Slot(uri=AMIGO.contributor, name="contributor", curie=AMIGO.curie('contributor'),
+                   model_uri=AMIGO.contributor, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.contributor_searchable = Slot(uri=DEFAULT_.contributor_searchable, name="contributor_searchable", curie=DEFAULT_.curie('contributor_searchable'),
-                   model_uri=DEFAULT_.contributor_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.contributor_searchable = Slot(uri=AMIGO.contributor_searchable, name="contributor_searchable", curie=AMIGO.curie('contributor_searchable'),
+                   model_uri=AMIGO.contributor_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.model_date = Slot(uri=DEFAULT_.model_date, name="model_date", curie=DEFAULT_.curie('model_date'),
-                   model_uri=DEFAULT_.model_date, domain=None, range=Optional[Union[str, SearchableString]])
+slots.model_date = Slot(uri=AMIGO.model_date, name="model_date", curie=AMIGO.curie('model_date'),
+                   model_uri=AMIGO.model_date, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.model_date_searchable = Slot(uri=DEFAULT_.model_date_searchable, name="model_date_searchable", curie=DEFAULT_.curie('model_date_searchable'),
-                   model_uri=DEFAULT_.model_date_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.model_date_searchable = Slot(uri=AMIGO.model_date_searchable, name="model_date_searchable", curie=AMIGO.curie('model_date_searchable'),
+                   model_uri=AMIGO.model_date_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.comment = Slot(uri=DEFAULT_.comment, name="comment", curie=DEFAULT_.curie('comment'),
-                   model_uri=DEFAULT_.comment, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.comment = Slot(uri=AMIGO.comment, name="comment", curie=AMIGO.curie('comment'),
+                   model_uri=AMIGO.comment, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.comment_searchable = Slot(uri=DEFAULT_.comment_searchable, name="comment_searchable", curie=DEFAULT_.curie('comment_searchable'),
-                   model_uri=DEFAULT_.comment_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.comment_searchable = Slot(uri=AMIGO.comment_searchable, name="comment_searchable", curie=AMIGO.curie('comment_searchable'),
+                   model_uri=AMIGO.comment_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.enabled_by_complex = Slot(uri=DEFAULT_.enabled_by_complex, name="enabled_by_complex", curie=DEFAULT_.curie('enabled_by_complex'),
-                   model_uri=DEFAULT_.enabled_by_complex, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_complex = Slot(uri=AMIGO.enabled_by_complex, name="enabled_by_complex", curie=AMIGO.curie('enabled_by_complex'),
+                   model_uri=AMIGO.enabled_by_complex, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_complex_searchable = Slot(uri=DEFAULT_.enabled_by_complex_searchable, name="enabled_by_complex_searchable", curie=DEFAULT_.curie('enabled_by_complex_searchable'),
-                   model_uri=DEFAULT_.enabled_by_complex_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_complex_searchable = Slot(uri=AMIGO.enabled_by_complex_searchable, name="enabled_by_complex_searchable", curie=AMIGO.curie('enabled_by_complex_searchable'),
+                   model_uri=AMIGO.enabled_by_complex_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_complex_label = Slot(uri=DEFAULT_.enabled_by_complex_label, name="enabled_by_complex_label", curie=DEFAULT_.curie('enabled_by_complex_label'),
-                   model_uri=DEFAULT_.enabled_by_complex_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_complex_label = Slot(uri=AMIGO.enabled_by_complex_label, name="enabled_by_complex_label", curie=AMIGO.curie('enabled_by_complex_label'),
+                   model_uri=AMIGO.enabled_by_complex_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.enabled_by_complex_label_searchable = Slot(uri=DEFAULT_.enabled_by_complex_label_searchable, name="enabled_by_complex_label_searchable", curie=DEFAULT_.curie('enabled_by_complex_label_searchable'),
-                   model_uri=DEFAULT_.enabled_by_complex_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.enabled_by_complex_label_searchable = Slot(uri=AMIGO.enabled_by_complex_label_searchable, name="enabled_by_complex_label_searchable", curie=AMIGO.curie('enabled_by_complex_label_searchable'),
+                   model_uri=AMIGO.enabled_by_complex_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_participant = Slot(uri=DEFAULT_.has_participant, name="has_participant", curie=DEFAULT_.curie('has_participant'),
-                   model_uri=DEFAULT_.has_participant, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_participant = Slot(uri=AMIGO.has_participant, name="has_participant", curie=AMIGO.curie('has_participant'),
+                   model_uri=AMIGO.has_participant, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_participant_searchable = Slot(uri=DEFAULT_.has_participant_searchable, name="has_participant_searchable", curie=DEFAULT_.curie('has_participant_searchable'),
-                   model_uri=DEFAULT_.has_participant_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_participant_searchable = Slot(uri=AMIGO.has_participant_searchable, name="has_participant_searchable", curie=AMIGO.curie('has_participant_searchable'),
+                   model_uri=AMIGO.has_participant_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_participant_label = Slot(uri=DEFAULT_.has_participant_label, name="has_participant_label", curie=DEFAULT_.curie('has_participant_label'),
-                   model_uri=DEFAULT_.has_participant_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_participant_label = Slot(uri=AMIGO.has_participant_label, name="has_participant_label", curie=AMIGO.curie('has_participant_label'),
+                   model_uri=AMIGO.has_participant_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_participant_label_searchable = Slot(uri=DEFAULT_.has_participant_label_searchable, name="has_participant_label_searchable", curie=DEFAULT_.curie('has_participant_label_searchable'),
-                   model_uri=DEFAULT_.has_participant_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_participant_label_searchable = Slot(uri=AMIGO.has_participant_label_searchable, name="has_participant_label_searchable", curie=AMIGO.curie('has_participant_label_searchable'),
+                   model_uri=AMIGO.has_participant_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_participant = Slot(uri=DEFAULT_.has_complex_participant, name="has_complex_participant", curie=DEFAULT_.curie('has_complex_participant'),
-                   model_uri=DEFAULT_.has_complex_participant, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_participant = Slot(uri=AMIGO.has_complex_participant, name="has_complex_participant", curie=AMIGO.curie('has_complex_participant'),
+                   model_uri=AMIGO.has_complex_participant, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_participant_searchable = Slot(uri=DEFAULT_.has_complex_participant_searchable, name="has_complex_participant_searchable", curie=DEFAULT_.curie('has_complex_participant_searchable'),
-                   model_uri=DEFAULT_.has_complex_participant_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_participant_searchable = Slot(uri=AMIGO.has_complex_participant_searchable, name="has_complex_participant_searchable", curie=AMIGO.curie('has_complex_participant_searchable'),
+                   model_uri=AMIGO.has_complex_participant_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_participant_label = Slot(uri=DEFAULT_.has_complex_participant_label, name="has_complex_participant_label", curie=DEFAULT_.curie('has_complex_participant_label'),
-                   model_uri=DEFAULT_.has_complex_participant_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_participant_label = Slot(uri=AMIGO.has_complex_participant_label, name="has_complex_participant_label", curie=AMIGO.curie('has_complex_participant_label'),
+                   model_uri=AMIGO.has_complex_participant_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_participant_label_searchable = Slot(uri=DEFAULT_.has_complex_participant_label_searchable, name="has_complex_participant_label_searchable", curie=DEFAULT_.curie('has_complex_participant_label_searchable'),
-                   model_uri=DEFAULT_.has_complex_participant_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_participant_label_searchable = Slot(uri=AMIGO.has_complex_participant_label_searchable, name="has_complex_participant_label_searchable", curie=AMIGO.curie('has_complex_participant_label_searchable'),
+                   model_uri=AMIGO.has_complex_participant_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_output = Slot(uri=DEFAULT_.has_output, name="has_output", curie=DEFAULT_.curie('has_output'),
-                   model_uri=DEFAULT_.has_output, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_output = Slot(uri=AMIGO.has_output, name="has_output", curie=AMIGO.curie('has_output'),
+                   model_uri=AMIGO.has_output, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_output_searchable = Slot(uri=DEFAULT_.has_output_searchable, name="has_output_searchable", curie=DEFAULT_.curie('has_output_searchable'),
-                   model_uri=DEFAULT_.has_output_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_output_searchable = Slot(uri=AMIGO.has_output_searchable, name="has_output_searchable", curie=AMIGO.curie('has_output_searchable'),
+                   model_uri=AMIGO.has_output_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_output_label = Slot(uri=DEFAULT_.has_output_label, name="has_output_label", curie=DEFAULT_.curie('has_output_label'),
-                   model_uri=DEFAULT_.has_output_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_output_label = Slot(uri=AMIGO.has_output_label, name="has_output_label", curie=AMIGO.curie('has_output_label'),
+                   model_uri=AMIGO.has_output_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_output_label_searchable = Slot(uri=DEFAULT_.has_output_label_searchable, name="has_output_label_searchable", curie=DEFAULT_.curie('has_output_label_searchable'),
-                   model_uri=DEFAULT_.has_output_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_output_label_searchable = Slot(uri=AMIGO.has_output_label_searchable, name="has_output_label_searchable", curie=AMIGO.curie('has_output_label_searchable'),
+                   model_uri=AMIGO.has_output_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_output = Slot(uri=DEFAULT_.has_complex_output, name="has_complex_output", curie=DEFAULT_.curie('has_complex_output'),
-                   model_uri=DEFAULT_.has_complex_output, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_output = Slot(uri=AMIGO.has_complex_output, name="has_complex_output", curie=AMIGO.curie('has_complex_output'),
+                   model_uri=AMIGO.has_complex_output, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_output_searchable = Slot(uri=DEFAULT_.has_complex_output_searchable, name="has_complex_output_searchable", curie=DEFAULT_.curie('has_complex_output_searchable'),
-                   model_uri=DEFAULT_.has_complex_output_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_output_searchable = Slot(uri=AMIGO.has_complex_output_searchable, name="has_complex_output_searchable", curie=AMIGO.curie('has_complex_output_searchable'),
+                   model_uri=AMIGO.has_complex_output_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_output_label = Slot(uri=DEFAULT_.has_complex_output_label, name="has_complex_output_label", curie=DEFAULT_.curie('has_complex_output_label'),
-                   model_uri=DEFAULT_.has_complex_output_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_output_label = Slot(uri=AMIGO.has_complex_output_label, name="has_complex_output_label", curie=AMIGO.curie('has_complex_output_label'),
+                   model_uri=AMIGO.has_complex_output_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.has_complex_output_label_searchable = Slot(uri=DEFAULT_.has_complex_output_label_searchable, name="has_complex_output_label_searchable", curie=DEFAULT_.curie('has_complex_output_label_searchable'),
-                   model_uri=DEFAULT_.has_complex_output_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.has_complex_output_label_searchable = Slot(uri=AMIGO.has_complex_output_label_searchable, name="has_complex_output_label_searchable", curie=AMIGO.curie('has_complex_output_label_searchable'),
+                   model_uri=AMIGO.has_complex_output_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.evidence_type_label = Slot(uri=DEFAULT_.evidence_type_label, name="evidence_type_label", curie=DEFAULT_.curie('evidence_type_label'),
-                   model_uri=DEFAULT_.evidence_type_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.evidence_type_label = Slot(uri=AMIGO.evidence_type_label, name="evidence_type_label", curie=AMIGO.curie('evidence_type_label'),
+                   model_uri=AMIGO.evidence_type_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.evidence_type_label_searchable = Slot(uri=DEFAULT_.evidence_type_label_searchable, name="evidence_type_label_searchable", curie=DEFAULT_.curie('evidence_type_label_searchable'),
-                   model_uri=DEFAULT_.evidence_type_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.evidence_type_label_searchable = Slot(uri=AMIGO.evidence_type_label_searchable, name="evidence_type_label_searchable", curie=AMIGO.curie('evidence_type_label_searchable'),
+                   model_uri=AMIGO.evidence_type_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.evidence_type_closure_label = Slot(uri=DEFAULT_.evidence_type_closure_label, name="evidence_type_closure_label", curie=DEFAULT_.curie('evidence_type_closure_label'),
-                   model_uri=DEFAULT_.evidence_type_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_type_closure_label = Slot(uri=AMIGO.evidence_type_closure_label, name="evidence_type_closure_label", curie=AMIGO.curie('evidence_type_closure_label'),
+                   model_uri=AMIGO.evidence_type_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.evidence_type_closure_label_searchable = Slot(uri=DEFAULT_.evidence_type_closure_label_searchable, name="evidence_type_closure_label_searchable", curie=DEFAULT_.curie('evidence_type_closure_label_searchable'),
-                   model_uri=DEFAULT_.evidence_type_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.evidence_type_closure_label_searchable = Slot(uri=AMIGO.evidence_type_closure_label_searchable, name="evidence_type_closure_label_searchable", curie=AMIGO.curie('evidence_type_closure_label_searchable'),
+                   model_uri=AMIGO.evidence_type_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.relationship = Slot(uri=DEFAULT_.relationship, name="relationship", curie=DEFAULT_.curie('relationship'),
-                   model_uri=DEFAULT_.relationship, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.relationship = Slot(uri=AMIGO.relationship, name="relationship", curie=AMIGO.curie('relationship'),
+                   model_uri=AMIGO.relationship, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.relationship_searchable = Slot(uri=DEFAULT_.relationship_searchable, name="relationship_searchable", curie=DEFAULT_.curie('relationship_searchable'),
-                   model_uri=DEFAULT_.relationship_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.relationship_searchable = Slot(uri=AMIGO.relationship_searchable, name="relationship_searchable", curie=AMIGO.curie('relationship_searchable'),
+                   model_uri=AMIGO.relationship_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.relationship_label = Slot(uri=DEFAULT_.relationship_label, name="relationship_label", curie=DEFAULT_.curie('relationship_label'),
-                   model_uri=DEFAULT_.relationship_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.relationship_label = Slot(uri=AMIGO.relationship_label, name="relationship_label", curie=AMIGO.curie('relationship_label'),
+                   model_uri=AMIGO.relationship_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.relationship_label_searchable = Slot(uri=DEFAULT_.relationship_label_searchable, name="relationship_label_searchable", curie=DEFAULT_.curie('relationship_label_searchable'),
-                   model_uri=DEFAULT_.relationship_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.relationship_label_searchable = Slot(uri=AMIGO.relationship_label_searchable, name="relationship_label_searchable", curie=AMIGO.curie('relationship_label_searchable'),
+                   model_uri=AMIGO.relationship_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.description = Slot(uri=DEFAULT_.description, name="description", curie=DEFAULT_.curie('description'),
-                   model_uri=DEFAULT_.description, domain=None, range=Optional[Union[str, SearchableString]])
+slots.description = Slot(uri=AMIGO.description, name="description", curie=AMIGO.curie('description'),
+                   model_uri=AMIGO.description, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.description_searchable = Slot(uri=DEFAULT_.description_searchable, name="description_searchable", curie=DEFAULT_.curie('description_searchable'),
-                   model_uri=DEFAULT_.description_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.description_searchable = Slot(uri=AMIGO.description_searchable, name="description_searchable", curie=AMIGO.curie('description_searchable'),
+                   model_uri=AMIGO.description_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.idspace = Slot(uri=DEFAULT_.idspace, name="idspace", curie=DEFAULT_.curie('idspace'),
-                   model_uri=DEFAULT_.idspace, domain=None, range=Optional[str])
+slots.idspace = Slot(uri=AMIGO.idspace, name="idspace", curie=AMIGO.curie('idspace'),
+                   model_uri=AMIGO.idspace, domain=None, range=Optional[str])
 
-slots.is_obsolete = Slot(uri=DEFAULT_.is_obsolete, name="is_obsolete", curie=DEFAULT_.curie('is_obsolete'),
-                   model_uri=DEFAULT_.is_obsolete, domain=None, range=Optional[Union[bool, Bool]])
+slots.is_obsolete = Slot(uri=AMIGO.is_obsolete, name="is_obsolete", curie=AMIGO.curie('is_obsolete'),
+                   model_uri=AMIGO.is_obsolete, domain=None, range=Optional[Union[bool, Bool]])
 
-slots.alternate_id = Slot(uri=DEFAULT_.alternate_id, name="alternate_id", curie=DEFAULT_.curie('alternate_id'),
-                   model_uri=DEFAULT_.alternate_id, domain=None, range=Optional[Union[str, List[str]]])
+slots.alternate_id = Slot(uri=AMIGO.alternate_id, name="alternate_id", curie=AMIGO.curie('alternate_id'),
+                   model_uri=AMIGO.alternate_id, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.replaced_by = Slot(uri=DEFAULT_.replaced_by, name="replaced_by", curie=DEFAULT_.curie('replaced_by'),
-                   model_uri=DEFAULT_.replaced_by, domain=None, range=Optional[Union[str, List[str]]])
+slots.replaced_by = Slot(uri=AMIGO.replaced_by, name="replaced_by", curie=AMIGO.curie('replaced_by'),
+                   model_uri=AMIGO.replaced_by, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.consider = Slot(uri=DEFAULT_.consider, name="consider", curie=DEFAULT_.curie('consider'),
-                   model_uri=DEFAULT_.consider, domain=None, range=Optional[Union[str, List[str]]])
+slots.consider = Slot(uri=AMIGO.consider, name="consider", curie=AMIGO.curie('consider'),
+                   model_uri=AMIGO.consider, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.subset = Slot(uri=DEFAULT_.subset, name="subset", curie=DEFAULT_.curie('subset'),
-                   model_uri=DEFAULT_.subset, domain=None, range=Optional[Union[str, List[str]]])
+slots.subset = Slot(uri=AMIGO.subset, name="subset", curie=AMIGO.curie('subset'),
+                   model_uri=AMIGO.subset, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.definition_xref = Slot(uri=DEFAULT_.definition_xref, name="definition_xref", curie=DEFAULT_.curie('definition_xref'),
-                   model_uri=DEFAULT_.definition_xref, domain=None, range=Optional[Union[str, List[str]]])
+slots.definition_xref = Slot(uri=AMIGO.definition_xref, name="definition_xref", curie=AMIGO.curie('definition_xref'),
+                   model_uri=AMIGO.definition_xref, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.isa_closure = Slot(uri=DEFAULT_.isa_closure, name="isa_closure", curie=DEFAULT_.curie('isa_closure'),
-                   model_uri=DEFAULT_.isa_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.isa_closure = Slot(uri=AMIGO.isa_closure, name="isa_closure", curie=AMIGO.curie('isa_closure'),
+                   model_uri=AMIGO.isa_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.isa_closure_label = Slot(uri=DEFAULT_.isa_closure_label, name="isa_closure_label", curie=DEFAULT_.curie('isa_closure_label'),
-                   model_uri=DEFAULT_.isa_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.isa_closure_label = Slot(uri=AMIGO.isa_closure_label, name="isa_closure_label", curie=AMIGO.curie('isa_closure_label'),
+                   model_uri=AMIGO.isa_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.isa_closure_label_searchable = Slot(uri=DEFAULT_.isa_closure_label_searchable, name="isa_closure_label_searchable", curie=DEFAULT_.curie('isa_closure_label_searchable'),
-                   model_uri=DEFAULT_.isa_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.isa_closure_label_searchable = Slot(uri=AMIGO.isa_closure_label_searchable, name="isa_closure_label_searchable", curie=AMIGO.curie('isa_closure_label_searchable'),
+                   model_uri=AMIGO.isa_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.regulates_transitivity_graph_json = Slot(uri=DEFAULT_.regulates_transitivity_graph_json, name="regulates_transitivity_graph_json", curie=DEFAULT_.curie('regulates_transitivity_graph_json'),
-                   model_uri=DEFAULT_.regulates_transitivity_graph_json, domain=None, range=Optional[str])
+slots.regulates_transitivity_graph_json = Slot(uri=AMIGO.regulates_transitivity_graph_json, name="regulates_transitivity_graph_json", curie=AMIGO.curie('regulates_transitivity_graph_json'),
+                   model_uri=AMIGO.regulates_transitivity_graph_json, domain=None, range=Optional[str])
 
-slots.neighborhood_graph_json = Slot(uri=DEFAULT_.neighborhood_graph_json, name="neighborhood_graph_json", curie=DEFAULT_.curie('neighborhood_graph_json'),
-                   model_uri=DEFAULT_.neighborhood_graph_json, domain=None, range=Optional[str])
+slots.isa_partof_transitivity_graph_json = Slot(uri=AMIGO.isa_partof_transitivity_graph_json, name="isa_partof_transitivity_graph_json", curie=AMIGO.curie('isa_partof_transitivity_graph_json'),
+                   model_uri=AMIGO.isa_partof_transitivity_graph_json, domain=None, range=Optional[str])
 
-slots.neighborhood_limited_graph_json = Slot(uri=DEFAULT_.neighborhood_limited_graph_json, name="neighborhood_limited_graph_json", curie=DEFAULT_.curie('neighborhood_limited_graph_json'),
-                   model_uri=DEFAULT_.neighborhood_limited_graph_json, domain=None, range=Optional[str])
+slots.neighborhood_graph_json = Slot(uri=AMIGO.neighborhood_graph_json, name="neighborhood_graph_json", curie=AMIGO.curie('neighborhood_graph_json'),
+                   model_uri=AMIGO.neighborhood_graph_json, domain=None, range=Optional[str])
 
-slots.only_in_taxon = Slot(uri=DEFAULT_.only_in_taxon, name="only_in_taxon", curie=DEFAULT_.curie('only_in_taxon'),
-                   model_uri=DEFAULT_.only_in_taxon, domain=None, range=Optional[Union[str, SearchableString]])
+slots.neighborhood_limited_graph_json = Slot(uri=AMIGO.neighborhood_limited_graph_json, name="neighborhood_limited_graph_json", curie=AMIGO.curie('neighborhood_limited_graph_json'),
+                   model_uri=AMIGO.neighborhood_limited_graph_json, domain=None, range=Optional[str])
 
-slots.only_in_taxon_searchable = Slot(uri=DEFAULT_.only_in_taxon_searchable, name="only_in_taxon_searchable", curie=DEFAULT_.curie('only_in_taxon_searchable'),
-                   model_uri=DEFAULT_.only_in_taxon_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.only_in_taxon = Slot(uri=AMIGO.only_in_taxon, name="only_in_taxon", curie=AMIGO.curie('only_in_taxon'),
+                   model_uri=AMIGO.only_in_taxon, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.only_in_taxon_label = Slot(uri=DEFAULT_.only_in_taxon_label, name="only_in_taxon_label", curie=DEFAULT_.curie('only_in_taxon_label'),
-                   model_uri=DEFAULT_.only_in_taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.only_in_taxon_searchable = Slot(uri=AMIGO.only_in_taxon_searchable, name="only_in_taxon_searchable", curie=AMIGO.curie('only_in_taxon_searchable'),
+                   model_uri=AMIGO.only_in_taxon_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.only_in_taxon_label_searchable = Slot(uri=DEFAULT_.only_in_taxon_label_searchable, name="only_in_taxon_label_searchable", curie=DEFAULT_.curie('only_in_taxon_label_searchable'),
-                   model_uri=DEFAULT_.only_in_taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.only_in_taxon_label = Slot(uri=AMIGO.only_in_taxon_label, name="only_in_taxon_label", curie=AMIGO.curie('only_in_taxon_label'),
+                   model_uri=AMIGO.only_in_taxon_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.only_in_taxon_closure = Slot(uri=DEFAULT_.only_in_taxon_closure, name="only_in_taxon_closure", curie=DEFAULT_.curie('only_in_taxon_closure'),
-                   model_uri=DEFAULT_.only_in_taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
+slots.only_in_taxon_label_searchable = Slot(uri=AMIGO.only_in_taxon_label_searchable, name="only_in_taxon_label_searchable", curie=AMIGO.curie('only_in_taxon_label_searchable'),
+                   model_uri=AMIGO.only_in_taxon_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.only_in_taxon_closure_label = Slot(uri=DEFAULT_.only_in_taxon_closure_label, name="only_in_taxon_closure_label", curie=DEFAULT_.curie('only_in_taxon_closure_label'),
-                   model_uri=DEFAULT_.only_in_taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.only_in_taxon_closure = Slot(uri=AMIGO.only_in_taxon_closure, name="only_in_taxon_closure", curie=AMIGO.curie('only_in_taxon_closure'),
+                   model_uri=AMIGO.only_in_taxon_closure, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.only_in_taxon_closure_label_searchable = Slot(uri=DEFAULT_.only_in_taxon_closure_label_searchable, name="only_in_taxon_closure_label_searchable", curie=DEFAULT_.curie('only_in_taxon_closure_label_searchable'),
-                   model_uri=DEFAULT_.only_in_taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.only_in_taxon_closure_label = Slot(uri=AMIGO.only_in_taxon_closure_label, name="only_in_taxon_closure_label", curie=AMIGO.curie('only_in_taxon_closure_label'),
+                   model_uri=AMIGO.only_in_taxon_closure_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_extension_owl_json = Slot(uri=DEFAULT_.annotation_extension_owl_json, name="annotation_extension_owl_json", curie=DEFAULT_.curie('annotation_extension_owl_json'),
-                   model_uri=DEFAULT_.annotation_extension_owl_json, domain=None, range=Optional[str])
+slots.only_in_taxon_closure_label_searchable = Slot(uri=AMIGO.only_in_taxon_closure_label_searchable, name="only_in_taxon_closure_label_searchable", curie=AMIGO.curie('only_in_taxon_closure_label_searchable'),
+                   model_uri=AMIGO.only_in_taxon_closure_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.annotation_relation = Slot(uri=DEFAULT_.annotation_relation, name="annotation_relation", curie=DEFAULT_.curie('annotation_relation'),
-                   model_uri=DEFAULT_.annotation_relation, domain=None, range=Optional[str])
+slots.annotation_extension_owl_json = Slot(uri=AMIGO.annotation_extension_owl_json, name="annotation_extension_owl_json", curie=AMIGO.curie('annotation_extension_owl_json'),
+                   model_uri=AMIGO.annotation_extension_owl_json, domain=None, range=Optional[str])
 
-slots.annotation_relation_label = Slot(uri=DEFAULT_.annotation_relation_label, name="annotation_relation_label", curie=DEFAULT_.curie('annotation_relation_label'),
-                   model_uri=DEFAULT_.annotation_relation_label, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_relation = Slot(uri=AMIGO.annotation_relation, name="annotation_relation", curie=AMIGO.curie('annotation_relation'),
+                   model_uri=AMIGO.annotation_relation, domain=None, range=Optional[str])
 
-slots.annotation_relation_label_searchable = Slot(uri=DEFAULT_.annotation_relation_label_searchable, name="annotation_relation_label_searchable", curie=DEFAULT_.curie('annotation_relation_label_searchable'),
-                   model_uri=DEFAULT_.annotation_relation_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
+slots.annotation_relation_label = Slot(uri=AMIGO.annotation_relation_label, name="annotation_relation_label", curie=AMIGO.curie('annotation_relation_label'),
+                   model_uri=AMIGO.annotation_relation_label, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.equivalent_class_expressions_json = Slot(uri=DEFAULT_.equivalent_class_expressions_json, name="equivalent_class_expressions_json", curie=DEFAULT_.curie('equivalent_class_expressions_json'),
-                   model_uri=DEFAULT_.equivalent_class_expressions_json, domain=None, range=Optional[str])
+slots.annotation_relation_label_searchable = Slot(uri=AMIGO.annotation_relation_label_searchable, name="annotation_relation_label_searchable", curie=AMIGO.curie('annotation_relation_label_searchable'),
+                   model_uri=AMIGO.annotation_relation_label_searchable, domain=None, range=Optional[Union[str, SearchableString]])
 
-slots.disjoint_class_list = Slot(uri=DEFAULT_.disjoint_class_list, name="disjoint_class_list", curie=DEFAULT_.curie('disjoint_class_list'),
-                   model_uri=DEFAULT_.disjoint_class_list, domain=None, range=Optional[Union[str, List[str]]])
+slots.equivalent_class_expressions_json = Slot(uri=AMIGO.equivalent_class_expressions_json, name="equivalent_class_expressions_json", curie=AMIGO.curie('equivalent_class_expressions_json'),
+                   model_uri=AMIGO.equivalent_class_expressions_json, domain=None, range=Optional[str])
 
-slots.disjoint_class_list_label = Slot(uri=DEFAULT_.disjoint_class_list_label, name="disjoint_class_list_label", curie=DEFAULT_.curie('disjoint_class_list_label'),
-                   model_uri=DEFAULT_.disjoint_class_list_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.disjoint_class_list = Slot(uri=AMIGO.disjoint_class_list, name="disjoint_class_list", curie=AMIGO.curie('disjoint_class_list'),
+                   model_uri=AMIGO.disjoint_class_list, domain=None, range=Optional[Union[str, List[str]]])
 
-slots.disjoint_class_list_label_searchable = Slot(uri=DEFAULT_.disjoint_class_list_label_searchable, name="disjoint_class_list_label_searchable", curie=DEFAULT_.curie('disjoint_class_list_label_searchable'),
-                   model_uri=DEFAULT_.disjoint_class_list_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
+slots.disjoint_class_list_label = Slot(uri=AMIGO.disjoint_class_list_label, name="disjoint_class_list_label", curie=AMIGO.curie('disjoint_class_list_label'),
+                   model_uri=AMIGO.disjoint_class_list_label, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.bioentity_list = Slot(uri=DEFAULT_.bioentity_list, name="bioentity_list", curie=DEFAULT_.curie('bioentity_list'),
-                   model_uri=DEFAULT_.bioentity_list, domain=None, range=Optional[Union[str, List[str]]])
+slots.disjoint_class_list_label_searchable = Slot(uri=AMIGO.disjoint_class_list_label_searchable, name="disjoint_class_list_label_searchable", curie=AMIGO.curie('disjoint_class_list_label_searchable'),
+                   model_uri=AMIGO.disjoint_class_list_label_searchable, domain=None, range=Optional[Union[Union[str, SearchableString], List[Union[str, SearchableString]]]])
 
-slots.bioentity_list_label = Slot(uri=DEFAULT_.bioentity_list_label, name="bioentity_list_label", curie=DEFAULT_.curie('bioentity_list_label'),
-                   model_uri=DEFAULT_.bioentity_list_label, domain=None, range=Optional[Union[str, List[str]]])
+slots.bioentity_list = Slot(uri=AMIGO.bioentity_list, name="bioentity_list", curie=AMIGO.curie('bioentity_list'),
+                   model_uri=AMIGO.bioentity_list, domain=None, range=Optional[Union[str, List[str]]])
+
+slots.bioentity_list_label = Slot(uri=AMIGO.bioentity_list_label, name="bioentity_list_label", curie=AMIGO.curie('bioentity_list_label'),
+                   model_uri=AMIGO.bioentity_list_label, domain=None, range=Optional[Union[str, List[str]]])

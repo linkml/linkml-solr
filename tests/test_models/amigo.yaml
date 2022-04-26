@@ -1,12 +1,12 @@
-id: https://w3id.org//None
+id: https://geneontology.org/amigo/schema
 name: amigo
-description: TODO
+description: AmiGO
 imports:
 - linkml:types
 prefixes:
   linkml: https://w3id.org/linkml/
-  null: http://kbase.us/
-default_prefix: null
+  amigo: https://geneontology.org/amigo/schema/
+default_prefix: amigo
 classes:
   annotation:
     aliases:
@@ -354,6 +354,7 @@ classes:
     - regulates_closure_label_searchable
     - topology_graph_json
     - regulates_transitivity_graph_json
+    - isa_partof_transitivity_graph_json
     - neighborhood_graph_json
     - neighborhood_limited_graph_json
     - only_in_taxon
@@ -670,6 +671,7 @@ slots:
     multivalued: true
     comments: []
   annotation_class:
+    identifier: true ## TODO
     description: Term acc/ID.
     range: string
     aliases:
@@ -1530,6 +1532,13 @@ slots:
     range: string
     aliases:
     - Regulates transitivity graph (JSON)
+    multivalued: false
+    comments: []
+  isa_partof_transitivity_graph_json:
+    description: JSON blob form of the local relation transitivity graph using is-a and part-of
+    range: string
+    aliases:
+    - Default transitivity graph (JSON)
     multivalued: false
     comments: []
   neighborhood_graph_json:

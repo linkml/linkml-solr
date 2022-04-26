@@ -5,15 +5,15 @@ import pysolr
 from dataclasses import dataclass
 import json
 import requests
+from linkml_dataops.query.query_model import AbstractQuery, FetchById
+from linkml_dataops.query.queryengine import QueryEngine
 
 from linkml_runtime.dumpers import json_dumper
 from linkml_runtime.utils.formatutils import underscore
 from linkml_runtime.linkml_model.meta import SchemaDefinition, ClassDefinition, YAMLRoot, ElementName, SlotDefinition, SlotDefinitionName
 
 from linkml_solr.solrmodel import SolrEndpoint, SolrQuery, SolrQueryResult, RawSolrResult, FIELD
-from linkml_solr.solrschema import Transaction
 from linkml_solr.solrschemagen import SolrSchemaGenerator
-
 from linkml_solr.mapper import LinkMLMapper
 
 # https://stackoverflow.com/questions/1176136/convert-string-to-python-class-object
@@ -25,17 +25,17 @@ def class_for_name(module_name, class_name):
     return c
 
 
-# TODO: inherit from linkml_runtime_api.QueryEngine
 @dataclass
-class SolrQueryEngine(object):
+class SolrQueryEngine(QueryEngine):
     """
     ORM wrapper for SOLR endpoint
     """
 
-    endpoint: SolrEndpoint
-    schema: SchemaDefinition
+    endpoint: SolrEndpoint = None
+    schema: SchemaDefinition = None
     mapper: LinkMLMapper = None
     discriminator_field: SlotDefinitionName = None
+    python_classes: List[Type[YAMLRoot]] = None
 
     def __post_init__(self):
         # TODO: use schemaview
@@ -146,6 +146,33 @@ class SolrQueryEngine(object):
             cls = target_class
         logging.debug(new_obj)
         return cls(**new_obj)
+
+    def fetch_by_id(self, q: AbstractQuery) -> YAMLRoot:
+        if isinstance(q, FetchById):
+            tgt_classes = [c for c in self.python_classes if c.class_name == q.target_class]
+            id_field = None
+            for c in self.schema.classes.values():
+                if c.name == q.target_class:
+                    for s in c.slots:
+                        if self.schema.slots[s].identifier:
+                            id_field = s
+            if not id_field:
+                raise ValueError(f'No ID found for {q.target_class}')
+            params = {'target_class': tgt_classes[0],
+                     id_field: q.id}
+            result = self.search(**params)
+            return result.items
+
+    def simple_query(self, target_class: str, **kwargs) -> List[YAMLRoot]:
+        tgt_classes = [c for c in self.python_classes if c.class_name == target_class]
+        if len(tgt_classes) != 1:
+            raise ValueError(f'Class: {target_class}')
+        py_class = tgt_classes[0]
+        params = {k: v for k, v in kwargs.items() if v is not None}
+        result = self.search(target_class=py_class, **params)
+        return result.items
+
+
 
     def execute(self, query: SolrQuery) -> RawSolrResult:
         """
