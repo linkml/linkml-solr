@@ -35,7 +35,7 @@ def bulkload_file(f,
         ct = 'application/json'
     else:
         raise Exception(f'Unknown format {format}')
-    command = ['curl', url, '--data-binary', f'@{f}', '-H', f'Content-type:{ct}']
+    command = ['curl', url, '-T', f'{f}', '-X', 'POST', '-H', f'Content-type:{ct}']
     print(command)
     subprocess.run(command)
 
