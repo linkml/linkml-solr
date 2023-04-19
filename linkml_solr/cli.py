@@ -4,6 +4,7 @@ import time
 import logging
 import subprocess
 
+from linkml_runtime.dumpers import YAMLDumper
 from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.loaders import yaml_loader
 from linkml_solr import SolrQueryEngine, SolrEndpoint, DEFAULT_CORE, DEFAULT_SOLR_URL
@@ -163,7 +164,19 @@ def add_cores(cores, schema, container, url, port):
               default=DEFAULT_SOLR_URL,
               show_default=True,
               help='solr url.')
-def create_schema(schema, url, core):
+@click.option('--debug',
+              default=False,
+              is_flag=True,
+              help='Print generated schema to stdout rather before loading into Solr.')
+@click.option('--dry-run',
+              default=False,
+              is_flag=True,
+              help='Generate schema but do not load into Solr.')
+@click.option('--top-class', '-t',
+              default=None,
+              show_default=True,
+              help='Solr document in this core is one instance of this class')
+def create_schema(schema, url, core, debug, dry_run, top_class):
     """
     Creates a solr schema from a LinkML schema
     """
@@ -171,8 +184,12 @@ def create_schema(schema, url, core):
     from linkml.generators.yamlgen import YAMLGenerator
     schema_obj = YAMLGenerator(schema).schema
     qe = SolrQueryEngine(schema=schema_obj,
-                         endpoint=SolrEndpoint(url=f'{url}/{core}'))
-    qe.load_schema()
+                         endpoint=SolrEndpoint(url=f'{url}/{core}'),
+                         top_class=top_class)
+
+    gen = qe.load_schema(dry_run=dry_run)
+    if debug:
+        print(gen.serialize())
 
 
 if __name__ == '__main__':

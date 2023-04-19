@@ -36,6 +36,7 @@ class SolrQueryEngine(QueryEngine):
     mapper: LinkMLMapper = None
     discriminator_field: SlotDefinitionName = None
     python_classes: List[Type[YAMLRoot]] = None
+    top_class: str = None
 
     def __post_init__(self):
         # TODO: use schemaview
@@ -256,7 +257,7 @@ class SolrQueryEngine(QueryEngine):
         obj = self._response_json(response, strict=strict)
         return [f['name'] for f in obj.get('fieldTypes', [])]
 
-    def load_schema(self):
+    def load_schema(self, dry_run: bool = False) -> SolrSchemaGenerator:
         """
         Adds a schema to SOLR corresponding to a LinkML schema
         """
@@ -275,10 +276,10 @@ class SolrQueryEngine(QueryEngine):
                 'name': 'date',
                 'class': 'solr.TrieDateField',
             }}, path='schema')
-        gen = SolrSchemaGenerator(self.schema)
+        gen = SolrSchemaGenerator(self.schema, top_class=self.top_class)
         gen.serialize()
         post_obj = gen.post_request
         for f in post_obj['add-field']:
-            if f['name'] not in existing_fields:
+            if f['name'] not in existing_fields and not dry_run:
                 self._solr_request({'add-field': f}, path='schema')
-
+        return gen
