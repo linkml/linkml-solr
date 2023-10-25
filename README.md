@@ -150,3 +150,5 @@ Alpha code. Functionality is very incomplete
  - automatic de-nesting/de-normalization
  - autogen of model-specific API
  - expose additional solr functionality
+
+
