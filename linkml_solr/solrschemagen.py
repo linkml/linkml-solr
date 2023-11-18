@@ -79,6 +79,8 @@ class SolrSchemaGenerator(Generator):
         sv = self.schemaview
         field_dict = {}
         for cn, c in sv.all_classes().items():
+            if self.topCls is not None and str(cn) != str(self.topCls):
+                continue
             if class_name is None or str(cn) == str(class_name):
                 for s in sv.class_induced_slots(cn):
                     field = self.get_field(s)
@@ -109,6 +111,10 @@ class SolrSchemaGenerator(Generator):
 
 
 @shared_arguments(SolrSchemaGenerator)
+@click.option('--top-class', '-t',
+              default=None,
+              show_default=True,
+              help='Solr document in this core is one instance of this class')
 @click.command()
 def cli(yamlfile, **kwargs):
     """ Generate SOLR Schema representation of a LinkML model """
