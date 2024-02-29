@@ -22,9 +22,9 @@ solr_schema_types: Dict[str, str] = {
     "string": "string",
     "bool": "boolean",
     "boolean": "boolean",
-    "float": "float",
-    "double": "double",
-    "decimal": "double",
+    "float": "pfloat",
+    "double": "pdouble",
+    "decimal": "pdouble",
     "xsddate": "date",
     "xsddatetime": "date",
     "xsdtime": "time"
