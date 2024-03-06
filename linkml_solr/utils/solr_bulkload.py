@@ -12,6 +12,7 @@ def bulkload_file(f,
                   base_url=None,
                   core=None,
                   schema: SchemaDefinition = None,
+                  processor: str = None,
                   ):
     """
     Bulkload a file using solr bulkload API
@@ -21,6 +22,7 @@ def bulkload_file(f,
     :param base_url:
     :param core:
     :param schema:
+    :param processor: Processor argument to pass when bulk loading to Solr
     :return:
     """
     mvslots = _get_multivalued_slots(schema)
@@ -29,6 +31,8 @@ def bulkload_file(f,
     internal_separator = '%7C'
     parts = [f'f.{s}.split=true&f.{s}.separator={internal_separator}' for s in mvslots]
     url = f'{base_url}/{core}/update?{"&".join(parts)}&commit=true&separator={separator}'
+    if (processor is not None):
+        url = f'{url}&processor={processor}'
     if format == 'csv':
         ct = 'application/csv'
     elif format == 'json':
