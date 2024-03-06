@@ -24,8 +24,7 @@ jobs:
         virtualenvs-in-project: true
 
     - name: Install dependencies
-        run: |
-          poetry install --no-interaction
+      run: poetry install --no-interaction
 
     - name: build a binary wheel dist
       run: |
