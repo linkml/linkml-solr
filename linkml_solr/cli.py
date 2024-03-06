@@ -50,8 +50,10 @@ def main(verbose: int, quiet: bool):
 @click.option('--url', '-u',
               default=DEFAULT_SOLR_URL,
               help='solr url.')
+@click.option('--processor', '-p',
+              help='Processor argument to pass when bulk loading to Solr')
 @click.argument('files', nargs=-1)
-def bulkload(files, format, schema, url, core):
+def bulkload(files, format, schema, url, core, processor=None):
     """
     Convert multiple golr yaml schemas to linkml
     """
@@ -60,7 +62,7 @@ def bulkload(files, format, schema, url, core):
         with open(schema) as stream:
             schema_obj = yaml_loader.load(stream, target_class=SchemaDefinition)
     for f in files:
-        bulkload_file(f, format=format, schema=schema_obj, core=core, base_url=url)
+        bulkload_file(f, format=format, schema=schema_obj, core=core, base_url=url, processor=processor)
 
 @main.command()
 @click.option('--schema', '-s',
