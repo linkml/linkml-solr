@@ -42,21 +42,25 @@ class SolrSchemaGenerator(Generator):
     generatorname = os.path.basename(__file__)
     generatorversion = "0.0.1"
     valid_formats = ["json"]
+    uses_schemaloader = False
     visit_all_class_slots = True
     transaction: Transaction = None
     schemaview: SchemaView = None
+    topCls: str = None
 
-    def __init__(self, schema: Union[str, TextIO, SchemaDefinition], top_class: Optional[str] = None, **kwargs) -> None:
-        super().__init__(schema, **kwargs)
+#    def __init__(self, schema: Union[str, TextIO, SchemaDefinition], top_class: Optional[str] = None, **kwargs) -> None:
+    def __post_init__(self):
+        # super().__init__(schema, **kwargs)
         #self.schema = schema
         self.transaction = Transaction()
         self.post_request = None
         self.inline = False
-        self.topCls = top_class  ## SOLR object is one instance of this
+      #   self.topCls = top_class  ## SOLR object is one instance of this
         self.entryProperties = {}
         # SOLR-Schema does not have inheritance,
         # so we duplicate slots from inherited parents and mixins
         self.visit_all_slots = True
+        super().__post_init__()
         self.schemaview = SchemaView(self.schema)
 
     def _transaction_json(self, transaction: Transaction) -> str:
