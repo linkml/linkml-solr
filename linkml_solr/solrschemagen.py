@@ -102,7 +102,9 @@ class SolrSchemaGenerator(Generator):
         elif range in self.schema.types:
             t = self.schema.types[range]
             range = t.typeof
-            if t.typeof is None:
+            if t.repr == 'str':
+                range = 'string'
+            elif range is None:
                 range = t.base
         range = str(range).lower()
         if range in solr_schema_types:
