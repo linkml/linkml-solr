@@ -11,6 +11,11 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.8, 3.9]
+    services:
+      solr:
+        image: solr:8
+        ports:
+          - 8983:8983
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
