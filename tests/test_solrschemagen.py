@@ -23,10 +23,10 @@ class SolrSchemaGenTestCase(unittest.TestCase):
     def test_gensolrschema(self):
         """ generate a flattened schema """
         gen = SolrSchemaGenerator(SCHEMA)
-        s = gen.serialize()
+        gen.serialize()
+        s = gen.post_request
         #print(s)
-        doc = json.loads(s)
-        fields = doc['add-field']
+        fields = s['add-field']
         test_fields = [
             {
                 "name": "alternate_id",
