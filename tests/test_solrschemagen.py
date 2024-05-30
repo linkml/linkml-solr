@@ -3,12 +3,15 @@ import os
 import unittest
 
 from linkml_solr.solrschemagen import SolrSchemaGenerator
+from linkml.utils.schema_builder import SchemaBuilder
+
 from tests.test_models.amigo import *
 import tests.test_models.amigo as amigo
 
 from tests import INPUT_DIR, MODEL_DIR
 
 SCHEMA = os.path.join(MODEL_DIR, 'amigo.yaml')
+KITCHEN_SINK_SCHEMA = os.path.join(MODEL_DIR, 'kitchen_sink.yaml')
 
 class SolrSchemaGenTestCase(unittest.TestCase):
     """
@@ -66,6 +69,21 @@ class SolrSchemaGenTestCase(unittest.TestCase):
         not_in = ['enabled_by']
         for x in not_in:
             assert x not in field_names
+
+
+    def test_top_class(self):
+        sb = SchemaBuilder("single-class-test-schema")
+        sb.add_slot("slot_one", range="string")
+        sb.add_slot("slot_two", range="string")
+        sb.add_class("ClassOne", ["slot_one"])
+        sb.add_class("ClassTwo", ["slot_two"])
+        gen = SolrSchemaGenerator(sb.schema)
+        s = gen.class_schema("ClassOne")
+        doc = json.loads(s)
+        fields = doc['add-field']
+        assert('slot_one' in [f['name'] for f in fields])
+        assert('slot_two' not in [f['name'] for f in fields])
+
 
 
 if __name__ == '__main__':

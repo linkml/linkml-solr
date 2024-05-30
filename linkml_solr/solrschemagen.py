@@ -46,16 +46,14 @@ class SolrSchemaGenerator(Generator):
     visit_all_class_slots = True
     transaction: Transaction = None
     schemaview: SchemaView = None
-    topCls: str = None
 
 #    def __init__(self, schema: Union[str, TextIO, SchemaDefinition], top_class: Optional[str] = None, **kwargs) -> None:
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # super().__init__(schema, **kwargs)
         #self.schema = schema
         self.transaction = Transaction()
         self.post_request = None
         self.inline = False
-      #   self.topCls = top_class  ## SOLR object is one instance of this
         self.entryProperties = {}
         # SOLR-Schema does not have inheritance,
         # so we duplicate slots from inherited parents and mixins
@@ -83,8 +81,6 @@ class SolrSchemaGenerator(Generator):
         sv = self.schemaview
         field_dict = {}
         for cn, c in sv.all_classes().items():
-            if self.topCls is not None and str(cn) != str(self.topCls):
-                continue
             if class_name is None or str(cn) == str(class_name):
                 for s in sv.class_induced_slots(cn):
                     field = self.get_field(s)
@@ -99,6 +95,8 @@ class SolrSchemaGenerator(Generator):
             range = 'string' # FK
         elif range in self.schema.enums:
             range = 'string'
+        elif range is None:
+            range = self.schemaview.schema.default_range if self.schemaview.schema.default_range else 'string'
         elif range in self.schema.types:
             t = self.schema.types[range]
             range = t.typeof

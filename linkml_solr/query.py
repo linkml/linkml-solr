@@ -277,6 +277,8 @@ class SolrQueryEngine(QueryEngine):
                 'class': 'solr.TrieDateField',
             }}, path='schema')
         gen = SolrSchemaGenerator(self.schema)
+        if self.top_class:
+            gen = gen.class_schema(self.top_class)
         gen.serialize()
         post_obj = gen.post_request
         for f in post_obj['add-field']:
