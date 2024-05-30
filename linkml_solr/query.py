@@ -277,10 +277,13 @@ class SolrQueryEngine(QueryEngine):
                 'class': 'solr.TrieDateField',
             }}, path='schema')
         gen = SolrSchemaGenerator(self.schema)
+
         if self.top_class:
-            gen = gen.class_schema(self.top_class)
-        gen.serialize()
-        post_obj = gen.post_request
+            post_obj = json.loads(gen.class_schema(self.top_class))
+        else:
+            gen.serialize()
+            post_obj = gen.post_request
+
         for f in post_obj['add-field']:
             if f['name'] not in existing_fields and not dry_run:
                 self._solr_request({'add-field': f}, path='schema')
