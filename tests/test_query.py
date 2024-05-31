@@ -12,11 +12,15 @@ import tests.test_models.books as amigo
 from tests import INPUT_DIR, MODEL_DIR
 
 from linkml_solr import SolrQueryEngine, SolrEndpoint
+from linkml_solr.utils.solr_bulkload import bulkload_file
+
 from SPARQLWrapper import SPARQLWrapper, N3
 from rdflib import Graph
 
 SCHEMA = os.path.join(MODEL_DIR, 'books.yaml')
 
+
+@unittest.skip("skipping test_query, since it requires a solr instance already loaded with books")
 class QueryTestCase(unittest.TestCase):
     """
     This test requires a solr instance running - see the Makefile
@@ -25,10 +29,13 @@ class QueryTestCase(unittest.TestCase):
 
     def test_query(self):
         """ tests querying from and adding to a solr endpoint """
+
         schema = YAMLGenerator(SCHEMA).schema
+
         qe = SolrQueryEngine(schema=schema,
                              endpoint=SolrEndpoint(url='http://localhost:8983/solr/books'))
-        qe.load_schema()
+        gen = qe.load_schema()
+        bulkload_file(INPUT_DIR + '/books.json', format='json', schema=schema, core='books', base_url='http://localhost:8983/solr')
         sq = qe.generate_query(genre_s='fantasy')
         print(sq)
         print(sq.http_params())

@@ -5,7 +5,7 @@ import pysolr
 import requests
 
 from linkml_runtime.dumpers import json_dumper, rdf_dumper
-from linkml_runtime.loaders import yaml_loader, csv_loader
+from linkml_runtime.loaders import yaml_loader, tsv_loader
 from linkml.generators.yamlgen import YAMLGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
@@ -47,7 +47,7 @@ class CreateLoadTestCase(unittest.TestCase):
         qe.add([a])
         results = qe.query(target_class=GeneToDiseaseAssociation)
         assert len(results) == 1
-        container = csv_loader.load(DATA, schemaview=sv, index_slot='associations', target_class=Container)
+        container = tsv_loader.load(DATA, schemaview=sv, index_slot='associations', target_class=Container)
         print(f'ASSOCS={len(container.associations)}')
         assert len(container.associations) > 50
         qe.add(container.associations)
