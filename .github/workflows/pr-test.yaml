@@ -14,6 +14,7 @@ jobs:
     services:
       solr:
         image: solr:8
+        options: --name my_solr
         ports:
           - 8983:8983
     steps:
