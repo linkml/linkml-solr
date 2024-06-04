@@ -43,5 +43,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install --no-interaction
+      - name: add test solr core explicitly
+        run: poetry run lsolr add-cores test
       - name: run tests
         run: poetry run python -m unittest -v
