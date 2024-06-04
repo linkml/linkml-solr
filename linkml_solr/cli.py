@@ -188,8 +188,7 @@ def create_schema(schema, url, core, debug, dry_run, top_class):
     qe = SolrQueryEngine(schema=schema_obj,
                          endpoint=SolrEndpoint(url=f'{url}/{core}'),
                          top_class=top_class)
-
-    gen = qe.load_schema(dry_run=dry_run)
+    gen = qe.load_schema(dry_run=dry_run,)
     if debug:
         print(gen.serialize())
 

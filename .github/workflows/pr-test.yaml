@@ -11,8 +11,19 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.8, 3.9]
+    services:
+      solr:
+        image: solr:8
+        options: --name my_solr
+        ports:
+          - 8983:8983
     steps:
       - uses: actions/checkout@v2
+      - name: Sleep for 15 seconds to give Solr time to start
+        run: sleep 15s
+        shell: bash
+      - name: Confirm that Solr is answering
+        run: curl -s -o /dev/null -w "%{http_code}" http://localhost:8983/solr/ || exit 1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -30,7 +41,9 @@ jobs:
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependencies and run
-        run: |
-          poetry install --no-interaction
-          poetry run python -m unittest
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: add test solr core explicitly
+        run: poetry run lsolr add-cores test
+      - name: run tests
+        run: poetry run python -m unittest -v

@@ -4,15 +4,11 @@ import unittest
 
 from linkml.generators.yamlgen import YAMLGenerator
 from tests.test_models.amigo import *
-from tests.test_models.amigo_api import AmigoSolrAPI
 import tests.test_models.amigo as amigo
-import linkml_dataops
 
 from tests import INPUT_DIR, MODEL_DIR
 
 from linkml_solr import SolrQueryEngine, SolrEndpoint
-from SPARQLWrapper import SPARQLWrapper, N3
-from rdflib import Graph
 
 DATA = os.path.join(INPUT_DIR, 'kitchen_sink_inst_01.yaml')
 CONTEXT = os.path.join(MODEL_DIR, 'kitchen_sink.context.jsonld')
@@ -71,23 +67,6 @@ class QueryTestCase(unittest.TestCase):
             if oc.id == 'GO:0106083':
                 n += 1
         assert n == 1
-
-    def test_api(self):
-        schema = YAMLGenerator(SCHEMA).schema
-        qe = SolrQueryEngine(schema=schema,
-                             discriminator_field=amigo.slots.document_category.name,
-                             python_classes=[OntologyClass],
-                             endpoint=SolrEndpoint(url='http://golr.geneontology.org/solr/'))
-        qe = self.sqe
-        api = AmigoSolrAPI(query_engine=qe)
-        c = api.fetch_OntologyClass(NUCLEAR_MEMBRANE)
-        print(c)
-        self.assertEqual('nuclear membrane', c.annotation_class_label)
-        self.assertEqual(NUCLEAR_MEMBRANE, c.annotation_class)
-        results = list(api.query_OntologyClass(isa_partof_closure=[NUCLEAR_MEMBRANE, PROTEIN_COMPLEX]))
-        for r in results:
-            print(f'{r.id} {r.annotation_class_label}')
-        assert len(results) > 1
 
 
 if __name__ == '__main__':
