@@ -49,9 +49,9 @@ def get_optimal_worker_count(max_workers: Optional[int] = None) -> int:
     # Get CPU count
     cpu_count = os.cpu_count() or 4  # Fallback to 4 if detection fails
     
-    # For I/O bound HTTP uploads, use 2x CPU count but cap at reasonable limit
-    # This balances parallelism with system resource usage
-    optimal = min(cpu_count * 2, 16)
+    # For I/O bound HTTP uploads, use CPU count + 50% but cap at reasonable limit
+    # This balances parallelism with system resource usage without being too aggressive
+    optimal = min(int(cpu_count * 1.5), 12)
     
     # Minimum of 2 workers for any benefit
     return max(optimal, 2)
@@ -196,7 +196,7 @@ def bulkload_chunked(csv_file: str,
                     base_url: str,
                     core: str,
                     schema: SchemaDefinition,
-                    chunk_size: int = 500000,
+                    chunk_size: int = 100000,
                     max_workers: Optional[int] = None,
                     format: str = 'csv',
                     processor: str = None) -> int:
@@ -363,7 +363,7 @@ def bulkload_duckdb(db_path: str,
                    base_url: str,
                    core: str,
                    schema: SchemaDefinition,
-                   chunk_size: int = 500000,
+                   chunk_size: int = 100000,
                    max_workers: Optional[int] = None,
                    where_clause: Optional[str] = None,
                    columns: Optional[str] = None,

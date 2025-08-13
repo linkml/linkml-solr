@@ -56,7 +56,7 @@ def main(verbose: int, quiet: bool):
 @click.option('--processor', '-p',
               help='Processor argument to pass when bulk loading to Solr')
 @click.option('--chunk-size', '-c',
-              default=500000,
+              default=100000,
               show_default=True,
               help='Number of rows per chunk for large files')
 @click.option('--parallel-workers', '-w',
@@ -154,7 +154,7 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
 @click.option('--schema', '-s',
               help='Path to schema.')
 @click.option('--chunk-size', '-c',
-              default=500000,
+              default=100000,
               show_default=True,
               help='Number of rows per chunk')
 @click.option('--parallel-workers', '-w',
