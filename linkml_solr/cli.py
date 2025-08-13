@@ -10,6 +10,7 @@ from linkml_runtime.loaders import yaml_loader
 from linkml_solr import SolrQueryEngine, SolrEndpoint, DEFAULT_CORE, DEFAULT_SOLR_URL
 from linkml_solr.utils.solr_bulkload import bulkload_file, bulkload_chunked
 import requests
+import time
 
 
 @click.group()
@@ -91,6 +92,7 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
         configure_solr_performance(url, core, ram_buffer, disable_autocommit=True)
     
     total_loaded = 0
+    start_time = time.time()
     
     try:
         for f in files:
@@ -117,13 +119,21 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
         
         # Commit all changes at the end
         print("Committing all changes...")
+        commit_start = time.time()
         if commit_solr(url, core):
+            commit_time = time.time() - commit_start
+            total_time = time.time() - start_time
             print(f"Successfully committed {total_loaded} documents to Solr")
+            print(f"Total time: {total_time:.2f}s (commit: {commit_time:.2f}s)")
         else:
+            total_time = time.time() - start_time
             print("Warning: Commit may have failed")
+            print(f"Total time: {total_time:.2f}s")
             
     except Exception as e:
+        total_time = time.time() - start_time
         print(f"Error during bulk loading: {e}")
+        print(f"Total time before error: {total_time:.2f}s")
         # Try to commit what we have
         commit_solr(url, core)
         raise
