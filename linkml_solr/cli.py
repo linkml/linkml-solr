@@ -55,11 +55,11 @@ def main(verbose: int, quiet: bool):
 @click.option('--processor', '-p',
               help='Processor argument to pass when bulk loading to Solr')
 @click.option('--chunk-size', '-c',
-              default=100000,
+              default=500000,
               show_default=True,
               help='Number of rows per chunk for large files')
 @click.option('--parallel-workers', '-w',
-              default=4,
+              default=8,
               show_default=True,
               help='Number of parallel workers for chunked loading')
 @click.option('--chunked/--no-chunked',
@@ -285,7 +285,11 @@ def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit
                                        "updateHandler.autoSoftCommit.maxTime": -1
                                    }
                                })
-        print(f"Disabled autocommit: {response.status_code}")
+        if response.status_code == 200:
+            print(f"Disabled autocommit: {response.status_code}")
+        else:
+            print(f"Failed to disable autocommit: {response.status_code}")
+            print(f"Error response: {response.text}")
     
     # Set RAM buffer size
     response = requests.post(config_url,
@@ -295,7 +299,11 @@ def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit
                                    "updateHandler.indexConfig.ramBufferSizeMB": ram_buffer_mb
                                }
                            })
-    print(f"Set RAM buffer to {ram_buffer_mb}MB: {response.status_code}")
+    if response.status_code == 200:
+        print(f"Set RAM buffer to {ram_buffer_mb}MB: {response.status_code}")
+    else:
+        print(f"Failed to set RAM buffer to {ram_buffer_mb}MB: {response.status_code}")
+        print(f"Error response: {response.text}")
 
 
 def commit_solr(url, core):
