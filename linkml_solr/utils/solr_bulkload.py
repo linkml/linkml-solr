@@ -7,6 +7,7 @@ import json
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import time
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
 import requests
 
@@ -204,6 +205,7 @@ def bulkload_chunked(csv_file: str,
     print(f"Processing {total_rows} rows in chunks of {chunk_size} with {max_workers} parallel workers")
     
     total_loaded = 0
+    preprocessing_start = time.time()
     
     # Submit all chunk processing and upload tasks in parallel
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -226,6 +228,10 @@ def bulkload_chunked(csv_file: str,
             )
             futures.append(future)
         
+        preprocessing_time = time.time() - preprocessing_start
+        print(f"Preprocessing complete ({preprocessing_time:.2f}s) - starting parallel uploads...")
+        upload_start = time.time()
+        
         # Process results as they complete (truly parallel!)
         for future in as_completed(futures):
             try:
@@ -234,6 +240,10 @@ def bulkload_chunked(csv_file: str,
                 print(f"Progress: {total_loaded}/{total_rows} documents loaded")
             except Exception as e:
                 print(f"Error in parallel chunk processing: {e}")
+        
+        upload_time = time.time() - upload_start
+        total_processing_time = time.time() - preprocessing_start
+        print(f"Upload complete! Processing: {preprocessing_time:.2f}s, Upload: {upload_time:.2f}s, Total: {total_processing_time:.2f}s")
     
     return total_loaded
 
