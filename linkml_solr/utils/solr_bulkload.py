@@ -1,7 +1,7 @@
 from typing import List, Optional, Iterator
 import logging
 import subprocess
-import pandas as pd
+import duckdb
 import cbor2
 import tempfile
 import os
@@ -57,21 +57,37 @@ def bulkload_file(f,
 
 def csv_to_cbor_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
     """
-    Convert a chunk of CSV data to CBOR format
+    Convert a chunk of CSV/TSV data to CBOR format using DuckDB
     
-    :param csv_file: Input CSV file path
+    :param csv_file: Input CSV/TSV file path
     :param chunk_start: Starting row (0-based)
     :param chunk_size: Number of rows to process
     :param output_file: Output CBOR file path
     :return: Number of documents processed
     """
     try:
-        df = pd.read_csv(csv_file, skiprows=range(1, chunk_start + 1), nrows=chunk_size)
-        docs = df.to_dict('records')
+        conn = duckdb.connect()
+        
+        # Auto-detect separator and read chunk with DuckDB
+        sep = '\t' if csv_file.endswith('.tsv') else ','
+        query = f"""
+        SELECT * FROM read_csv_auto('{csv_file}', 
+                                   delim='{sep}',
+                                   ignore_errors=true,
+                                   header=true)
+        LIMIT {chunk_size} OFFSET {chunk_start}
+        """
+        
+        result = conn.execute(query).fetchall()
+        columns = [desc[0] for desc in conn.description]
+        
+        # Convert to list of dicts
+        docs = [dict(zip(columns, row)) for row in result]
         
         with open(output_file, 'wb') as f:
             cbor2.dump(docs, f)
         
+        conn.close()
         return len(docs)
     except Exception as e:
         print(f"Error processing chunk starting at {chunk_start}: {e}")
@@ -99,8 +115,17 @@ def bulkload_chunked(csv_file: str,
     :param processor: Solr processor to use
     :return: Total number of documents loaded
     """
-    # Get total row count
-    total_rows = sum(1 for _ in open(csv_file)) - 1  # Subtract header
+    # Get total row count using DuckDB (more reliable for large files)
+    conn = duckdb.connect()
+    sep = '\t' if csv_file.endswith('.tsv') else ','
+    count_query = f"""
+    SELECT COUNT(*) FROM read_csv_auto('{csv_file}', 
+                                      delim='{sep}',
+                                      ignore_errors=true,
+                                      header=true)
+    """
+    total_rows = conn.execute(count_query).fetchone()[0]
+    conn.close()
     print(f"Processing {total_rows} rows in chunks of {chunk_size}")
     
     total_loaded = 0
@@ -175,18 +200,41 @@ def bulkload_chunked(csv_file: str,
 
 def _create_csv_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
     """
-    Create a CSV chunk file with header
+    Create a CSV/TSV chunk file with header using DuckDB
     
-    :param csv_file: Input CSV file path
+    :param csv_file: Input CSV/TSV file path
     :param chunk_start: Starting row (0-based)
     :param chunk_size: Number of rows to process
     :param output_file: Output CSV file path
     :return: Number of rows processed
     """
     try:
-        df = pd.read_csv(csv_file, skiprows=range(1, chunk_start + 1), nrows=chunk_size)
-        df.to_csv(output_file, index=False)
-        return len(df)
+        conn = duckdb.connect()
+        
+        # Auto-detect separator
+        sep = '\t' if csv_file.endswith('.tsv') else ','
+        
+        # Export chunk directly to CSV
+        query = f"""
+        COPY (
+            SELECT * FROM read_csv_auto('{csv_file}', 
+                                       delim='{sep}',
+                                       ignore_errors=true,
+                                       header=true)
+            LIMIT {chunk_size} OFFSET {chunk_start}
+        ) TO '{output_file}' (FORMAT CSV, HEADER true)
+        """
+        
+        conn.execute(query)
+        
+        # Count rows to return
+        count_query = f"""
+        SELECT COUNT(*) FROM read_csv_auto('{output_file}', header=true)
+        """
+        count = conn.execute(count_query).fetchone()[0]
+        
+        conn.close()
+        return count
     except Exception as e:
         print(f"Error creating CSV chunk starting at {chunk_start}: {e}")
         return 0
