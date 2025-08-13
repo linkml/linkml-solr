@@ -2,8 +2,8 @@ from typing import List, Optional, Iterator
 import logging
 import subprocess
 import duckdb
-import cbor2
 import tempfile
+import json
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
@@ -66,9 +66,6 @@ def bulkload_file(f,
         ct = 'application/csv'
     elif format == 'json':
         ct = 'application/json'
-    elif format == 'cbor':
-        ct = 'application/cbor'
-        url = f'{base_url}/{core}/update/cbor?commit={commit_param}'
     else:
         raise Exception(f'Unknown format {format}')
     # Use direct HTTP with connection pooling for better performance
@@ -85,14 +82,14 @@ def bulkload_file(f,
         return False
 
 
-def csv_to_cbor_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
+def csv_to_json_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
     """
-    Convert a chunk of CSV/TSV data to CBOR format using DuckDB
+    Convert a chunk of CSV/TSV data to JSON format using DuckDB
     
     :param csv_file: Input CSV/TSV file path
     :param chunk_start: Starting row (0-based)
     :param chunk_size: Number of rows to process
-    :param output_file: Output CBOR file path
+    :param output_file: Output JSON file path
     :return: Number of documents processed
     """
     try:
@@ -111,11 +108,11 @@ def csv_to_cbor_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_f
         result = conn.execute(query).fetchall()
         columns = [desc[0] for desc in conn.description]
         
-        # Convert to list of dicts
+        # Convert to list of dicts for JSON
         docs = [dict(zip(columns, row)) for row in result]
         
-        with open(output_file, 'wb') as f:
-            cbor2.dump(docs, f)
+        with open(output_file, 'w') as f:
+            json.dump(docs, f)
         
         conn.close()
         return len(docs)
@@ -132,10 +129,10 @@ def process_and_upload_chunk(csv_file: str, chunk_start: int, chunk_size: int,
     """
     temp_file = None
     try:
-        if format == 'cbor':
-            temp_file = tempfile.NamedTemporaryFile(suffix='.cbor', delete=False)
+        if format == 'json':
+            temp_file = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
             temp_file.close()
-            docs_processed = csv_to_cbor_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
+            docs_processed = csv_to_json_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
         else:
             temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
             temp_file.close()

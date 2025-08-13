@@ -45,7 +45,7 @@ def main(verbose: int, quiet: bool):
               show_default=True,
               help='solr core.')
 @click.option('--format', '-f',
-              type=click.Choice(['csv', 'json', 'cbor']),
+              type=click.Choice(['csv', 'json']),
               default='csv',
               show_default=True,
               help='input format.')
@@ -96,7 +96,7 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
         for f in files:
             print(f"Processing file: {f}")
             
-            if chunked and format in ['csv', 'cbor']:
+            if chunked and format in ['csv', 'json']:
                 # Use chunked loading for large files
                 docs_loaded = bulkload_chunked(
                     csv_file=f,
@@ -167,7 +167,11 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
               default='3g',
               show_default=True,
               help='JVM heap size (e.g., 2g, 4g)')
-def start_server(schema, kill, container, url, core, port, sleep: int, create_schema, memory, heap_size):
+@click.option('--ram-buffer-mb',
+              default=512,
+              show_default=True,
+              help='Solr RAM buffer size in MB for bulk loading')
+def start_server(schema, kill, container, url, core, port, sleep: int, create_schema, memory, heap_size, ram_buffer_mb):
     """
     Starts a solr server (via Docker)
     """
@@ -185,6 +189,8 @@ def start_server(schema, kill, container, url, core, port, sleep: int, create_sc
         memory,
         '-e',
         f'SOLR_JAVA_MEM=-Xms{heap_size} -Xmx{heap_size}',
+        '-e',
+        f'SOLR_OPTS=-Dsolr.ramBufferSizeMB={ram_buffer_mb}',
         'solr:8',
         'solr-precreate',
         core]
@@ -291,19 +297,8 @@ def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit
             print(f"Failed to disable autocommit: {response.status_code}")
             print(f"Error response: {response.text}")
     
-    # Set RAM buffer size
-    response = requests.post(config_url,
-                           headers={'Content-type': 'application/json'},
-                           json={
-                               "set-property": {
-                                   "updateHandler.indexConfig.ramBufferSizeMB": ram_buffer_mb
-                               }
-                           })
-    if response.status_code == 200:
-        print(f"Set RAM buffer to {ram_buffer_mb}MB: {response.status_code}")
-    else:
-        print(f"Failed to set RAM buffer to {ram_buffer_mb}MB: {response.status_code}")
-        print(f"Error response: {response.text}")
+    # Note: RAM buffer size must be set via environment variables when starting Solr
+    print(f"Note: RAM buffer ({ram_buffer_mb}MB) should be set via SOLR_OPTS environment variable when starting Solr")
 
 
 def commit_solr(url, core):
