@@ -9,7 +9,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from linkml.utils.generator import Generator, shared_arguments
 
-from linkml_solr.solrschcema import *
+from linkml_solr.solrschema import *
 
 # Map from underlying python data type to solr equivalent
 # Note: The underlying types are a union of any built-in python datatype + any type defined in
