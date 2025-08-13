@@ -6,8 +6,29 @@ import cbor2
 import tempfile
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
 import requests
+
+# Global session for connection pooling
+_session_lock = threading.Lock()
+_global_session = None
+
+def get_http_session():
+    """Get a shared HTTP session with connection pooling"""
+    global _global_session
+    with _session_lock:
+        if _global_session is None:
+            _global_session = requests.Session()
+            # Configure connection pooling for parallel uploads
+            adapter = requests.adapters.HTTPAdapter(
+                pool_connections=20,
+                pool_maxsize=20,
+                pool_block=True
+            )
+            _global_session.mount('http://', adapter)
+            _global_session.mount('https://', adapter)
+        return _global_session
 
 def _get_multivalued_slots(schema: SchemaDefinition) -> List[SlotDefinitionName]:
     return [s.name for s in schema.slots.values() if s.multivalued]
@@ -50,9 +71,18 @@ def bulkload_file(f,
         url = f'{base_url}/{core}/update/cbor?commit={commit_param}'
     else:
         raise Exception(f'Unknown format {format}')
-    command = ['curl', url, '-T', f'{f}', '-X', 'POST', '-H', f'Content-type:{ct}']
-    print(command)
-    subprocess.run(command)
+    # Use direct HTTP with connection pooling for better performance
+    try:
+        session = get_http_session()
+        with open(f, 'rb') as file_data:
+            response = session.post(url, data=file_data, headers={'Content-Type': ct}, timeout=300)
+            print(f"Uploaded {f}: {response.status_code}")
+            if response.status_code != 200:
+                print(f"Error response: {response.text}")
+            return response.status_code == 200
+    except Exception as e:
+        print(f"Error uploading {f}: {e}")
+        return False
 
 
 def csv_to_cbor_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
@@ -94,12 +124,60 @@ def csv_to_cbor_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_f
         return 0
 
 
+def process_and_upload_chunk(csv_file: str, chunk_start: int, chunk_size: int, 
+                           base_url: str, core: str, schema: SchemaDefinition,
+                           format: str, processor: str) -> int:
+    """
+    Process a chunk (create temp file) and upload it to Solr in one parallel task
+    """
+    temp_file = None
+    try:
+        if format == 'cbor':
+            temp_file = tempfile.NamedTemporaryFile(suffix='.cbor', delete=False)
+            temp_file.close()
+            docs_processed = csv_to_cbor_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
+        else:
+            temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
+            temp_file.close()
+            docs_processed = _create_csv_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
+        
+        if docs_processed > 0:
+            success = bulkload_file(
+                temp_file.name,
+                format=format,
+                base_url=base_url,
+                core=core,
+                schema=schema,
+                processor=processor,
+                commit=False
+            )
+            if success:
+                print(f"Chunk {chunk_start}-{chunk_start+chunk_size}: {docs_processed} docs uploaded")
+                return docs_processed
+            else:
+                print(f"Failed to upload chunk {chunk_start}-{chunk_start+chunk_size}")
+                return 0
+        else:
+            return 0
+            
+    except Exception as e:
+        print(f"Error processing chunk {chunk_start}: {e}")
+        return 0
+    finally:
+        # Clean up temp file
+        if temp_file and os.path.exists(temp_file.name):
+            try:
+                os.unlink(temp_file.name)
+            except:
+                pass
+
+
 def bulkload_chunked(csv_file: str,
                     base_url: str,
                     core: str,
                     schema: SchemaDefinition,
-                    chunk_size: int = 100000,
-                    max_workers: int = 4,
+                    chunk_size: int = 500000,
+                    max_workers: int = 8,
                     format: str = 'csv',
                     processor: str = None) -> int:
     """
@@ -126,74 +204,39 @@ def bulkload_chunked(csv_file: str,
     """
     total_rows = conn.execute(count_query).fetchone()[0]
     conn.close()
-    print(f"Processing {total_rows} rows in chunks of {chunk_size}")
+    print(f"Processing {total_rows} rows in chunks of {chunk_size} with {max_workers} parallel workers")
     
     total_loaded = 0
-    temp_files = []
     
-    try:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = []
+    # Submit all chunk processing and upload tasks in parallel
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = []
+        
+        for chunk_start in range(0, total_rows, chunk_size):
+            actual_chunk_size = min(chunk_size, total_rows - chunk_start)
             
-            for chunk_start in range(0, total_rows, chunk_size):
-                actual_chunk_size = min(chunk_size, total_rows - chunk_start)
-                
-                if format == 'cbor':
-                    # Convert chunk to CBOR
-                    temp_file = tempfile.NamedTemporaryFile(suffix='.cbor', delete=False)
-                    temp_file.close()
-                    temp_files.append(temp_file.name)
-                    
-                    future = executor.submit(
-                        csv_to_cbor_chunk,
-                        csv_file,
-                        chunk_start,
-                        actual_chunk_size,
-                        temp_file.name
-                    )
-                    futures.append((future, temp_file.name, 'cbor'))
-                else:
-                    # For CSV, create chunk file
-                    temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
-                    temp_file.close()
-                    temp_files.append(temp_file.name)
-                    
-                    future = executor.submit(
-                        _create_csv_chunk,
-                        csv_file,
-                        chunk_start,
-                        actual_chunk_size,
-                        temp_file.name
-                    )
-                    futures.append((future, temp_file.name, 'csv'))
-            
-            # Process chunks as they complete
-            for future, temp_file, file_format in futures:
-                try:
-                    docs_processed = future.result()
-                    if docs_processed > 0:
-                        # Upload the chunk
-                        bulkload_file(
-                            temp_file,
-                            format=file_format,
-                            base_url=base_url,
-                            core=core,
-                            schema=schema,
-                            processor=processor,
-                            commit=False
-                        )
-                        total_loaded += docs_processed
-                        print(f"Loaded chunk: {docs_processed} docs (Total: {total_loaded})")
-                except Exception as e:
-                    print(f"Error processing chunk {temp_file}: {e}")
-    
-    finally:
-        # Clean up temporary files
-        for temp_file in temp_files:
+            # Submit the entire process+upload as one parallel task
+            future = executor.submit(
+                process_and_upload_chunk,
+                csv_file,
+                chunk_start,
+                actual_chunk_size,
+                base_url,
+                core,
+                schema,
+                format,
+                processor
+            )
+            futures.append(future)
+        
+        # Process results as they complete (truly parallel!)
+        for future in as_completed(futures):
             try:
-                os.unlink(temp_file)
-            except:
-                pass
+                docs_loaded = future.result()
+                total_loaded += docs_loaded
+                print(f"Progress: {total_loaded}/{total_rows} documents loaded")
+            except Exception as e:
+                print(f"Error in parallel chunk processing: {e}")
     
     return total_loaded
 
