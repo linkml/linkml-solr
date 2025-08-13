@@ -303,7 +303,7 @@ def commit_solr(url, core):
     Commit changes to Solr
     """
     commit_url = f"{url}/{core}/update?commit=true"
-    response = requests.post(commit_url)
+    response = requests.post(commit_url, headers={'Content-Type': 'application/json'}, json={})
     print(f"Committed changes: {response.status_code}")
     return response.status_code == 200
 
