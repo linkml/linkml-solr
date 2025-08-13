@@ -8,6 +8,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import time
+import os
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
 import requests
 
@@ -33,6 +34,27 @@ def get_http_session():
 
 def _get_multivalued_slots(schema: SchemaDefinition) -> List[SlotDefinitionName]:
     return [s.name for s in schema.slots.values() if s.multivalued]
+
+
+def get_optimal_worker_count(max_workers: Optional[int] = None) -> int:
+    """
+    Determine optimal number of parallel workers based on system capabilities
+    
+    :param max_workers: Maximum workers to use, None for auto-detection
+    :return: Optimal number of workers
+    """
+    if max_workers is not None:
+        return max_workers
+    
+    # Get CPU count
+    cpu_count = os.cpu_count() or 4  # Fallback to 4 if detection fails
+    
+    # For I/O bound HTTP uploads, use 2x CPU count but cap at reasonable limit
+    # This balances parallelism with system resource usage
+    optimal = min(cpu_count * 2, 16)
+    
+    # Minimum of 2 workers for any benefit
+    return max(optimal, 2)
 
 
 def bulkload_file(f,
@@ -175,7 +197,7 @@ def bulkload_chunked(csv_file: str,
                     core: str,
                     schema: SchemaDefinition,
                     chunk_size: int = 500000,
-                    max_workers: int = 8,
+                    max_workers: Optional[int] = None,
                     format: str = 'csv',
                     processor: str = None) -> int:
     """
@@ -202,13 +224,21 @@ def bulkload_chunked(csv_file: str,
     """
     total_rows = conn.execute(count_query).fetchone()[0]
     conn.close()
-    print(f"Processing {total_rows} rows in chunks of {chunk_size} with {max_workers} parallel workers")
+    
+    # Auto-detect optimal worker count
+    actual_workers = get_optimal_worker_count(max_workers)
+    cpu_count = os.cpu_count() or 'unknown'
+    
+    if max_workers is None:
+        print(f"Auto-detected {actual_workers} workers (CPU cores: {cpu_count})")
+    
+    print(f"Processing {total_rows} rows in chunks of {chunk_size} with {actual_workers} parallel workers")
     
     total_loaded = 0
     preprocessing_start = time.time()
     
     # Submit all chunk processing and upload tasks in parallel
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=actual_workers) as executor:
         futures = []
         
         for chunk_start in range(0, total_rows, chunk_size):
@@ -243,7 +273,13 @@ def bulkload_chunked(csv_file: str,
         
         upload_time = time.time() - upload_start
         total_processing_time = time.time() - preprocessing_start
+        
+        # Calculate throughput metrics
+        docs_per_sec = total_loaded / total_processing_time if total_processing_time > 0 else 0
+        upload_docs_per_sec = total_loaded / upload_time if upload_time > 0 else 0
+        
         print(f"Upload complete! Processing: {preprocessing_time:.2f}s, Upload: {upload_time:.2f}s, Total: {total_processing_time:.2f}s")
+        print(f"Throughput: {docs_per_sec:,.0f} docs/sec overall, {upload_docs_per_sec:,.0f} docs/sec upload")
     
     return total_loaded
 

@@ -60,9 +60,9 @@ def main(verbose: int, quiet: bool):
               show_default=True,
               help='Number of rows per chunk for large files')
 @click.option('--parallel-workers', '-w',
-              default=8,
-              show_default=True,
-              help='Number of parallel workers for chunked loading')
+              default=None,
+              type=int,
+              help='Number of parallel workers (default: auto-detect based on CPU cores)')
 @click.option('--chunked/--no-chunked',
               default=False,
               show_default=True,
@@ -123,12 +123,16 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
         if commit_solr(url, core):
             commit_time = time.time() - commit_start
             total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
             print(f"Successfully committed {total_loaded} documents to Solr")
             print(f"Total time: {total_time:.2f}s (commit: {commit_time:.2f}s)")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
         else:
             total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
             print("Warning: Commit may have failed")
             print(f"Total time: {total_time:.2f}s")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
             
     except Exception as e:
         total_time = time.time() - start_time
