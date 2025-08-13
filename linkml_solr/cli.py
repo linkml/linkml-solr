@@ -8,7 +8,7 @@ from linkml_runtime.dumpers import YAMLDumper
 from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.loaders import yaml_loader
 from linkml_solr import SolrQueryEngine, SolrEndpoint, DEFAULT_CORE, DEFAULT_SOLR_URL
-from linkml_solr.utils.solr_bulkload import bulkload_file, bulkload_chunked
+from linkml_solr.utils.solr_bulkload import bulkload_file, bulkload_chunked, bulkload_duckdb
 import requests
 import time
 
@@ -141,6 +141,104 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
         # Try to commit what we have
         commit_solr(url, core)
         raise
+
+
+@main.command()
+@click.option('--core', '-C',
+              default=DEFAULT_CORE,
+              show_default=True,
+              help='solr core.')
+@click.option('--url', '-u',
+              default=DEFAULT_SOLR_URL,
+              help='solr url.')
+@click.option('--schema', '-s',
+              help='Path to schema.')
+@click.option('--chunk-size', '-c',
+              default=500000,
+              show_default=True,
+              help='Number of rows per chunk')
+@click.option('--parallel-workers', '-w',
+              default=None,
+              type=int,
+              help='Number of parallel workers (default: auto-detect based on CPU cores)')
+@click.option('--where',
+              help='SQL WHERE clause for filtering data')
+@click.option('--columns',
+              help='Comma-separated list of columns to export (default: all)')
+@click.option('--order-by',
+              help='SQL ORDER BY clause for consistent chunking')
+@click.option('--auto-configure/--no-auto-configure',
+              default=True,
+              show_default=True,
+              help='Automatically configure Solr for optimal performance')
+@click.option('--ram-buffer',
+              default=2048,
+              show_default=True,
+              help='RAM buffer size in MB (used with auto-configure)')
+@click.argument('db_path')
+@click.argument('table_name')
+def bulkload_db(db_path, table_name, core, url, schema, chunk_size, parallel_workers, 
+               where, columns, order_by, auto_configure, ram_buffer):
+    """
+    Bulk load data from DuckDB database to Solr with high-performance parallel processing
+    
+    DB_PATH: Path to the DuckDB database file
+    TABLE_NAME: Name of the table to export
+    """
+    if schema is not None:
+        with open(schema) as stream:
+            schema_obj = yaml_loader.load(stream, target_class=SchemaDefinition)
+    else:
+        schema_obj = None
+    
+    # Auto-configure Solr for performance if requested
+    if auto_configure:
+        print("Configuring Solr for optimal bulk loading performance...")
+        configure_solr_performance(url, core, ram_buffer, disable_autocommit=True)
+    
+    start_time = time.time()
+    
+    try:
+        print(f"Loading from DuckDB: {db_path} → table: {table_name}")
+        
+        total_loaded = bulkload_duckdb(
+            db_path=db_path,
+            table_name=table_name,
+            base_url=url,
+            core=core,
+            schema=schema_obj,
+            chunk_size=chunk_size,
+            max_workers=parallel_workers,
+            where_clause=where,
+            columns=columns,
+            order_by=order_by
+        )
+        
+        # Commit all changes at the end
+        print("Committing all changes...")
+        commit_start = time.time()
+        if commit_solr(url, core):
+            commit_time = time.time() - commit_start
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print(f"Successfully committed {total_loaded} documents to Solr")
+            print(f"Total time: {total_time:.2f}s (commit: {commit_time:.2f}s)")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+        else:
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print("Warning: Commit may have failed")
+            print(f"Total time: {total_time:.2f}s")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+            
+    except Exception as e:
+        total_time = time.time() - start_time
+        print(f"Error during bulk loading: {e}")
+        print(f"Total time before error: {total_time:.2f}s")
+        # Try to commit what we have
+        commit_solr(url, core)
+        raise
+
 
 @main.command()
 @click.option('--schema', '-s',
