@@ -124,9 +124,7 @@ def csv_to_json_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_f
         SELECT * FROM read_csv_auto('{csv_file}', 
                                    delim='{sep}',
                                    ignore_errors=true,
-                                   header=true,
-                                   null_padding=true,
-                                   max_line_size=1048576)
+                                   header=true)
         LIMIT {chunk_size} OFFSET {chunk_start}
         """
         
@@ -222,9 +220,7 @@ def bulkload_chunked(csv_file: str,
     SELECT COUNT(*) FROM read_csv_auto('{csv_file}', 
                                       delim='{sep}',
                                       ignore_errors=true,
-                                      header=true,
-                                      null_padding=true,
-                                      max_line_size=1048576)
+                                      header=true)
     """
     total_rows = conn.execute(count_query).fetchone()[0]
     conn.close()
@@ -488,18 +484,16 @@ def _create_csv_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_f
             SELECT * FROM read_csv_auto('{csv_file}', 
                                        delim='{sep}',
                                        ignore_errors=true,
-                                       header=true,
-                                       null_padding=true,
-                                       max_line_size=1048576)
+                                       header=true)
             LIMIT {chunk_size} OFFSET {chunk_start}
-        ) TO '{output_file}' (FORMAT CSV, HEADER true)
+        ) TO '{output_file}' (FORMAT CSV, DELIMITER '\t', HEADER true)
         """
         
         conn.execute(query)
         
         # Count rows to return
         count_query = f"""
-        SELECT COUNT(*) FROM read_csv_auto('{output_file}', header=true, ignore_errors=true, null_padding=true)
+        SELECT COUNT(*) FROM read_csv_auto('{output_file}', header=true, ignore_errors=true)
         """
         count = conn.execute(count_query).fetchone()[0]
         
