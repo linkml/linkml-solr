@@ -175,10 +175,12 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
               default=2048,
               show_default=True,
               help='RAM buffer size in MB (used with auto-configure)')
+@click.option('--processor', '-p',
+              help='Processor argument to pass when bulk loading to Solr')
 @click.argument('db_path')
 @click.argument('table_name')
 def bulkload_db(db_path, table_name, core, url, schema, chunk_size, parallel_workers, 
-               where, columns, order_by, auto_configure, ram_buffer):
+               where, columns, order_by, auto_configure, ram_buffer, processor):
     """
     Bulk load data from DuckDB database to Solr with high-performance parallel processing
     
@@ -211,7 +213,8 @@ def bulkload_db(db_path, table_name, core, url, schema, chunk_size, parallel_wor
             max_workers=parallel_workers,
             where_clause=where,
             columns=columns,
-            order_by=order_by
+            order_by=order_by,
+            processor=processor
         )
         
         # Commit all changes at the end

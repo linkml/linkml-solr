@@ -313,7 +313,7 @@ def query_duckdb_chunk(db_path: str, query: str, offset: int, chunk_size: int) -
 
 
 def upload_duckdb_chunk(db_path: str, query: str, offset: int, chunk_size: int,
-                       base_url: str, core: str, schema: SchemaDefinition) -> int:
+                       base_url: str, core: str, schema: SchemaDefinition, processor: Optional[str] = None) -> int:
     """
     Query DuckDB chunk and upload directly to Solr
     
@@ -340,6 +340,8 @@ def upload_duckdb_chunk(db_path: str, query: str, offset: int, chunk_size: int,
         # Upload directly to Solr
         session = get_http_session()
         url = f'{base_url}/{core}/update/json/docs?commit=false'
+        if processor is not None:
+            url = f'{url}&processor={processor}'
         
         response = session.post(url, data=json_data, 
                                headers={'Content-Type': 'application/json'}, 
@@ -367,7 +369,8 @@ def bulkload_duckdb(db_path: str,
                    max_workers: Optional[int] = None,
                    where_clause: Optional[str] = None,
                    columns: Optional[str] = None,
-                   order_by: Optional[str] = None) -> int:
+                   order_by: Optional[str] = None,
+                   processor: Optional[str] = None) -> int:
     """
     Load data from DuckDB database to Solr with parallel processing
     
@@ -429,7 +432,8 @@ def bulkload_duckdb(db_path: str,
                     chunk_size,
                     base_url,
                     core,
-                    schema
+                    schema,
+                    processor
                 )
                 futures.append(future)
             
