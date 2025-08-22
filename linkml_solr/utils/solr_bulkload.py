@@ -419,35 +419,46 @@ def bulkload_duckdb(db_path: str,
         total_loaded = 0
         processing_start = time.time()
         
-        # Submit all chunk queries and uploads in parallel
+        # Process chunks in batches to control memory usage
         with ThreadPoolExecutor(max_workers=actual_workers) as executor:
-            futures = []
+            # Create list of all chunk offsets
+            chunk_offsets = list(range(0, total_rows, chunk_size))
+            total_chunks = len(chunk_offsets)
             
-            for offset in range(0, total_rows, chunk_size):
-                future = executor.submit(
-                    upload_duckdb_chunk,
-                    db_path,
-                    base_query,
-                    offset,
-                    chunk_size,
-                    base_url,
-                    core,
-                    schema,
-                    processor
-                )
-                futures.append(future)
-            
-            print(f"Submitted {len(futures)} parallel chunks - processing...")
+            print(f"Processing {total_chunks} chunks in batches of {actual_workers} workers")
             upload_start = time.time()
             
-            # Process results as they complete
-            for future in as_completed(futures):
-                try:
-                    docs_loaded = future.result()
-                    total_loaded += docs_loaded
-                    print(f"Progress: {total_loaded}/{total_rows} documents loaded")
-                except Exception as e:
-                    print(f"Error in parallel DuckDB chunk processing: {e}")
+            # Process chunks in batches of worker count
+            for batch_start in range(0, len(chunk_offsets), actual_workers):
+                batch_end = min(batch_start + actual_workers, len(chunk_offsets))
+                batch_offsets = chunk_offsets[batch_start:batch_end]
+                
+                print(f"Processing batch {batch_start//actual_workers + 1}/{(total_chunks + actual_workers - 1)//actual_workers}: chunks {batch_start + 1}-{batch_end}")
+                
+                # Submit current batch
+                futures = []
+                for offset in batch_offsets:
+                    future = executor.submit(
+                        upload_duckdb_chunk,
+                        db_path,
+                        base_query,
+                        offset,
+                        chunk_size,
+                        base_url,
+                        core,
+                        schema,
+                        processor
+                    )
+                    futures.append(future)
+                
+                # Wait for current batch to complete
+                for future in as_completed(futures):
+                    try:
+                        docs_loaded = future.result()
+                        total_loaded += docs_loaded
+                        print(f"Progress: {total_loaded:,}/{total_rows:,} documents loaded")
+                    except Exception as e:
+                        print(f"Error in parallel DuckDB chunk processing: {e}")
             
             upload_time = time.time() - upload_start
             total_processing_time = time.time() - processing_start
