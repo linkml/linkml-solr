@@ -305,7 +305,7 @@ def start_server(schema, kill, container, url, core, port, sleep: int, create_sc
         '-e',
         f'SOLR_JAVA_MEM=-Xms{heap_size} -Xmx{heap_size}',
         '-e',
-        f'SOLR_OPTS=-Dsolr.ramBufferSizeMB={ram_buffer_mb}',
+        f'SOLR_OPTS=-Dsolr.ramBufferSizeMB={ram_buffer_mb} -Dsolr.jetty.request.header.size=65535',
         'solr:8',
         'solr-precreate',
         core]
