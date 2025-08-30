@@ -1,8 +1,8 @@
 # linkml-solr
 
-A simple wrapper for using Solr with [LinkML](https://linkml.io) schemas
+A simple wrapper for using [Solr] with [LinkML](https://linkml.io) schemas
 
-This provides a convenience layer for working with a Solr database
+This provides a convenience layer for working with a [Solr] database
 whose schema is defined in LinkML. It provides bindings both from
 slots in your schema to queries, and binds result objects to your
 object model.
@@ -20,7 +20,7 @@ for book in result.items:
     print(f'Book:  {book.name} :: {book}')
 ```
 
-Unlike querying with the native pysolr API, this will validate input
+Unlike querying with the native [pysolr] API, this will validate input
 keys (which your IDE will be aware of), and will instantiate an
 instance of your model class.
 
@@ -33,9 +33,9 @@ instance of your model class.
 See [tests/test_models/books.yaml](tests/test_models/books.yaml) for an example schema
 
 The Schema must be specified as a [LinkML schema](https://linkml.io/linkml/schemas/index.html). Note that LinkML is
-more expressive than solr schemas, so not all constructs can be
-used. However, certain inferences are performed when compiling to Solr
-schemas - for example, you can use inheritance, and leaf classes will have all slots inferred.
+more expressive than [Solr schemas], so not all constructs can be
+used. However, certain inferences are performed when compiling to [Solr
+schemas] - for example, you can use inheritance, and leaf classes will have all slots inferred.
 
 Your schemas should be relatively "flat and wide". Use denormalization over nesting.
 
@@ -46,7 +46,7 @@ When designing your schema consider the two different paradigms supported:
 
 Note: you can use the linkml-model-enrichment toolkit to auto-infer schemas from data
 
-In future there will be ways to annotate your schema to give hints when making solr indexers etc.
+In future there will be ways to annotate your schema to give hints when making Solr indexers etc.
 
 ## Step 2: Create Python dataclasses
 
@@ -60,13 +60,13 @@ See [tests/test_models/books.py](tests/test_models/books.py) for an example
 
 ## Step 3: Start a server
 
-This starts a server, precreates a core "books" and loads a solr schema from a linkml schema:
+This starts a server, precreates a core "books" and loads a Solr schema from a linkml schema:
 
 ```bash
 lsolr start-server -C books -s books.yaml
 ```
 
-This wraps a docker container. If you do not wish to use a Docker container, then start solr in the usual way
+This wraps a docker container. If you do not wish to use a Docker container, then start [Solr] in the usual way
 
 TODO: docs on how to do this
 
@@ -150,3 +150,7 @@ Alpha code. Functionality is very incomplete
  - automatic de-nesting/de-normalization
  - autogen of model-specific API
  - expose additional solr functionality
+
+[Solr]: https://solr.apache.org/
+[Solr schemas]: https://solr.apache.org/guide/solr/latest/indexing-guide/schema-elements.html
+[pysolr]: https://github.com/django-haystack/pysolr?tab=readme-ov-file#pysolr
