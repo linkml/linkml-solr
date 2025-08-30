@@ -1,10 +1,60 @@
-from typing import List
+from typing import List, Optional, Iterator
 import logging
 import subprocess
+import duckdb
+import tempfile
+import json
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
+import time
+import os
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
+import requests
+
+# Global session for connection pooling
+_session_lock = threading.Lock()
+_global_session = None
+
+def get_http_session():
+    """Get a shared HTTP session with connection pooling"""
+    global _global_session
+    with _session_lock:
+        if _global_session is None:
+            _global_session = requests.Session()
+            # Configure connection pooling for parallel uploads
+            adapter = requests.adapters.HTTPAdapter(
+                pool_connections=20,
+                pool_maxsize=20,
+                pool_block=True
+            )
+            _global_session.mount('http://', adapter)
+            _global_session.mount('https://', adapter)
+        return _global_session
 
 def _get_multivalued_slots(schema: SchemaDefinition) -> List[SlotDefinitionName]:
     return [s.name for s in schema.slots.values() if s.multivalued]
+
+
+def get_optimal_worker_count(max_workers: Optional[int] = None) -> int:
+    """
+    Determine optimal number of parallel workers based on system capabilities
+    
+    :param max_workers: Maximum workers to use, None for auto-detection
+    :return: Optimal number of workers
+    """
+    if max_workers is not None:
+        return max_workers
+    
+    # Get CPU count
+    cpu_count = os.cpu_count() or 4  # Fallback to 4 if detection fails
+    
+    # For I/O bound HTTP uploads, use CPU count + 50% but cap at reasonable limit
+    # This balances parallelism with system resource usage without being too aggressive
+    optimal = min(int(cpu_count * 1.5), 12)
+    
+    # Minimum of 2 workers for any benefit
+    return max(optimal, 2)
 
 
 def bulkload_file(f,
@@ -13,6 +63,7 @@ def bulkload_file(f,
                   core=None,
                   schema: SchemaDefinition = None,
                   processor: str = None,
+                  commit: bool = False,
                   ):
     """
     Bulkload a file using solr bulkload API
@@ -30,7 +81,8 @@ def bulkload_file(f,
     separator = '%09'
     internal_separator = '%7C'
     parts = [f'f.{s}.split=true&f.{s}.separator={internal_separator}' for s in mvslots]
-    url = f'{base_url}/{core}/update?{"&".join(parts)}&commit=true&separator={separator}'
+    commit_param = 'true' if commit else 'false'
+    url = f'{base_url}/{core}/update?{"&".join(parts)}&commit={commit_param}&separator={separator}'
     if (processor is not None):
         url = f'{url}&processor={processor}'
     if format == 'csv':
@@ -39,7 +91,430 @@ def bulkload_file(f,
         ct = 'application/json'
     else:
         raise Exception(f'Unknown format {format}')
-    command = ['curl', url, '-T', f'{f}', '-X', 'POST', '-H', f'Content-type:{ct}']
-    print(command)
-    subprocess.run(command)
+    # Use direct HTTP with connection pooling for better performance
+    try:
+        session = get_http_session()
+        with open(f, 'rb') as file_data:
+            response = session.post(url, data=file_data, headers={'Content-Type': ct}, timeout=300)
+            print(f"Uploaded {f}: {response.status_code}")
+            if response.status_code != 200:
+                print(f"Error response: {response.text}")
+            return response.status_code == 200
+    except Exception as e:
+        print(f"Error uploading {f}: {e}")
+        return False
+
+
+def csv_to_json_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
+    """
+    Convert a chunk of CSV/TSV data to JSON format using DuckDB
+    
+    :param csv_file: Input CSV/TSV file path
+    :param chunk_start: Starting row (0-based)
+    :param chunk_size: Number of rows to process
+    :param output_file: Output JSON file path
+    :return: Number of documents processed
+    """
+    try:
+        conn = duckdb.connect()
+        
+        # Auto-detect separator and read chunk with DuckDB
+        sep = '\t' if csv_file.endswith('.tsv') else ','
+        query = f"""
+        SELECT * FROM read_csv_auto('{csv_file}', 
+                                   delim='{sep}',
+                                   ignore_errors=true,
+                                   header=true)
+        LIMIT {chunk_size} OFFSET {chunk_start}
+        """
+        
+        result = conn.execute(query).fetchall()
+        columns = [desc[0] for desc in conn.description]
+        
+        # Convert to list of dicts for JSON
+        docs = [dict(zip(columns, row)) for row in result]
+        
+        with open(output_file, 'w') as f:
+            json.dump(docs, f)
+        
+        conn.close()
+        return len(docs)
+    except Exception as e:
+        print(f"Error processing chunk starting at {chunk_start}: {e}")
+        return 0
+
+
+def process_and_upload_chunk(csv_file: str, chunk_start: int, chunk_size: int, 
+                           base_url: str, core: str, schema: SchemaDefinition,
+                           format: str, processor: str) -> int:
+    """
+    Process a chunk (create temp file) and upload it to Solr in one parallel task
+    """
+    temp_file = None
+    try:
+        if format == 'json':
+            temp_file = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
+            temp_file.close()
+            docs_processed = csv_to_json_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
+        else:
+            temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
+            temp_file.close()
+            docs_processed = _create_csv_chunk(csv_file, chunk_start, chunk_size, temp_file.name)
+        
+        if docs_processed > 0:
+            success = bulkload_file(
+                temp_file.name,
+                format=format,
+                base_url=base_url,
+                core=core,
+                schema=schema,
+                processor=processor,
+                commit=False
+            )
+            if success:
+                print(f"Chunk {chunk_start}-{chunk_start+chunk_size}: {docs_processed} docs uploaded")
+                return docs_processed
+            else:
+                print(f"Failed to upload chunk {chunk_start}-{chunk_start+chunk_size}")
+                return 0
+        else:
+            return 0
+            
+    except Exception as e:
+        print(f"Error processing chunk {chunk_start}: {e}")
+        return 0
+    finally:
+        # Clean up temp file
+        if temp_file and os.path.exists(temp_file.name):
+            try:
+                os.unlink(temp_file.name)
+            except:
+                pass
+
+
+def bulkload_chunked(csv_file: str,
+                    base_url: str,
+                    core: str,
+                    schema: SchemaDefinition,
+                    chunk_size: int = 100000,
+                    max_workers: Optional[int] = None,
+                    format: str = 'csv',
+                    processor: str = None) -> int:
+    """
+    Load a large CSV file in chunks with parallel processing
+    
+    :param csv_file: Path to the CSV file
+    :param base_url: Solr base URL
+    :param core: Solr core name
+    :param schema: LinkML schema definition
+    :param chunk_size: Number of rows per chunk
+    :param max_workers: Number of parallel workers
+    :param format: Output format ('csv' or 'cbor')
+    :param processor: Solr processor to use
+    :return: Total number of documents loaded
+    """
+    # Get total row count using DuckDB (more reliable for large files)
+    conn = duckdb.connect()
+    sep = '\t' if csv_file.endswith('.tsv') else ','
+    count_query = f"""
+    SELECT COUNT(*) FROM read_csv_auto('{csv_file}', 
+                                      delim='{sep}',
+                                      ignore_errors=true,
+                                      header=true)
+    """
+    total_rows = conn.execute(count_query).fetchone()[0]
+    conn.close()
+    
+    # Auto-detect optimal worker count
+    actual_workers = get_optimal_worker_count(max_workers)
+    cpu_count = os.cpu_count() or 'unknown'
+    
+    if max_workers is None:
+        print(f"Auto-detected {actual_workers} workers (CPU cores: {cpu_count})")
+    
+    print(f"Processing {total_rows} rows in chunks of {chunk_size} with {actual_workers} parallel workers")
+    
+    total_loaded = 0
+    preprocessing_start = time.time()
+    
+    # Submit all chunk processing and upload tasks in parallel
+    with ThreadPoolExecutor(max_workers=actual_workers) as executor:
+        futures = []
+        
+        for chunk_start in range(0, total_rows, chunk_size):
+            actual_chunk_size = min(chunk_size, total_rows - chunk_start)
+            
+            # Submit the entire process+upload as one parallel task
+            future = executor.submit(
+                process_and_upload_chunk,
+                csv_file,
+                chunk_start,
+                actual_chunk_size,
+                base_url,
+                core,
+                schema,
+                format,
+                processor
+            )
+            futures.append(future)
+        
+        preprocessing_time = time.time() - preprocessing_start
+        print(f"Preprocessing complete ({preprocessing_time:.2f}s) - starting parallel uploads...")
+        upload_start = time.time()
+        
+        # Process results as they complete (truly parallel!)
+        for future in as_completed(futures):
+            try:
+                docs_loaded = future.result()
+                total_loaded += docs_loaded
+                print(f"Progress: {total_loaded}/{total_rows} documents loaded")
+            except Exception as e:
+                print(f"Error in parallel chunk processing: {e}")
+        
+        upload_time = time.time() - upload_start
+        total_processing_time = time.time() - preprocessing_start
+        
+        # Calculate throughput metrics
+        docs_per_sec = total_loaded / total_processing_time if total_processing_time > 0 else 0
+        upload_docs_per_sec = total_loaded / upload_time if upload_time > 0 else 0
+        
+        print(f"Upload complete! Processing: {preprocessing_time:.2f}s, Upload: {upload_time:.2f}s, Total: {total_processing_time:.2f}s")
+        print(f"Throughput: {docs_per_sec:,.0f} docs/sec overall, {upload_docs_per_sec:,.0f} docs/sec upload")
+    
+    return total_loaded
+
+
+def query_duckdb_chunk(db_path: str, query: str, offset: int, chunk_size: int) -> tuple:
+    """
+    Query a chunk of data from DuckDB with read-only connection
+    
+    :param db_path: Path to DuckDB database
+    :param query: Base SQL query (without LIMIT/OFFSET)
+    :param offset: Starting row offset
+    :param chunk_size: Number of rows to fetch
+    :return: (results, columns) tuple
+    """
+    try:
+        # Open read-only connection for safety
+        conn = duckdb.connect(db_path, read_only=True)
+        
+        # Add LIMIT/OFFSET to the query
+        chunk_query = f"{query} LIMIT {chunk_size} OFFSET {offset}"
+        
+        result = conn.execute(chunk_query)
+        rows = result.fetchall()
+        columns = [desc[0] for desc in result.description]
+        
+        conn.close()
+        return rows, columns
+    except Exception as e:
+        print(f"Error querying DuckDB chunk at offset {offset}: {e}")
+        return [], []
+
+
+def upload_duckdb_chunk(db_path: str, query: str, offset: int, chunk_size: int,
+                       base_url: str, core: str, schema: SchemaDefinition, processor: Optional[str] = None) -> int:
+    """
+    Query DuckDB chunk and upload directly to Solr
+    
+    :param db_path: Path to DuckDB database
+    :param query: Base SQL query
+    :param offset: Starting row offset  
+    :param chunk_size: Number of rows to process
+    :param base_url: Solr base URL
+    :param core: Solr core name
+    :param schema: LinkML schema definition
+    :return: Number of documents uploaded
+    """
+    try:
+        # Query the chunk
+        rows, columns = query_duckdb_chunk(db_path, query, offset, chunk_size)
+        
+        if not rows:
+            return 0
+        
+        # Convert to JSON for Solr
+        docs = [dict(zip(columns, row)) for row in rows]
+        json_data = json.dumps(docs)
+        
+        # Upload directly to Solr
+        session = get_http_session()
+        url = f'{base_url}/{core}/update/json/docs?commit=false'
+        if processor is not None:
+            url = f'{url}&processor={processor}'
+        
+        response = session.post(url, data=json_data, 
+                               headers={'Content-Type': 'application/json'}, 
+                               timeout=300)
+        
+        if response.status_code == 200:
+            print(f"Uploaded chunk offset {offset}: {len(docs)} docs")
+            return len(docs)
+        else:
+            print(f"Error uploading chunk offset {offset}: {response.status_code}")
+            print(f"Error response: {response.text}")
+            return 0
+            
+    except Exception as e:
+        print(f"Error processing DuckDB chunk at offset {offset}: {e}")
+        return 0
+
+
+def bulkload_duckdb(db_path: str,
+                   table_name: str,
+                   base_url: str,
+                   core: str,
+                   schema: SchemaDefinition,
+                   chunk_size: int = 100000,
+                   max_workers: Optional[int] = None,
+                   where_clause: Optional[str] = None,
+                   columns: Optional[str] = None,
+                   order_by: Optional[str] = None,
+                   processor: Optional[str] = None) -> int:
+    """
+    Load data from DuckDB database to Solr with parallel processing
+    
+    :param db_path: Path to DuckDB database file
+    :param table_name: Name of table to export
+    :param base_url: Solr base URL
+    :param core: Solr core name
+    :param schema: LinkML schema definition
+    :param chunk_size: Number of rows per chunk
+    :param max_workers: Number of parallel workers (None for auto-detect)
+    :param where_clause: Optional SQL WHERE clause
+    :param columns: Optional comma-separated column list
+    :param order_by: Optional SQL ORDER BY clause
+    :return: Total number of documents loaded
+    """
+    try:
+        # Build SQL query
+        column_list = columns if columns else "*"
+        base_query = f"SELECT {column_list} FROM {table_name}"
+        
+        if where_clause:
+            base_query += f" WHERE {where_clause}"
+        
+        if order_by:
+            base_query += f" ORDER BY {order_by}"
+        
+        # Get total row count with read-only connection
+        conn = duckdb.connect(db_path, read_only=True)
+        count_query = f"SELECT COUNT(*) FROM {table_name}"
+        if where_clause:
+            count_query += f" WHERE {where_clause}"
+            
+        total_rows = conn.execute(count_query).fetchone()[0]
+        conn.close()
+        
+        # Auto-detect optimal worker count
+        actual_workers = get_optimal_worker_count(max_workers)
+        cpu_count = os.cpu_count() or 'unknown'
+        
+        if max_workers is None:
+            print(f"Auto-detected {actual_workers} workers (CPU cores: {cpu_count})")
+        
+        print(f"Processing {total_rows} rows from DuckDB in chunks of {chunk_size} with {actual_workers} parallel workers")
+        print(f"Query: {base_query}")
+        
+        total_loaded = 0
+        processing_start = time.time()
+        
+        # Process chunks in batches to control memory usage
+        with ThreadPoolExecutor(max_workers=actual_workers) as executor:
+            # Create list of all chunk offsets
+            chunk_offsets = list(range(0, total_rows, chunk_size))
+            total_chunks = len(chunk_offsets)
+            
+            print(f"Processing {total_chunks} chunks in batches of {actual_workers} workers")
+            upload_start = time.time()
+            
+            # Process chunks in batches of worker count
+            for batch_start in range(0, len(chunk_offsets), actual_workers):
+                batch_end = min(batch_start + actual_workers, len(chunk_offsets))
+                batch_offsets = chunk_offsets[batch_start:batch_end]
+                
+                print(f"Processing batch {batch_start//actual_workers + 1}/{(total_chunks + actual_workers - 1)//actual_workers}: chunks {batch_start + 1}-{batch_end}")
+                
+                # Submit current batch
+                futures = []
+                for offset in batch_offsets:
+                    future = executor.submit(
+                        upload_duckdb_chunk,
+                        db_path,
+                        base_query,
+                        offset,
+                        chunk_size,
+                        base_url,
+                        core,
+                        schema,
+                        processor
+                    )
+                    futures.append(future)
+                
+                # Wait for current batch to complete
+                for future in as_completed(futures):
+                    try:
+                        docs_loaded = future.result()
+                        total_loaded += docs_loaded
+                        print(f"Progress: {total_loaded:,}/{total_rows:,} documents loaded")
+                    except Exception as e:
+                        print(f"Error in parallel DuckDB chunk processing: {e}")
+            
+            upload_time = time.time() - upload_start
+            total_processing_time = time.time() - processing_start
+            
+            # Calculate throughput metrics
+            docs_per_sec = total_loaded / total_processing_time if total_processing_time > 0 else 0
+            upload_docs_per_sec = total_loaded / upload_time if upload_time > 0 else 0
+            
+            print(f"DuckDB upload complete! Upload: {upload_time:.2f}s, Total: {total_processing_time:.2f}s")
+            print(f"Throughput: {docs_per_sec:,.0f} docs/sec overall, {upload_docs_per_sec:,.0f} docs/sec upload")
+        
+        return total_loaded
+        
+    except Exception as e:
+        print(f"Error in DuckDB bulk loading: {e}")
+        return 0
+
+
+def _create_csv_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
+    """
+    Create a CSV/TSV chunk file with header using DuckDB
+    
+    :param csv_file: Input CSV/TSV file path
+    :param chunk_start: Starting row (0-based)
+    :param chunk_size: Number of rows to process
+    :param output_file: Output CSV file path
+    :return: Number of rows processed
+    """
+    try:
+        conn = duckdb.connect()
+        
+        # Auto-detect separator
+        sep = '\t' if csv_file.endswith('.tsv') else ','
+        
+        # Export chunk directly to CSV
+        query = f"""
+        COPY (
+            SELECT * FROM read_csv_auto('{csv_file}', 
+                                       delim='{sep}',
+                                       ignore_errors=true,
+                                       header=true)
+            LIMIT {chunk_size} OFFSET {chunk_start}
+        ) TO '{output_file}' (FORMAT CSV, DELIMITER '\t', HEADER true)
+        """
+        
+        conn.execute(query)
+        
+        # Count rows to return
+        count_query = f"""
+        SELECT COUNT(*) FROM read_csv_auto('{output_file}', header=true, ignore_errors=true)
+        """
+        count = conn.execute(count_query).fetchone()[0]
+        
+        conn.close()
+        return count
+    except Exception as e:
+        print(f"Error creating CSV chunk starting at {chunk_start}: {e}")
+        return 0
 

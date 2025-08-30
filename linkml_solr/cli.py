@@ -8,7 +8,9 @@ from linkml_runtime.dumpers import YAMLDumper
 from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.loaders import yaml_loader
 from linkml_solr import SolrQueryEngine, SolrEndpoint, DEFAULT_CORE, DEFAULT_SOLR_URL
-from linkml_solr.utils.solr_bulkload import bulkload_file
+from linkml_solr.utils.solr_bulkload import bulkload_file, bulkload_chunked, bulkload_duckdb
+import requests
+import time
 
 
 @click.group()
@@ -44,6 +46,7 @@ def main(verbose: int, quiet: bool):
               show_default=True,
               help='solr core.')
 @click.option('--format', '-f',
+              type=click.Choice(['csv', 'json']),
               default='csv',
               show_default=True,
               help='input format.')
@@ -52,17 +55,193 @@ def main(verbose: int, quiet: bool):
               help='solr url.')
 @click.option('--processor', '-p',
               help='Processor argument to pass when bulk loading to Solr')
+@click.option('--chunk-size', '-c',
+              default=100000,
+              show_default=True,
+              help='Number of rows per chunk for large files')
+@click.option('--parallel-workers', '-w',
+              default=None,
+              type=int,
+              help='Number of parallel workers (default: auto-detect based on CPU cores)')
+@click.option('--chunked/--no-chunked',
+              default=False,
+              show_default=True,
+              help='Use chunked parallel loading for large files')
+@click.option('--auto-configure/--no-auto-configure',
+              default=True,
+              show_default=True,
+              help='Automatically configure Solr for optimal performance')
+@click.option('--ram-buffer',
+              default=2048,
+              show_default=True,
+              help='RAM buffer size in MB (used with auto-configure)')
 @click.argument('files', nargs=-1)
-def bulkload(files, format, schema, url, core, processor=None):
+def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_workers, chunked, auto_configure, ram_buffer):
     """
-    Convert multiple golr yaml schemas to linkml
+    Bulk load files into Solr with optional chunking and performance optimization
     """
-    inputs = {}
     if schema is not None:
         with open(schema) as stream:
             schema_obj = yaml_loader.load(stream, target_class=SchemaDefinition)
-    for f in files:
-        bulkload_file(f, format=format, schema=schema_obj, core=core, base_url=url, processor=processor)
+    else:
+        schema_obj = None
+    
+    # Auto-configure Solr for performance if requested
+    if auto_configure:
+        print("Configuring Solr for optimal bulk loading performance...")
+        configure_solr_performance(url, core, ram_buffer, disable_autocommit=True)
+    
+    total_loaded = 0
+    start_time = time.time()
+    
+    try:
+        for f in files:
+            print(f"Processing file: {f}")
+            
+            if chunked and format in ['csv', 'json']:
+                # Use chunked loading for large files
+                docs_loaded = bulkload_chunked(
+                    csv_file=f,
+                    base_url=url,
+                    core=core,
+                    schema=schema_obj,
+                    chunk_size=chunk_size,
+                    max_workers=parallel_workers,
+                    format=format,
+                    processor=processor
+                )
+                total_loaded += docs_loaded
+                print(f"Loaded {docs_loaded} documents from {f}")
+            else:
+                # Use standard bulkload
+                bulkload_file(f, format=format, schema=schema_obj, core=core, base_url=url, processor=processor, commit=False)
+                print(f"Loaded file {f}")
+        
+        # Commit all changes at the end
+        print("Committing all changes...")
+        commit_start = time.time()
+        if commit_solr(url, core):
+            commit_time = time.time() - commit_start
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print(f"Successfully committed {total_loaded} documents to Solr")
+            print(f"Total time: {total_time:.2f}s (commit: {commit_time:.2f}s)")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+        else:
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print("Warning: Commit may have failed")
+            print(f"Total time: {total_time:.2f}s")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+            
+    except Exception as e:
+        total_time = time.time() - start_time
+        print(f"Error during bulk loading: {e}")
+        print(f"Total time before error: {total_time:.2f}s")
+        # Try to commit what we have
+        commit_solr(url, core)
+        raise
+
+
+@main.command()
+@click.option('--core', '-C',
+              default=DEFAULT_CORE,
+              show_default=True,
+              help='solr core.')
+@click.option('--url', '-u',
+              default=DEFAULT_SOLR_URL,
+              help='solr url.')
+@click.option('--schema', '-s',
+              help='Path to schema.')
+@click.option('--chunk-size', '-c',
+              default=100000,
+              show_default=True,
+              help='Number of rows per chunk')
+@click.option('--parallel-workers', '-w',
+              default=None,
+              type=int,
+              help='Number of parallel workers (default: auto-detect based on CPU cores)')
+@click.option('--where',
+              help='SQL WHERE clause for filtering data')
+@click.option('--columns',
+              help='Comma-separated list of columns to export (default: all)')
+@click.option('--order-by',
+              help='SQL ORDER BY clause for consistent chunking')
+@click.option('--auto-configure/--no-auto-configure',
+              default=True,
+              show_default=True,
+              help='Automatically configure Solr for optimal performance')
+@click.option('--ram-buffer',
+              default=2048,
+              show_default=True,
+              help='RAM buffer size in MB (used with auto-configure)')
+@click.option('--processor', '-p',
+              help='Processor argument to pass when bulk loading to Solr')
+@click.argument('db_path')
+@click.argument('table_name')
+def bulkload_db(db_path, table_name, core, url, schema, chunk_size, parallel_workers, 
+               where, columns, order_by, auto_configure, ram_buffer, processor):
+    """
+    Bulk load data from DuckDB database to Solr with high-performance parallel processing
+    
+    DB_PATH: Path to the DuckDB database file
+    TABLE_NAME: Name of the table to export
+    """
+    if schema is not None:
+        with open(schema) as stream:
+            schema_obj = yaml_loader.load(stream, target_class=SchemaDefinition)
+    else:
+        schema_obj = None
+    
+    # Auto-configure Solr for performance if requested
+    if auto_configure:
+        print("Configuring Solr for optimal bulk loading performance...")
+        configure_solr_performance(url, core, ram_buffer, disable_autocommit=True)
+    
+    start_time = time.time()
+    
+    try:
+        print(f"Loading from DuckDB: {db_path} → table: {table_name}")
+        
+        total_loaded = bulkload_duckdb(
+            db_path=db_path,
+            table_name=table_name,
+            base_url=url,
+            core=core,
+            schema=schema_obj,
+            chunk_size=chunk_size,
+            max_workers=parallel_workers,
+            where_clause=where,
+            columns=columns,
+            order_by=order_by,
+            processor=processor
+        )
+        
+        # Commit all changes at the end
+        print("Committing all changes...")
+        commit_start = time.time()
+        if commit_solr(url, core):
+            commit_time = time.time() - commit_start
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print(f"Successfully committed {total_loaded} documents to Solr")
+            print(f"Total time: {total_time:.2f}s (commit: {commit_time:.2f}s)")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+        else:
+            total_time = time.time() - start_time
+            overall_docs_per_sec = total_loaded / total_time if total_time > 0 else 0
+            print("Warning: Commit may have failed")
+            print(f"Total time: {total_time:.2f}s")
+            print(f"Overall throughput: {overall_docs_per_sec:,.0f} docs/sec")
+            
+    except Exception as e:
+        total_time = time.time() - start_time
+        print(f"Error during bulk loading: {e}")
+        print(f"Total time before error: {total_time:.2f}s")
+        # Try to commit what we have
+        commit_solr(url, core)
+        raise
+
 
 @main.command()
 @click.option('--schema', '-s',
@@ -95,7 +274,19 @@ def bulkload(files, format, schema, url, core, processor=None):
               default=DEFAULT_SOLR_URL,
               show_default=True,
               help='solr url.')
-def start_server(schema, kill, container, url, core, port, sleep: int, create_schema):
+@click.option('--memory', '-m',
+              default='4g',
+              show_default=True,
+              help='Docker memory limit (e.g., 4g, 8g)')
+@click.option('--heap-size', '-j',
+              default='3g',
+              show_default=True,
+              help='JVM heap size (e.g., 2g, 4g)')
+@click.option('--ram-buffer-mb',
+              default=512,
+              show_default=True,
+              help='Solr RAM buffer size in MB for bulk loading')
+def start_server(schema, kill, container, url, core, port, sleep: int, create_schema, memory, heap_size, ram_buffer_mb):
     """
     Starts a solr server (via Docker)
     """
@@ -109,6 +300,12 @@ def start_server(schema, kill, container, url, core, port, sleep: int, create_sc
         container,
         '-p',
         f'{port}:{port}',
+        '-m',
+        memory,
+        '-e',
+        f'SOLR_JAVA_MEM=-Xms{heap_size} -Xmx{heap_size}',
+        '-e',
+        f'SOLR_OPTS=-Dsolr.ramBufferSizeMB={ram_buffer_mb} -Dsolr.jetty.request.header.size=65535',
         'solr:8',
         'solr-precreate',
         core]
@@ -191,6 +388,62 @@ def create_schema(schema, url, core, debug, dry_run, top_class):
     gen = qe.load_schema(dry_run=dry_run,)
     if debug:
         print(gen.serialize())
+
+
+def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit=True):
+    """
+    Configure Solr for optimal bulk loading performance
+    """
+    config_url = f"{url}/{core}/config"
+    
+    if disable_autocommit:
+        # Disable autocommit
+        response = requests.post(config_url, 
+                               headers={'Content-type': 'application/json'},
+                               json={
+                                   "set-property": {
+                                       "updateHandler.autoCommit.maxTime": -1,
+                                       "updateHandler.autoSoftCommit.maxTime": -1
+                                   }
+                               })
+        if response.status_code == 200:
+            print(f"Disabled autocommit: {response.status_code}")
+        else:
+            print(f"Failed to disable autocommit: {response.status_code}")
+            print(f"Error response: {response.text}")
+    
+    # Note: RAM buffer size must be set via environment variables when starting Solr
+    print(f"Note: RAM buffer ({ram_buffer_mb}MB) should be set via SOLR_OPTS environment variable when starting Solr")
+
+
+def commit_solr(url, core):
+    """
+    Commit changes to Solr
+    """
+    commit_url = f"{url}/{core}/update?commit=true"
+    response = requests.post(commit_url, headers={'Content-Type': 'application/json'}, json={})
+    print(f"Committed changes: {response.status_code}")
+    return response.status_code == 200
+
+
+@main.command()
+@click.option('--url', '-u',
+              default=DEFAULT_SOLR_URL,
+              help='solr url.')
+@click.option('--core', '-C',
+              default=DEFAULT_CORE,
+              help='solr core.')
+@click.option('--ram-buffer',
+              default=2048,
+              help='RAM buffer size in MB.')
+@click.option('--enable/--disable',
+              default=False,
+              help='Enable or disable autocommit.')
+def configure_performance(url, core, ram_buffer, enable):
+    """
+    Configure Solr performance settings for bulk loading
+    """
+    configure_solr_performance(url, core, ram_buffer, not enable)
 
 
 if __name__ == '__main__':
