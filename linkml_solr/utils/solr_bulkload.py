@@ -11,22 +11,32 @@ import time
 import os
 from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinitionName
 import requests
+from urllib3.util.retry import Retry
+
+logger = logging.getLogger(__name__)
 
 # Global session for connection pooling
 _session_lock = threading.Lock()
 _global_session = None
 
 def get_http_session():
-    """Get a shared HTTP session with connection pooling"""
+    """Get a shared HTTP session with connection pooling and transport-level retry"""
     global _global_session
     with _session_lock:
         if _global_session is None:
             _global_session = requests.Session()
-            # Configure connection pooling for parallel uploads
+            # Transport-level retry for connection errors and server errors
+            retry_strategy = Retry(
+                total=3,
+                backoff_factor=1,
+                status_forcelist=[502, 503, 504],
+                allowed_methods=["POST", "GET"],
+            )
             adapter = requests.adapters.HTTPAdapter(
                 pool_connections=20,
                 pool_maxsize=20,
-                pool_block=True
+                pool_block=True,
+                max_retries=retry_strategy,
             )
             _global_session.mount('http://', adapter)
             _global_session.mount('https://', adapter)
@@ -91,18 +101,28 @@ def bulkload_file(f,
         ct = 'application/json'
     else:
         raise Exception(f'Unknown format {format}')
-    # Use direct HTTP with connection pooling for better performance
-    try:
-        session = get_http_session()
-        with open(f, 'rb') as file_data:
-            response = session.post(url, data=file_data, headers={'Content-Type': ct}, timeout=300)
-            print(f"Uploaded {f}: {response.status_code}")
-            if response.status_code != 200:
-                print(f"Error response: {response.text}")
-            return response.status_code == 200
-    except Exception as e:
-        print(f"Error uploading {f}: {e}")
-        return False
+    # Use direct HTTP with connection pooling and retry for better reliability
+    max_retries = 3
+    session = get_http_session()
+    for attempt in range(1, max_retries + 1):
+        try:
+            with open(f, 'rb') as file_data:
+                response = session.post(url, data=file_data, headers={'Content-Type': ct}, timeout=300)
+            if response.status_code == 200:
+                print(f"Uploaded {f}: {response.status_code}")
+                return True
+            logger.warning(f"Solr returned {response.status_code} uploading {f} "
+                           f"(attempt {attempt}/{max_retries}): {response.text[:200]}")
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Upload of {f} failed (attempt {attempt}/{max_retries}): {e}")
+
+        if attempt < max_retries:
+            wait = 2 ** (attempt - 1)  # 1s, 2s
+            logger.info(f"Retrying in {wait}s...")
+            time.sleep(wait)
+
+    logger.error(f"Failed to upload {f} after {max_retries} attempts")
+    return False
 
 
 def csv_to_json_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
@@ -284,15 +304,16 @@ def bulkload_chunked(csv_file: str,
     return total_loaded
 
 
-def upload_rows_to_solr(rows, columns, base_url, core, processor=None):
+def upload_rows_to_solr(rows, columns, base_url, core, processor=None, max_retries=3):
     """
-    Upload pre-fetched rows to Solr as JSON documents.
+    Upload pre-fetched rows to Solr as JSON documents with retry on failure.
 
     :param rows: List of row tuples from DuckDB fetchmany
     :param columns: List of column names
     :param base_url: Solr base URL
     :param core: Solr core name
     :param processor: Optional Solr processor
+    :param max_retries: Number of attempts before giving up
     :return: Number of documents uploaded
     """
     docs = [dict(zip(columns, row)) for row in rows]
@@ -301,10 +322,27 @@ def upload_rows_to_solr(rows, columns, base_url, core, processor=None):
     url = f'{base_url}/{core}/update/json/docs?commit=false'
     if processor:
         url += f'&processor={processor}'
-    response = session.post(url, data=json_data,
-                           headers={'Content-Type': 'application/json'},
-                           timeout=300)
-    return len(docs) if response.status_code == 200 else 0
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = session.post(url, data=json_data,
+                                    headers={'Content-Type': 'application/json'},
+                                    timeout=300)
+            if response.status_code == 200:
+                return len(docs)
+            logger.warning(f"Solr returned {response.status_code} for {len(docs)} docs "
+                           f"(attempt {attempt}/{max_retries}): {response.text[:200]}")
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Upload of {len(docs)} docs failed "
+                           f"(attempt {attempt}/{max_retries}): {e}")
+
+        if attempt < max_retries:
+            wait = 2 ** (attempt - 1)  # 1s, 2s
+            logger.info(f"Retrying in {wait}s...")
+            time.sleep(wait)
+
+    logger.error(f"Failed to upload {len(docs)} docs to {core} after {max_retries} attempts")
+    return 0
 
 
 def bulkload_duckdb(db_path: str,
