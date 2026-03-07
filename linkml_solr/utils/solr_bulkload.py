@@ -55,16 +55,17 @@ def get_optimal_worker_count(max_workers: Optional[int] = None) -> int:
     """
     if max_workers is not None:
         return max_workers
-    
-    # Get CPU count
-    cpu_count = os.cpu_count() or 4  # Fallback to 4 if detection fails
-    
-    # For I/O bound HTTP uploads, use CPU count + 50% but cap at reasonable limit
-    # This balances parallelism with system resource usage without being too aggressive
-    optimal = min(int(cpu_count * 1.5), 12)
-    
-    # Minimum of 2 workers for any benefit
-    return max(optimal, 2)
+
+    cpu_count = os.cpu_count() or 4
+
+    # Assume Solr is colocated and sharing CPUs. Reserve roughly half the cores
+    # for Solr indexing, and use the rest for upload workers. The uploads are
+    # I/O-bound (HTTP), so a small number of threads can still saturate the
+    # network link while leaving headroom for Solr's merge/flush threads.
+    optimal = max(cpu_count // 2, 2)
+
+    # Cap to avoid overwhelming Solr's request handler on large machines
+    return min(optimal, 8)
 
 
 def bulkload_file(f,
