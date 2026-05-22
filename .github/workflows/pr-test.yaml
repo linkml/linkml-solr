@@ -43,8 +43,8 @@ jobs:
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install --no-interaction
-      - name: Ensure setuptools is available (pysolr imports pkg_resources)
-        run: poetry run pip install setuptools
+      - name: Ensure pkg_resources is available (pysolr imports it; setuptools>=81 dropped it)
+        run: poetry run pip install 'setuptools<81'
       - name: add test solr core explicitly
         run: poetry run lsolr add-cores test
       - name: run tests
