@@ -160,13 +160,13 @@ def bulkload(files, format, schema, url, core, processor, chunk_size, parallel_w
 @click.option('--parallel-workers', '-w',
               default=None,
               type=int,
-              help='Number of parallel workers (default: auto-detect based on CPU cores)')
+              help='Number of parallel Solr upload workers (default: 4). DuckDB reads are serial against a one-time snapshot.')
 @click.option('--where',
               help='SQL WHERE clause for filtering data')
 @click.option('--columns',
               help='Comma-separated list of columns to export (default: all)')
 @click.option('--order-by',
-              help='SQL ORDER BY clause for consistent chunking')
+              help='Optional SQL ORDER BY applied while building the snapshot. Not required for correctness; useful only for reproducible run-to-run row order.')
 @click.option('--auto-configure/--no-auto-configure',
               default=True,
               show_default=True,

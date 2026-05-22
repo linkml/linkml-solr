@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9]
+        python-version: ["3.10", "3.11"]
     services:
       solr:
         image: solr:8
@@ -18,18 +18,18 @@ jobs:
         ports:
           - 8983:8983
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Sleep for 15 seconds to give Solr time to start
         run: sleep 15s
         shell: bash
       - name: Confirm that Solr is answering
         run: curl -s -o /dev/null -w "%{http_code}" http://localhost:8983/solr/ || exit 1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3
+        uses: snok/install-poetry@v1
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
@@ -37,12 +37,14 @@ jobs:
       #  load cached venv if cache exists
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install --no-interaction
+      - name: Ensure pkg_resources is available (pysolr imports it; setuptools>=81 dropped it)
+        run: poetry run pip install 'setuptools<81'
       - name: add test solr core explicitly
         run: poetry run lsolr add-cores test
       - name: run tests
