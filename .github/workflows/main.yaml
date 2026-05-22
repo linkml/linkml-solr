@@ -6,47 +6,45 @@ on:
 
 jobs:
   unittests:
-    needs: update-requirements
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7.6, 3.8, 3.9]
+        python-version: ["3.10", "3.11"]
+    services:
+      solr:
+        image: solr:8
+        options: --name my_solr
+        ports:
+          - 8983:8983
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    - name: Sleep for 15 seconds to give Solr time to start
+      run: sleep 15s
+      shell: bash
+    - name: Confirm that Solr is answering
+      run: curl -s -o /dev/null -w "%{http_code}" http://localhost:8983/solr/ || exit 1
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Poetry
-      uses: snok/install-poetry@v1.3
+      uses: snok/install-poetry@v1
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
 
-    #  load cached venv if cache exists
     - name: Load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-    - name: Install dependencies and run
-      run: |
-        poetry install --no-interaction
-        poetry run python -m unittest
-
-  update-outputs:
-    needs: unittests
-    runs-on: ubuntu-latest
-    steps:
-      - if: ${{ matrix.python-version == '3.9' }}
-        run: |
-          find tests -name output -exec git add --force {} \;
-          if [[ ! -z $(git status -s tests) ]]
-          then
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git commit -m 'Automated adding outputs from tests' tests
-            git push
-          fi
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    - name: Install dependencies
+      run: poetry install --no-interaction
+    - name: Ensure pkg_resources is available (pysolr imports it; setuptools>=81 dropped it)
+      run: poetry run pip install 'setuptools<81'
+    - name: add test solr core explicitly
+      run: poetry run lsolr add-cores test
+    - name: run tests
+      run: poetry run python -m unittest -v
