@@ -277,31 +277,52 @@ def bulkload_chunked(csv_file: str,
 
 
 def _upload_docs_to_solr(docs: list, base_url: str, core: str,
-                         processor: Optional[str], chunk_label: str) -> int:
-    """Upload a batch of documents (list of dicts) to Solr via /update/json/docs."""
+                         processor: Optional[str], chunk_label: str,
+                         timeout: int = 600, max_attempts: int = 4,
+                         backoff_base: float = 2.0) -> int:
+    """Upload a batch of documents (list of dicts) to Solr via /update/json/docs.
+
+    Retries transient failures (timeouts, connection resets, 5xx) with
+    exponential backoff. Re-POSTing the same chunk is idempotent: each doc
+    carries a unique ``id``, so a retried upload overwrites rather than
+    duplicates — safe even when a prior attempt timed out client-side but
+    Solr had already indexed the batch.
+
+    On success returns the number of docs uploaded. If every attempt fails,
+    raises ``RuntimeError`` so the caller records the chunk as failed and
+    aborts loudly instead of silently shipping a short index.
+    """
     if not docs:
         return 0
     session = get_http_session()
     url = f'{base_url}/{core}/update/json/docs?commit=false'
     if processor is not None:
         url = f'{url}&processor={processor}'
-    try:
-        json_data = json.dumps(docs, default=str)
-        response = session.post(
-            url,
-            data=json_data,
-            headers={'Content-Type': 'application/json'},
-            timeout=300,
-        )
-        if response.status_code == 200:
-            print(f"Uploaded {chunk_label}: {len(docs)} docs")
-            return len(docs)
-        print(f"Error uploading {chunk_label}: HTTP {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        return 0
-    except Exception as e:
-        print(f"Error uploading {chunk_label}: {e}")
-        return 0
+    json_data = json.dumps(docs, default=str)
+    last_error = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = session.post(
+                url,
+                data=json_data,
+                headers={'Content-Type': 'application/json'},
+                timeout=timeout,
+            )
+            if response.status_code == 200:
+                suffix = f" (attempt {attempt})" if attempt > 1 else ""
+                print(f"Uploaded {chunk_label}: {len(docs)} docs{suffix}")
+                return len(docs)
+            last_error = f"HTTP {response.status_code}: {response.text[:300]}"
+        except Exception as e:
+            last_error = repr(e)
+        if attempt < max_attempts:
+            sleep_s = backoff_base ** (attempt - 1)
+            print(f"Retry {attempt}/{max_attempts - 1} for {chunk_label} "
+                  f"after error: {last_error} (sleeping {sleep_s:.1f}s)")
+            time.sleep(sleep_s)
+    raise RuntimeError(
+        f"Failed to upload {chunk_label} after {max_attempts} attempts: {last_error}"
+    )
 
 
 def bulkload_duckdb(db_path: str,
@@ -374,8 +395,18 @@ def bulkload_duckdb(db_path: str,
 
         upload_start = time.time()
         total_loaded = 0
+        upload_errors: list = []
         in_flight: list = []
         max_in_flight = max(actual_workers * 2, 2)
+
+        def _collect(futures):
+            nonlocal total_loaded
+            for fut in futures:
+                try:
+                    total_loaded += fut.result()
+                except Exception as e:
+                    upload_errors.append(str(e))
+                    print(f"Upload worker error: {e}")
 
         rconn = duckdb.connect(snapshot_path, read_only=True)
         try:
@@ -397,19 +428,11 @@ def bulkload_duckdb(db_path: str,
 
                     if len(in_flight) >= max_in_flight:
                         done, pending = wait(in_flight, return_when=FIRST_COMPLETED)
-                        for fut in done:
-                            try:
-                                total_loaded += fut.result()
-                            except Exception as e:
-                                print(f"Upload worker error: {e}")
+                        _collect(done)
                         in_flight = list(pending)
                         print(f"Progress: {total_loaded:,}/{total_rows:,} documents uploaded")
 
-                for fut in as_completed(in_flight):
-                    try:
-                        total_loaded += fut.result()
-                    except Exception as e:
-                        print(f"Upload worker error: {e}")
+                _collect(as_completed(in_flight))
         finally:
             rconn.close()
 
@@ -422,11 +445,24 @@ def bulkload_duckdb(db_path: str,
         print(f"Throughput: {docs_per_sec:,.0f} docs/sec overall, "
               f"{upload_docs_per_sec:,.0f} docs/sec upload phase")
 
+        # Fail loud: a partial load must never be reported as success. Every row
+        # has a unique id and is posted exactly once, so a complete load means
+        # total_loaded == total_rows. Anything less means chunks were dropped.
+        if upload_errors or total_loaded != total_rows:
+            raise RuntimeError(
+                f"Incomplete Solr load for core '{core}': uploaded "
+                f"{total_loaded:,}/{total_rows:,} rows; {len(upload_errors)} chunk(s) "
+                f"failed after retries. Refusing to report success. "
+                f"First error: {upload_errors[0] if upload_errors else 'count mismatch'}"
+            )
+
         return total_loaded
 
     except Exception as e:
+        # Re-raise so the CLI exits non-zero; never swallow into a 0 return that
+        # the caller would print as 'Successfully committed 0 documents'.
         print(f"Error in DuckDB bulk loading: {e}")
-        return 0
+        raise
     finally:
         try:
             if os.path.exists(snapshot_path):
