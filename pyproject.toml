@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linkml-solr"
-version = "0.2.0"
+version = "0.2.3"
 description = ""
 authors = ["Chris Mungall <cjm@berkeleybop.org>", "Kevin Schaper <kevin@tislab.org"]
 
