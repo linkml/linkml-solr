@@ -1,0 +1,7 @@
+{
+  "add-dynamic-field": {"name": "*_extra", "type": "mytext", "indexed": true, "stored": true, "multiValued": true},
+  "add-copy-field": [
+    {"source": "name", "dest": "name_extra"},
+    {"source": "does_not_exist", "dest": "does_not_exist_extra"}
+  ]
+}

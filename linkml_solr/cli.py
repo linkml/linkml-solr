@@ -390,15 +390,15 @@ def create_schema(schema, url, core, debug, dry_run, top_class):
         print(gen.serialize())
 
 
-def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit=True):
+def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit=True, disable_tlog=True):
     """
     Configure Solr for optimal bulk loading performance
     """
     config_url = f"{url}/{core}/config"
-    
+
     if disable_autocommit:
         # Disable autocommit
-        response = requests.post(config_url, 
+        response = requests.post(config_url,
                                headers={'Content-type': 'application/json'},
                                json={
                                    "set-property": {
@@ -411,7 +411,17 @@ def configure_solr_performance(url, core, ram_buffer_mb=2048, disable_autocommit
         else:
             print(f"Failed to disable autocommit: {response.status_code}")
             print(f"Error response: {response.text}")
-    
+
+    if disable_tlog:
+        # Cap the transaction log to nothing. A batch build is re-runnable, so the
+        # tlog buys no recovery — but left on it grows to ~the index size and is
+        # then carried in the shipped index dir. numRecordsToKeep only takes effect
+        # after a core RELOAD.
+        r = requests.post(config_url, headers={'Content-type': 'application/json'},
+                          json={"set-property": {"updateLog.numRecordsToKeep": 0}})
+        requests.get(f"{url}/admin/cores", params={"action": "RELOAD", "core": core})
+        print(f"Disabled transaction log (numRecordsToKeep=0): {r.status_code}")
+
     # Note: RAM buffer size must be set via environment variables when starting Solr
     print(f"Note: RAM buffer ({ram_buffer_mb}MB) should be set via SOLR_OPTS environment variable when starting Solr")
 
@@ -444,6 +454,36 @@ def configure_performance(url, core, ram_buffer, enable):
     Configure Solr performance settings for bulk loading
     """
     configure_solr_performance(url, core, ram_buffer, not enable)
+
+
+@main.command()
+@click.option('--config', '-c', 'config_path', required=True,
+              help='Path to a build YAML (see linkml_solr.build for the schema).')
+@click.option('--runtime', default=None, help="Container runtime: docker | apptainer (default: config/auto).")
+@click.option('--port', default=None, type=int, help='Override Solr HTTP port.')
+@click.option('--skip-tarball/--tarball', default=None,
+              help='Leave Solr running (no tarball) vs. produce the index tarball.')
+@click.option('--dry-run', is_flag=True, default=False, help='Print the plan without starting Solr or loading.')
+def build(config_path, runtime, port, skip_tarball, dry_run):
+    """
+    Build one or more Solr cores end-to-end from a YAML config.
+
+    Starts Solr (Docker/Apptainer), creates + schemas each core, loads it from
+    DuckDB (single-writer or sharded+MERGEINDEXES), verifies doc counts, and
+    optionally tars the index.
+    """
+    from linkml_solr.build import BuildConfig, build as run_build
+
+    cfg = BuildConfig.from_yaml(config_path)
+    if runtime is not None:
+        cfg.runtime = runtime
+    if port is not None:
+        cfg.port = port
+    if skip_tarball is not None:
+        cfg.skip_tarball = skip_tarball
+    if dry_run:
+        cfg.dry_run = True
+    run_build(cfg)
 
 
 if __name__ == '__main__':

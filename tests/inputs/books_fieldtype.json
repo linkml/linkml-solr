@@ -1,0 +1,2 @@
+{"add-field-type": {"name": "mytext", "class": "solr.TextField", "positionIncrementGap": "100",
+  "analyzer": {"tokenizer": {"class": "solr.StandardTokenizerFactory"}}}}

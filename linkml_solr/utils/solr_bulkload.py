@@ -335,7 +335,10 @@ def bulkload_duckdb(db_path: str,
                    where_clause: Optional[str] = None,
                    columns: Optional[str] = None,
                    order_by: Optional[str] = None,
-                   processor: Optional[str] = None) -> int:
+                   processor: Optional[str] = None,
+                   snapshot: bool = True,
+                   drop_nulls: bool = False,
+                   memory_limit: Optional[str] = None) -> int:
     """
     Load data from DuckDB (table or view) into Solr.
 
@@ -351,6 +354,15 @@ def bulkload_duckdb(db_path: str,
       * When the source was a view, every chunk recomputed the view.
 
     One materialization, one pass, bounded memory.
+
+    ``snapshot=False`` skips the temp-DuckDB materialization and streams directly
+    from the source (opened read-only, with an optional ``memory_limit``). This is
+    faster for a concrete table read once, and is the mode a sharded loader uses:
+    N processes each read a disjoint ``hash(id) % N = j`` slice of the same
+    read-only DB. Keep ``snapshot=True`` (default) when the source is a view or you
+    need a stable ``ORDER BY`` snapshot. ``drop_nulls=True`` omits null-valued keys
+    from each doc (smaller payloads; Solr treats an absent field and a null field
+    identically, so this is behaviour-preserving).
     """
     column_list = columns if columns else "*"
     actual_workers = get_optimal_worker_count(max_workers)
@@ -359,36 +371,53 @@ def bulkload_duckdb(db_path: str,
     if max_workers is None:
         print(f"Auto-detected {actual_workers} upload workers (CPU cores: {cpu_count})")
 
-    snapshot_fd, snapshot_path = tempfile.mkstemp(suffix='.duckdb', prefix='lsolr_snapshot_')
-    os.close(snapshot_fd)
-    os.unlink(snapshot_path)
-
-    # Allow table_name to be either a bare identifier (qualified into the
-    # attached "src" database) or a parenthesized subquery whose contents the
-    # caller has already qualified with src.* themselves.
-    from_clause = table_name if table_name.lstrip().startswith('(') else f"src.{table_name}"
-    snapshot_query = f"SELECT {column_list} FROM {from_clause}"
-    if where_clause:
-        snapshot_query += f" WHERE {where_clause}"
-    if order_by:
-        snapshot_query += f" ORDER BY {order_by}"
+    snapshot_path = None
+    snapshot_time = 0.0
+    # table_name may be a bare identifier or a parenthesized subquery the caller
+    # has already qualified.
+    is_subquery = table_name.lstrip().startswith('(')
 
     try:
-        snapshot_start = time.time()
-        print(f"Materializing snapshot from {table_name} into temp DuckDB...")
-        wconn = duckdb.connect(snapshot_path)
-        try:
-            wconn.execute(f"ATTACH '{db_path}' AS src (READ_ONLY)")
-            wconn.execute(f"CREATE TABLE snapshot AS {snapshot_query}")
-            total_rows = wconn.execute("SELECT COUNT(*) FROM snapshot").fetchone()[0]
-            wconn.execute("DETACH src")
-        finally:
-            wconn.close()
-        snapshot_time = time.time() - snapshot_start
-        print(f"Snapshot ready: {total_rows:,} rows in {snapshot_time:.2f}s")
-        if order_by is None:
-            print("Note: no --order-by supplied; snapshot order is whatever the source returned. "
-                  "This is safe (every row appears exactly once) but not reproducible run-to-run.")
+        if snapshot:
+            snapshot_fd, snapshot_path = tempfile.mkstemp(suffix='.duckdb', prefix='lsolr_snapshot_')
+            os.close(snapshot_fd)
+            os.unlink(snapshot_path)
+            from_clause = table_name if is_subquery else f"src.{table_name}"
+            snapshot_query = f"SELECT {column_list} FROM {from_clause}"
+            if where_clause:
+                snapshot_query += f" WHERE {where_clause}"
+            if order_by:
+                snapshot_query += f" ORDER BY {order_by}"
+
+            snapshot_start = time.time()
+            print(f"Materializing snapshot from {table_name} into temp DuckDB...")
+            wconn = duckdb.connect(snapshot_path)
+            try:
+                wconn.execute(f"ATTACH '{db_path}' AS src (READ_ONLY)")
+                wconn.execute(f"CREATE TABLE snapshot AS {snapshot_query}")
+                total_rows = wconn.execute("SELECT COUNT(*) FROM snapshot").fetchone()[0]
+                wconn.execute("DETACH src")
+            finally:
+                wconn.close()
+            snapshot_time = time.time() - snapshot_start
+            print(f"Snapshot ready: {total_rows:,} rows in {snapshot_time:.2f}s")
+            if order_by is None:
+                print("Note: no --order-by supplied; snapshot order is whatever the source returned. "
+                      "This is safe (every row appears exactly once) but not reproducible run-to-run.")
+            read_path, read_from = snapshot_path, "snapshot"
+        else:
+            from_clause = table_name
+            where_sql = f" WHERE {where_clause}" if where_clause else ""
+            order_sql = f" ORDER BY {order_by}" if order_by else ""
+            read_from = f"(SELECT {column_list} FROM {from_clause}{where_sql}{order_sql})"
+            cconn = duckdb.connect(db_path, read_only=True)
+            try:
+                total_rows = cconn.execute(f"SELECT COUNT(*) FROM {read_from}").fetchone()[0]
+            finally:
+                cconn.close()
+            print(f"Direct read: {total_rows:,} rows from {table_name}"
+                  + (f" WHERE {where_clause}" if where_clause else ""))
+            read_path = db_path
 
         if total_rows == 0:
             return 0
@@ -408,9 +437,11 @@ def bulkload_duckdb(db_path: str,
                     upload_errors.append(str(e))
                     print(f"Upload worker error: {e}")
 
-        rconn = duckdb.connect(snapshot_path, read_only=True)
+        rconn = duckdb.connect(read_path, read_only=True)
         try:
-            cursor = rconn.execute("SELECT * FROM snapshot")
+            if memory_limit:
+                rconn.execute(f"SET memory_limit='{memory_limit}'")
+            cursor = rconn.execute(f"SELECT * FROM {read_from}")
             col_names = [d[0] for d in cursor.description]
 
             with ThreadPoolExecutor(max_workers=actual_workers) as executor:
@@ -419,7 +450,10 @@ def bulkload_duckdb(db_path: str,
                     rows = cursor.fetchmany(chunk_size)
                     if not rows:
                         break
-                    docs = [dict(zip(col_names, row)) for row in rows]
+                    if drop_nulls:
+                        docs = [{c: v for c, v in zip(col_names, row) if v is not None} for row in rows]
+                    else:
+                        docs = [dict(zip(col_names, row)) for row in rows]
                     label = f"chunk offset {offset}"
                     in_flight.append(executor.submit(
                         _upload_docs_to_solr, docs, base_url, core, processor, label
@@ -464,14 +498,15 @@ def bulkload_duckdb(db_path: str,
         print(f"Error in DuckDB bulk loading: {e}")
         raise
     finally:
-        try:
-            if os.path.exists(snapshot_path):
-                os.unlink(snapshot_path)
-            wal = snapshot_path + '.wal'
-            if os.path.exists(wal):
-                os.unlink(wal)
-        except OSError:
-            pass
+        if snapshot_path:
+            try:
+                if os.path.exists(snapshot_path):
+                    os.unlink(snapshot_path)
+                wal = snapshot_path + '.wal'
+                if os.path.exists(wal):
+                    os.unlink(wal)
+            except OSError:
+                pass
 
 
 def _create_csv_chunk(csv_file: str, chunk_start: int, chunk_size: int, output_file: str) -> int:
