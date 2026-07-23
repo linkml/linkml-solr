@@ -11,6 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        # Full history + tags so poetry-dynamic-versioning can derive the version
+        # from the release tag (a shallow checkout has no tags).
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -23,6 +27,9 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
 
+    - name: Install the dynamic-versioning plugin
+      run: poetry self add "poetry-dynamic-versioning[plugin]"
+
     - name: Install dependencies
       run: poetry install --no-interaction
 
@@ -30,6 +37,7 @@ jobs:
       run: |
         rm -fr dist
         poetry build
+        echo "Built:" && ls dist
 
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1

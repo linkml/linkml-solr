@@ -1,6 +1,9 @@
 [tool.poetry]
 name = "linkml-solr"
-version = "0.2.3"
+# Version is derived from the git tag by poetry-dynamic-versioning; this is only a
+# placeholder for untagged / sdist builds. Do NOT bump this by hand — tag a release
+# (e.g. `v0.3.0`) and the built version follows the tag.
+version = "0.0.0"
 description = ""
 authors = ["Chris Mungall <cjm@berkeleybop.org>", "Kevin Schaper <kevin@tislab.org"]
 
@@ -20,6 +23,13 @@ requests = "^2.25.0"
 [tool.poetry.dev-dependencies]
 tox = "^3.24.5"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+# git tags are `vX.Y.Z`; strip the leading v.
+pattern = "^v(?P<base>\\d+\\.\\d+\\.\\d+)"
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
