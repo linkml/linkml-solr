@@ -66,6 +66,7 @@ class Field(YAMLRoot):
     stored: Optional[str] = None
     indexed: Optional[str] = None
     multiValued: Optional[Union[bool, Bool]] = None
+    docValues: Optional[Union[bool, Bool]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self._is_empty(self.name):
@@ -84,6 +85,9 @@ class Field(YAMLRoot):
 
         if self.multiValued is not None and not isinstance(self.multiValued, Bool):
             self.multiValued = Bool(self.multiValued)
+
+        if self.docValues is not None and not isinstance(self.docValues, Bool):
+            self.docValues = Bool(self.docValues)
 
         super().__post_init__(**kwargs)
 
