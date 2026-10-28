@@ -85,6 +85,50 @@ class SolrSchemaGenTestCase(unittest.TestCase):
         assert('slot_two' not in [f['name'] for f in fields])
 
 
+    def test_inlined_class_slot_is_stored_json_string(self):
+        """Solr reads a JSON object in a doc as a child document, so an inlined
+        class slot becomes a stored, unindexed string field (one JSON string per
+        record); a non-inlined class slot stays a plain string reference."""
+        sb = SchemaBuilder("inlined-test-schema")
+        sb.add_slot("id", range="string", identifier=True)
+        sb.add_slot("resource_id", range="string")
+        sb.add_class("Source", ["id", "resource_id"])
+        sb.add_slot("sources", range="Source", multivalued=True, inlined_as_list=True)
+        sb.add_slot("source_ref", range="Source", multivalued=True, inlined=False)
+        sb.add_class("Association", ["sources", "source_ref"])
+        gen = SolrSchemaGenerator(sb.schema)
+        fields = {f['name']: f for f in json.loads(gen.class_schema("Association"))['add-field']}
+        assert fields['sources'] == {
+            "name": "sources",
+            "type": "string",
+            "stored": "true",
+            "indexed": "false",
+            "multiValued": True,
+            "docValues": False,
+        }
+        assert fields['source_ref'] == {"name": "source_ref", "type": "string", "multiValued": True}
+
+
+    def test_class_slot_without_identifier_is_stored_json_string(self):
+        """A range class with no identifier is always inlined by LinkML, even
+        when the slot doesn't say so."""
+        sb = SchemaBuilder("no-identifier-test-schema")
+        sb.add_slot("resource_id", range="string")
+        sb.add_class("Source", ["resource_id"])
+        sb.add_slot("sources", range="Source", multivalued=True)
+        sb.add_class("Association", ["sources"])
+        gen = SolrSchemaGenerator(sb.schema)
+        fields = {f['name']: f for f in json.loads(gen.class_schema("Association"))['add-field']}
+        assert fields['sources'] == {
+            "name": "sources",
+            "type": "string",
+            "stored": "true",
+            "indexed": "false",
+            "multiValued": True,
+            "docValues": False,
+        }
+
+
 
 if __name__ == '__main__':
     unittest.main()

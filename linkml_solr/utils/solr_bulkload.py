@@ -276,6 +276,18 @@ def bulkload_chunked(csv_file: str,
     return total_loaded
 
 
+def _solr_value(value):
+    """Serialize nested records for Solr, which reads a JSON object in a doc
+    as a child document rather than a field value. A record (STRUCT/MAP →
+    dict) becomes a JSON string; a list of records, a list of JSON strings —
+    matching the string fields `create-schema` declares for inlined slots."""
+    if isinstance(value, dict):
+        return json.dumps(value, default=str)
+    if isinstance(value, list) and any(isinstance(v, (dict, list)) for v in value):
+        return [json.dumps(v, default=str) if isinstance(v, (dict, list)) else v for v in value]
+    return value
+
+
 def _upload_docs_to_solr(docs: list, base_url: str, core: str,
                          processor: Optional[str], chunk_label: str,
                          timeout: int = 600, max_attempts: int = 4,
@@ -451,9 +463,15 @@ def bulkload_duckdb(db_path: str,
                     if not rows:
                         break
                     if drop_nulls:
-                        docs = [{c: v for c, v in zip(col_names, row) if v is not None} for row in rows]
+                        docs = [
+                            {c: _solr_value(v) for c, v in zip(col_names, row) if v is not None}
+                            for row in rows
+                        ]
                     else:
-                        docs = [dict(zip(col_names, row)) for row in rows]
+                        docs = [
+                            {c: _solr_value(v) for c, v in zip(col_names, row)}
+                            for row in rows
+                        ]
                     label = f"chunk offset {offset}"
                     in_flight.append(executor.submit(
                         _upload_docs_to_solr, docs, base_url, core, processor, label

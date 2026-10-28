@@ -91,14 +91,29 @@ class SolrSchemaGenerator(Generator):
 
     def get_field(self, slot: SlotDefinition) -> Field:
         range = slot.range
-        if range in self.schema.classes:
+        if range in self.schemaview.all_classes():
+            # is_inlined also covers a range class with no identifier, which
+            # LinkML always inlines.
+            if self.schemaview.is_inlined(slot):
+                # Solr can't hold a nested record as a field value (a JSON
+                # object in a doc is read as a child document), so inlined
+                # records are stored as JSON strings — one per record for a
+                # multivalued slot. Returned with the doc, not searchable;
+                # no docValues, which cap a value at 32KB.
+                return Field(name=slot.name,
+                             multiValued=slot.multivalued,
+                             type='string',
+                             indexed='false',
+                             stored='true',
+                             docValues=False)
             range = 'string' # FK
-        elif range in self.schema.enums:
+        elif range in self.schemaview.all_enums():
             range = 'string'
         elif range is None:
             range = self.schemaview.schema.default_range if self.schemaview.schema.default_range else 'string'
-        elif range in self.schema.types:
-            t = self.schema.types[range]
+        elif range in self.schemaview.all_types():
+            # all_types includes imports (e.g. linkml:types' uriorcurie)
+            t = self.schemaview.get_type(range)
             range = t.typeof
             if t.repr == 'str':
                 range = 'string'

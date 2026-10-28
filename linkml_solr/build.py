@@ -49,6 +49,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
@@ -577,6 +578,98 @@ def verify_counts(cfg: BuildConfig) -> None:
             failures.append(f"{spec.name}: {got} != {expected} ({spec.verify['table']})")
     if failures:
         raise RuntimeError("Solr load incomplete:\n  - " + "\n  - ".join(failures))
+
+
+def solr_ids(cfg: BuildConfig, core: str, query: str, page: int = 50000) -> List[str]:
+    """Every id matching ``query`` in ``core`` (cursorMark paging)."""
+    ids: List[str] = []
+    cursor = "*"
+    while True:
+        r = requests.get(f"{cfg.base_url}/{core}/select",
+                         params={"q": query, "fl": "id", "sort": "id asc", "rows": page,
+                                 "cursorMark": cursor, "wt": "json"}, timeout=600)
+        r.raise_for_status()
+        body = r.json()
+        ids.extend(d["id"] for d in body["response"]["docs"])
+        if body["nextCursorMark"] == cursor:
+            return ids
+        cursor = body["nextCursorMark"]
+
+
+def patch_core(cfg: BuildConfig, spec: CoreSpec, solr_query: str, where: str) -> dict:
+    """Replace one slice of a live core with the current rows of its DuckDB source.
+
+    The docs matching ``solr_query`` are deleted, then the source rows matching
+    ``where`` are loaded, along with any deleted id that still has a source row
+    (so a doc whose provenance changed is reloaded rather than dropped). The
+    core's own ``source.where`` still applies. Returns the counts.
+
+    The delete and reload are sent uncommitted and committed only once the loaded
+    count matches the expected one. If the load fails or the counts differ, a
+    ``rollback`` is sent and the error raised without committing. Rollback
+    discards *every* uncommitted change on the core, not just this patch's, and
+    cannot undo anything an autoCommit already made durable mid-load; it is also
+    unsupported in SolrCloud. Standalone cores only.
+    """
+    src = spec.source
+    if src is None or not src.duckdb:
+        raise ValueError(f"core '{spec.name}' has no duckdb source to patch from")
+
+    old_ids = solr_ids(cfg, spec.name, solr_query)
+    with tempfile.NamedTemporaryFile("w", suffix=".tsv", delete=False) as fh:
+        fh.write("id\n")
+        fh.writelines(f"{i}\n" for i in old_ids)
+        id_file = fh.name
+    try:
+        reload_where = (f"(({where}) OR id IN (SELECT id FROM read_csv('{id_file}', header=true, "
+                        f"delim='\\t', quote='', columns={{'id': 'VARCHAR'}})))")
+        if src.where:
+            reload_where = f"({src.where}) AND {reload_where}"
+        expected = _shard_source_count(src.duckdb, src.table, reload_where)
+        logger.info(f"{spec.name}: deleting {len(old_ids):,} docs matching {solr_query!r}, "
+                    f"reloading {expected:,} rows")
+        if cfg.dry_run:
+            return {"deleted": len(old_ids), "expected": expected, "loaded": 0}
+
+        # Same load as _shard_worker, but without its trailing commit: nothing is
+        # made visible until the count check below passes.
+        t0 = time.time()
+        try:
+            r = requests.post(f"{cfg.base_url}/{spec.name}/update",
+                              json={"delete": {"query": solr_query}}, params={"commit": "false"}, timeout=600)
+            r.raise_for_status()
+            loaded = bulkload_duckdb(
+                db_path=src.duckdb, table_name=src.table, base_url=cfg.base_url, core=spec.name,
+                schema=None, chunk_size=cfg.chunk_size, max_workers=cfg.upload_workers,
+                where_clause=reload_where, snapshot=False, drop_nulls=True,
+                memory_limit=cfg.duckdb_memory_limit,
+            )
+        except Exception as e:
+            raise RuntimeError(f"{spec.name}: patch failed ({e}); {_rollback(cfg, spec.name)}") from e
+    finally:
+        os.unlink(id_file)
+    logger.info(f"{spec.name}: loaded {loaded:,} docs in {round(time.time() - t0, 1)}s")
+    if loaded != expected:
+        raise RuntimeError(f"{spec.name}: loaded {loaded:,} docs, expected {expected:,}; "
+                           f"{_rollback(cfg, spec.name)}")
+    r = requests.get(f"{cfg.base_url}/{spec.name}/update",
+                     params={"commit": "true", "waitSearcher": "true"}, timeout=600)
+    r.raise_for_status()
+    return {"deleted": len(old_ids), "expected": expected, "loaded": loaded}
+
+
+def _rollback(cfg: BuildConfig, core: str) -> str:
+    """Discard all uncommitted changes on ``core``; returns what happened, for the error."""
+    try:
+        r = requests.post(f"{cfg.base_url}/{core}/update", json={"rollback": {}}, timeout=600)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        return (f"not committed, and the rollback failed ({e}): the uncommitted delete/reload remains "
+                "pending and Solr's autoCommit (if configured) may still make it visible. Roll the core "
+                "back or re-run the patch")
+    return ("not committed; rolled back all uncommitted changes on the core. If autoCommit ran during "
+            "the load, part of the delete/reload may already be durable: check the core and re-run "
+            "the patch")
 
 
 def build(cfg: BuildConfig) -> None:
