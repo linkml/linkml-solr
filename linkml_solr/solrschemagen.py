@@ -92,7 +92,9 @@ class SolrSchemaGenerator(Generator):
     def get_field(self, slot: SlotDefinition) -> Field:
         range = slot.range
         if range in self.schemaview.all_classes():
-            if slot.inlined or slot.inlined_as_list:
+            # is_inlined also covers a range class with no identifier, which
+            # LinkML always inlines.
+            if self.schemaview.is_inlined(slot):
                 # Solr can't hold a nested record as a field value (a JSON
                 # object in a doc is read as a child document), so inlined
                 # records are stored as JSON strings — one per record for a

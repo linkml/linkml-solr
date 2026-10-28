@@ -463,12 +463,15 @@ def bulkload_duckdb(db_path: str,
                     if not rows:
                         break
                     if drop_nulls:
-                        docs = [{c: v for c, v in zip(col_names, row) if v is not None} for row in rows]
+                        docs = [
+                            {c: _solr_value(v) for c, v in zip(col_names, row) if v is not None}
+                            for row in rows
+                        ]
                     else:
                         docs = [
-                        {name: _solr_value(value) for name, value in zip(col_names, row)}
-                        for row in rows
-                    ]
+                            {c: _solr_value(v) for c, v in zip(col_names, row)}
+                            for row in rows
+                        ]
                     label = f"chunk offset {offset}"
                     in_flight.append(executor.submit(
                         _upload_docs_to_solr, docs, base_url, core, processor, label
