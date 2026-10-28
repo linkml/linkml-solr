@@ -1,5 +1,6 @@
 from typing import List
 import click
+import json
 import time
 import logging
 import subprocess
@@ -485,6 +486,43 @@ def build(config_path, runtime, port, skip_tarball, dry_run):
         cfg.dry_run = True
     run_build(cfg)
 
+
+
+@main.command()
+@click.option('--config', '-c', 'config_path', required=True,
+              help='Path to the build YAML whose cores and duckdb sources to patch from.')
+@click.option('--core', 'core_name', required=True, help='Core to patch (a name from the config).')
+@click.option('--solr-query', required=True,
+              help='Solr query selecting the docs to replace, e.g. provided_by:medic_edges.')
+@click.option('--where', required=True,
+              help="DuckDB filter selecting the rows to load, e.g. provided_by = 'medic_edges'.")
+@click.option('--host', default=None, help='Override the Solr host from the config.')
+@click.option('--port', default=None, type=int, help='Override the Solr HTTP port from the config.')
+@click.option('--dry-run', is_flag=True, default=False, help='Report the counts without changing the core.')
+def patch(config_path, core_name, solr_query, where, host, port, dry_run):
+    """
+    Replace one slice of a running core with the current rows from its DuckDB source.
+
+    Deletes the docs matching --solr-query, then loads the source rows matching
+    --where plus any deleted id that still has a source row, and commits. Use it to
+    refresh one source's docs after a rebuild of the DuckDB without reindexing.
+    """
+    from linkml_solr.build import BuildConfig, commit, patch_core
+
+    cfg = BuildConfig.from_yaml(config_path)
+    if dry_run:
+        cfg.dry_run = True
+    spec = next((c for c in cfg.cores if c.name == core_name), None)
+    if spec is None:
+        raise click.BadParameter(f"no core named {core_name!r} in {config_path}", param_hint='--core')
+    if host is not None:
+        cfg.host = host
+    if port is not None:
+        cfg.port = port
+    counts = patch_core(cfg, spec, solr_query, where)
+    if not dry_run:
+        commit(cfg, spec.name)
+    click.echo(json.dumps(counts))
 
 if __name__ == '__main__':
     main()

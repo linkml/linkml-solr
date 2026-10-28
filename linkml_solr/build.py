@@ -49,6 +49,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
@@ -577,6 +578,64 @@ def verify_counts(cfg: BuildConfig) -> None:
             failures.append(f"{spec.name}: {got} != {expected} ({spec.verify['table']})")
     if failures:
         raise RuntimeError("Solr load incomplete:\n  - " + "\n  - ".join(failures))
+
+
+def solr_ids(cfg: BuildConfig, core: str, query: str, page: int = 50000) -> List[str]:
+    """Every id matching ``query`` in ``core`` (cursorMark paging)."""
+    ids: List[str] = []
+    cursor = "*"
+    while True:
+        r = requests.get(f"{cfg.base_url}/{core}/select",
+                         params={"q": query, "fl": "id", "sort": "id asc", "rows": page,
+                                 "cursorMark": cursor, "wt": "json"}, timeout=600)
+        r.raise_for_status()
+        body = r.json()
+        ids.extend(d["id"] for d in body["response"]["docs"])
+        if body["nextCursorMark"] == cursor:
+            return ids
+        cursor = body["nextCursorMark"]
+
+
+def patch_core(cfg: BuildConfig, spec: CoreSpec, solr_query: str, where: str) -> dict:
+    """Replace one slice of a live core with the current rows of its DuckDB source.
+
+    The docs matching ``solr_query`` are deleted, then the source rows matching
+    ``where`` are loaded, along with any deleted id that still has a source row
+    (so a doc whose provenance changed is reloaded rather than dropped). The
+    core's own ``source.where`` still applies. Returns the counts.
+    """
+    src = spec.source
+    if src is None or not src.duckdb:
+        raise ValueError(f"core '{spec.name}' has no duckdb source to patch from")
+
+    old_ids = solr_ids(cfg, spec.name, solr_query)
+    with tempfile.NamedTemporaryFile("w", suffix=".tsv", delete=False) as fh:
+        fh.write("id\n")
+        fh.writelines(f"{i}\n" for i in old_ids)
+        id_file = fh.name
+    try:
+        reload_where = (f"(({where}) OR id IN (SELECT id FROM read_csv('{id_file}', header=true, "
+                        f"delim='\\t', quote='', columns={{'id': 'VARCHAR'}})))")
+        if src.where:
+            reload_where = f"({src.where}) AND {reload_where}"
+        expected = _shard_source_count(src.duckdb, src.table, reload_where)
+        logger.info(f"{spec.name}: deleting {len(old_ids):,} docs matching {solr_query!r}, "
+                    f"reloading {expected:,} rows")
+        if cfg.dry_run:
+            return {"deleted": len(old_ids), "expected": expected, "loaded": 0}
+
+        r = requests.post(f"{cfg.base_url}/{spec.name}/update",
+                          json={"delete": {"query": solr_query}}, params={"commit": "false"}, timeout=600)
+        r.raise_for_status()
+        _, loaded, secs = _shard_worker(
+            (src.duckdb, cfg.base_url, spec.name, src.table, reload_where,
+             cfg.duckdb_memory_limit, cfg.chunk_size, cfg.upload_workers))
+    finally:
+        os.unlink(id_file)
+    logger.info(f"{spec.name}: loaded {loaded:,} docs in {secs}s")
+    if loaded != expected:
+        raise RuntimeError(f"{spec.name}: loaded {loaded:,} docs, expected {expected:,}")
+    return {"deleted": len(old_ids), "expected": expected, "loaded": loaded}
 
 
 def build(cfg: BuildConfig) -> None:
