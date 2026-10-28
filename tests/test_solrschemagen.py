@@ -109,6 +109,26 @@ class SolrSchemaGenTestCase(unittest.TestCase):
         assert fields['source_ref'] == {"name": "source_ref", "type": "string", "multiValued": True}
 
 
+    def test_class_slot_without_identifier_is_stored_json_string(self):
+        """A range class with no identifier is always inlined by LinkML, even
+        when the slot doesn't say so."""
+        sb = SchemaBuilder("no-identifier-test-schema")
+        sb.add_slot("resource_id", range="string")
+        sb.add_class("Source", ["resource_id"])
+        sb.add_slot("sources", range="Source", multivalued=True)
+        sb.add_class("Association", ["sources"])
+        gen = SolrSchemaGenerator(sb.schema)
+        fields = {f['name']: f for f in json.loads(gen.class_schema("Association"))['add-field']}
+        assert fields['sources'] == {
+            "name": "sources",
+            "type": "string",
+            "stored": "true",
+            "indexed": "false",
+            "multiValued": True,
+            "docValues": False,
+        }
+
+
 
 if __name__ == '__main__':
     unittest.main()
