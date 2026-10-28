@@ -603,6 +603,13 @@ def patch_core(cfg: BuildConfig, spec: CoreSpec, solr_query: str, where: str) ->
     ``where`` are loaded, along with any deleted id that still has a source row
     (so a doc whose provenance changed is reloaded rather than dropped). The
     core's own ``source.where`` still applies. Returns the counts.
+
+    The delete and reload are sent uncommitted and committed only once the loaded
+    count matches the expected one. If the load fails or the counts differ, a
+    ``rollback`` is sent and the error raised without committing. Rollback
+    discards *every* uncommitted change on the core, not just this patch's, and
+    cannot undo anything an autoCommit already made durable mid-load; it is also
+    unsupported in SolrCloud. Standalone cores only.
     """
     src = spec.source
     if src is None or not src.duckdb:
@@ -624,18 +631,45 @@ def patch_core(cfg: BuildConfig, spec: CoreSpec, solr_query: str, where: str) ->
         if cfg.dry_run:
             return {"deleted": len(old_ids), "expected": expected, "loaded": 0}
 
-        r = requests.post(f"{cfg.base_url}/{spec.name}/update",
-                          json={"delete": {"query": solr_query}}, params={"commit": "false"}, timeout=600)
-        r.raise_for_status()
-        _, loaded, secs = _shard_worker(
-            (src.duckdb, cfg.base_url, spec.name, src.table, reload_where,
-             cfg.duckdb_memory_limit, cfg.chunk_size, cfg.upload_workers))
+        # Same load as _shard_worker, but without its trailing commit: nothing is
+        # made visible until the count check below passes.
+        t0 = time.time()
+        try:
+            r = requests.post(f"{cfg.base_url}/{spec.name}/update",
+                              json={"delete": {"query": solr_query}}, params={"commit": "false"}, timeout=600)
+            r.raise_for_status()
+            loaded = bulkload_duckdb(
+                db_path=src.duckdb, table_name=src.table, base_url=cfg.base_url, core=spec.name,
+                schema=None, chunk_size=cfg.chunk_size, max_workers=cfg.upload_workers,
+                where_clause=reload_where, snapshot=False, drop_nulls=True,
+                memory_limit=cfg.duckdb_memory_limit,
+            )
+        except Exception as e:
+            raise RuntimeError(f"{spec.name}: patch failed ({e}); {_rollback(cfg, spec.name)}") from e
     finally:
         os.unlink(id_file)
-    logger.info(f"{spec.name}: loaded {loaded:,} docs in {secs}s")
+    logger.info(f"{spec.name}: loaded {loaded:,} docs in {round(time.time() - t0, 1)}s")
     if loaded != expected:
-        raise RuntimeError(f"{spec.name}: loaded {loaded:,} docs, expected {expected:,}")
+        raise RuntimeError(f"{spec.name}: loaded {loaded:,} docs, expected {expected:,}; "
+                           f"{_rollback(cfg, spec.name)}")
+    r = requests.get(f"{cfg.base_url}/{spec.name}/update",
+                     params={"commit": "true", "waitSearcher": "true"}, timeout=600)
+    r.raise_for_status()
     return {"deleted": len(old_ids), "expected": expected, "loaded": loaded}
+
+
+def _rollback(cfg: BuildConfig, core: str) -> str:
+    """Discard all uncommitted changes on ``core``; returns what happened, for the error."""
+    try:
+        r = requests.post(f"{cfg.base_url}/{core}/update", json={"rollback": {}}, timeout=600)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        return (f"not committed, and the rollback failed ({e}): the uncommitted delete/reload remains "
+                "pending and Solr's autoCommit (if configured) may still make it visible. Roll the core "
+                "back or re-run the patch")
+    return ("not committed; rolled back all uncommitted changes on the core. If autoCommit ran during "
+            "the load, part of the delete/reload may already be durable: check the core and re-run "
+            "the patch")
 
 
 def build(cfg: BuildConfig) -> None:

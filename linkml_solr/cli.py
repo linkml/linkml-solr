@@ -1,9 +1,10 @@
-from typing import List
-import click
 import json
-import time
 import logging
 import subprocess
+import time
+from typing import List
+
+import click
 
 from linkml_runtime.dumpers import YAMLDumper
 from linkml_runtime.linkml_model import SchemaDefinition
@@ -487,7 +488,6 @@ def build(config_path, runtime, port, skip_tarball, dry_run):
     run_build(cfg)
 
 
-
 @main.command()
 @click.option('--config', '-c', 'config_path', required=True,
               help='Path to the build YAML whose cores and duckdb sources to patch from.')
@@ -504,10 +504,18 @@ def patch(config_path, core_name, solr_query, where, host, port, dry_run):
     Replace one slice of a running core with the current rows from its DuckDB source.
 
     Deletes the docs matching --solr-query, then loads the source rows matching
-    --where plus any deleted id that still has a source row, and commits. Use it to
-    refresh one source's docs after a rebuild of the DuckDB without reindexing.
+    --where plus any deleted id that still has a source row. Use it to refresh one
+    source's docs after a rebuild of the DuckDB without reindexing.
+
+    This modifies a live index: run with --dry-run first to check the counts. The
+    delete and reload are committed only if the loaded count matches the expected
+    one. If the load fails or the counts differ, nothing is committed and a Solr
+    rollback is sent, which discards ALL uncommitted changes on the core (not just
+    this patch's). If autoCommit runs during the load, part of the change may
+    already be durable, so after a failure check the core and re-run the patch.
+    Standalone cores only (SolrCloud does not support rollback).
     """
-    from linkml_solr.build import BuildConfig, commit, patch_core
+    from linkml_solr.build import BuildConfig, patch_core
 
     cfg = BuildConfig.from_yaml(config_path)
     if dry_run:
@@ -520,8 +528,6 @@ def patch(config_path, core_name, solr_query, where, host, port, dry_run):
     if port is not None:
         cfg.port = port
     counts = patch_core(cfg, spec, solr_query, where)
-    if not dry_run:
-        commit(cfg, spec.name)
     click.echo(json.dumps(counts))
 
 if __name__ == '__main__':
